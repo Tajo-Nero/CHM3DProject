@@ -779,6 +779,7 @@ MonoBehaviour:
   camRotSpeed: 1
   cam: {fileID: 963194227}
   target: {fileID: 2055173137}
+  terrain: {fileID: 0}
 --- !u!54 &2055173135
 Rigidbody:
   m_ObjectHideFlags: 0
