@@ -1374,6 +1374,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3157446597870216736, guid: f804f4a559b109e4e91655be6f8d9773, type: 3}
+      propertyPath: m_MaterialTemplate
+      value: 
+      objectReference: {fileID: 2100000, guid: 06d2d82c741d6b34692010a75df9b1fc, type: 2}
     - target: {fileID: 5002188271606695774, guid: f804f4a559b109e4e91655be6f8d9773, type: 3}
       propertyPath: m_Name
       value: UpTerrain
