@@ -31,6 +31,7 @@ public class ColliderCheck : MonoBehaviour
     {
         if (other.gameObject.tag == "Towers")
         {
+            Debug.Log("»¡°­");
             GetRed();
             
         }

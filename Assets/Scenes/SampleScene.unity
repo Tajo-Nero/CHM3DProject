@@ -596,6 +596,11 @@ MonoBehaviour:
   _Yaxis: 0
   _Xaxis: 0
   target: {fileID: 2055173137}
+--- !u!1 &1021314531 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3524384385267151811, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+  m_PrefabInstance: {fileID: 1961366412}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1032166155
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -860,7 +865,7 @@ GameObject:
   - component: {fileID: 1856280335}
   m_Layer: 0
   m_Name: TowerCreation
-  m_TagString: Untagged
+  m_TagString: Towers
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -892,32 +897,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d84e337f7a65e294f9d90f1efefe672a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _craft_Cannon:
+  _CraftTower:
   - _craftName: Cannon
-    _Prefab: {fileID: 2055665458963272873, guid: 38ba78548930e6340a2fbdb368a3fb47, type: 3}
+    _TowerPrefab: {fileID: 2055665458963272873, guid: 38ba78548930e6340a2fbdb368a3fb47, type: 3}
     _PreviewPrefab: {fileID: 2055665458963272873, guid: 623507ddb5313bd47ba79254db0615ba, type: 3}
   - _craftName: Lazer
-    _Prefab: {fileID: 1229389129709629617, guid: e8ada64e2ca7f33468786e4f4a823087, type: 3}
+    _TowerPrefab: {fileID: 1229389129709629617, guid: e8ada64e2ca7f33468786e4f4a823087, type: 3}
     _PreviewPrefab: {fileID: 1229389129709629617, guid: 5a6e95b7fbf6d0b47ad3d7a9cd9c3bd5, type: 3}
   - _craftName: Rocket
-    _Prefab: {fileID: 7098814355583657019, guid: 25854aaa9de9c6c4abdb41f39578ced7, type: 3}
+    _TowerPrefab: {fileID: 7098814355583657019, guid: 25854aaa9de9c6c4abdb41f39578ced7, type: 3}
     _PreviewPrefab: {fileID: 7098814355583657019, guid: 797d781ce13a02d4ba892b9213ff66f9, type: 3}
   _Player: {fileID: 2055173137}
-  _Preview:
-  - {fileID: 2055665458963272873, guid: 623507ddb5313bd47ba79254db0615ba, type: 3}
-  - {fileID: 1229389129709629617, guid: 5a6e95b7fbf6d0b47ad3d7a9cd9c3bd5, type: 3}
-  - {fileID: 7098814355583657019, guid: 25854aaa9de9c6c4abdb41f39578ced7, type: 3}
-  _IsPreviewActivated: 0
-  _TowerPrefab:
-  - {fileID: 2055665458963272873, guid: 38ba78548930e6340a2fbdb368a3fb47, type: 3}
-  - {fileID: 1229389129709629617, guid: e8ada64e2ca7f33468786e4f4a823087, type: 3}
-  - {fileID: 7098814355583657019, guid: 25854aaa9de9c6c4abdb41f39578ced7, type: 3}
-  _IsTowerActivated: 0
-  _Material:
+  _Materials:
   - {fileID: 2100000, guid: 6082b650ee0af9a48b7f073c2f51f950, type: 2}
   - {fileID: 2100000, guid: 529646af2724ffe42bf42d7023d791c5, type: 2}
-  _Tower: {fileID: 0}
-  _Colliders: []
+  currentPreview: {fileID: 0}
 --- !u!1 &1871630563 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100002, guid: 96e82463b7d46344295e9a965beb41f9, type: 3}
@@ -951,6 +945,79 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1779064888747842755, guid: 22d4a89f461b64046bcd55ba1668bcd5, type: 3}
   m_PrefabInstance: {fileID: 821348475}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1961366412
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3423277821389728182, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.40000004
+      objectReference: {fileID: 0}
+    - target: {fileID: 3423277821389728182, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.40000004
+      objectReference: {fileID: 0}
+    - target: {fileID: 3423277821389728182, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.40000004
+      objectReference: {fileID: 0}
+    - target: {fileID: 3423277821389728182, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 37.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 3423277821389728182, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3423277821389728182, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 13.200001
+      objectReference: {fileID: 0}
+    - target: {fileID: 3423277821389728182, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3423277821389728182, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3423277821389728182, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3423277821389728182, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3423277821389728182, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3423277821389728182, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3423277821389728182, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3524384385267151811, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_Name
+      value: Ice Cream Car
+      objectReference: {fileID: 0}
+    - target: {fileID: 3524384385267151811, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b00badad82939f441b2c3b3820bfae76, type: 3}
 --- !u!1 &1990456907
 GameObject:
   m_ObjectHideFlags: 0
@@ -1005,8 +1072,9 @@ MonoBehaviour:
   camRotSpeed: 1
   cam: {fileID: 963194227}
   target: {fileID: 2055173137}
+  _Obj: {fileID: 1021314531}
   terrainData: {fileID: 15600000, guid: 0e8bda889d042394cbf76549e9876cbf, type: 2}
-  resolution: 40
+  resolution: 32
   heightScale: 1.5
 --- !u!54 &2055173135
 Rigidbody:
@@ -1104,3 +1172,4 @@ SceneRoots:
   - {fileID: 1032166155}
   - {fileID: 1142828263}
   - {fileID: 729313019}
+  - {fileID: 1961366412}

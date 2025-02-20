@@ -21,8 +21,8 @@ public class PlayerMove : MonoBehaviour
     public Camera cam;
     public Transform target;
     Transform tr;
-    
-    
+
+    [SerializeField] GameObject _Obj;
     [SerializeField] private TerrainData terrainData;
     [SerializeField] private int resolution = 32;//터레인 크기
     //[SerializeField] private float scale = 1f; //설정할 터레인 사이즈,이건 PerlinNoise 노이즈= 굴곡 설정할떄 쓰임 
@@ -79,13 +79,18 @@ public class PlayerMove : MonoBehaviour
 
         PlayermoveMent();
 
-        if (Input.GetMouseButtonUp(1))
+        if (Input.GetMouseButton(1))
         {
             animator.SetBool("IsHammer", false);
         }
         if (Input.GetKeyDown(KeyCode.P))
         {
             SetTerrainHeights();
+        }
+        if (Input.GetKeyUp(KeyCode.O))
+        {
+            _Obj.gameObject.SetActive(true);
+            gameObject.SetActive(false);
         }
        
 
