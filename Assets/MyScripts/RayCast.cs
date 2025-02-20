@@ -47,7 +47,7 @@ public class RayCast : MonoBehaviour
     
                             // 높이를 업데이트합니다.
                             terrainData.SetHeights(xPos, yPos, heights);
-
+    
                         }
                     }
                 }
@@ -60,6 +60,68 @@ public class RayCast : MonoBehaviour
         //    Debug.Log("Terrain이 아닙니다.");
         //}
     }
+    //void OnCollisionStay(Collision collision)
+    //{
+        //// 충돌된 오브젝트 정보 출력
+        //Debug.Log($"충돌한 오브젝트: {collision.collider.name}, 태그: {collision.collider.tag}");
+
+        //// 충돌된 오브젝트가 터레인인지 확인합니다.
+        //Terrain terrain = collision.collider.GetComponent<Terrain>();
+        //if (terrain != null)
+        //{
+            //Debug.Log("터레인 충돌 감지!");
+
+            //// 터레인 데이터에 접근하여 정보를 얻습니다.
+            //TerrainData terrainData = terrain.terrainData;
+            //Vector3 collisionPoint = collision.contacts[0].point;
+
+            //// 충돌 지점의 월드 좌표를 터레인 데이터의 로컬 좌표로 변환합니다.
+            //Vector3 terrainPosition = terrain.transform.position;
+            //int xBase = Mathf.FloorToInt((collisionPoint.x - terrainPosition.x) / terrainData.size.x * terrainData.heightmapResolution);
+            //int yBase = Mathf.FloorToInt((collisionPoint.z - terrainPosition.z) / terrainData.size.z * terrainData.heightmapResolution);
+
+            //Debug.Log($"충돌 지점: {collisionPoint}, 로컬 좌표: ({xBase}, {yBase})");
+
+            //// 땅을 파는 반경 내의 높이를 부드럽게 조절합니다.
+            //int radius = Mathf.FloorToInt(digRadius / terrainData.size.x * terrainData.heightmapResolution);
+
+            //// 시작 및 끝 좌표를 계산할 때 범위 내에 있도록 조정
+            //int startX = Mathf.Clamp(xBase - radius, 0, terrainData.heightmapResolution - 1);
+            //int endX = Mathf.Clamp(xBase + radius, 0, terrainData.heightmapResolution - 1);
+            //int startY = Mathf.Clamp(yBase - radius, 0, terrainData.heightmapResolution - 1);
+            //int endY = Mathf.Clamp(yBase + radius, 0, terrainData.heightmapResolution - 1);
+
+            //// 높이 배열 가져오기
+            //float[,] heights = terrainData.GetHeights(startX, startY, endX - startX + 1, endY - startY + 1);
+
+            //for (int y = 0; y < heights.GetLength(0); y++)
+            //{
+                //for (int x = 0; x < heights.GetLength(1); x++)
+                //{
+                    //float distance = Mathf.Sqrt(Mathf.Pow(x + startX - xBase, 2) + Mathf.Pow(y + startY - yBase, 2));
+                    //if (distance <= radius)
+                    //{
+                        //float depthFactor = 1 - (distance / radius);
+                        //heights[y, x] = Mathf.Max(0, heights[y, x] - digDepth * depthFactor);
+                        //Debug.Log($"(x, y) 좌표에서 높이를 업데이트함: ({startX + x}, {startY + y}), 새 높이 값: {heights[y, x]}");
+                    //}
+                //}
+            //}
+
+            //// 높이 값을 업데이트합니다.
+            //terrainData.SetHeights(startX, startY, heights);
+            //Debug.Log($"({xBase}, {yBase}) 주변의 높이 값 업데이트됨");
+        //}
+        //else
+        //{
+            //Debug.Log("터레인이 아닌 오브젝트와 충돌 감지됨.");
+        //}
+    //}
+
+
+
+
+
     private void Update()
     {
         //RayTerrain();

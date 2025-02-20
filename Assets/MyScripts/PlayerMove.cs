@@ -1,10 +1,4 @@
-using Cinemachine.Utility;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Animations;
-using UnityEngine.InputSystem;
 
 public class PlayerMove : MonoBehaviour
 {
@@ -22,34 +16,113 @@ public class PlayerMove : MonoBehaviour
     public Transform target;
     Transform tr;
 
+    //[SerializeField] GameObject _Obj;
+    //[SerializeField] private TerrainData terrainData;
+    //[SerializeField] private int resolution;//터레인 크기
+    //[SerializeField] private float scale = 1f; //설정할 터레인 사이즈,이건 PerlinNoise 노이즈= 굴곡 설정할떄 쓰임 
+    //[SerializeField] private float heightScale = 1.5f; // 터레인 높이
+                                                       //public float digDistance = 1.0f;  // 땅을 팔 거리
+                                                       //void SetTerrainHeights()//터레인 생성 함수
+                                                       //{
+                                                       //terrainData.heightmapResolution = resolution;
+                                                       //terrainData.size = new Vector3(resolution, heightScale, resolution);
+                                                       //float[,] heights = new float[terrainData.heightmapResolution, terrainData.heightmapResolution];
+
+
+    //// 지형 데이터의 현재 해상도를 가져오기
+    ////int currentResolution = terrainData.heightmapResolution;
+
+    //// 새로운 해상도로 설정
+    ////if (currentResolution != resolution)
+    ////{
+    ////    terrainData.heightmapResolution = resolution;
+    ////}
+
+    //// 지형 데이터의 크기를 설정
+    ////terrainData.size = new Vector3(resolution, heightScale, resolution);
+
+    //// 새로운 해상도에 맞는 높이 배열 생성
+    ////float[,] heights = new float[terrainData.heightmapResolution, terrainData.heightmapResolution];
+
+    ////for 문이라 0,0 에서부터 시작해서 x,y 0 좌표값 부터 시작됨 
+    ////0,0 에서 resolution에 넣어준 값 까지 현재 100,100 까지 설정된 높이까지 올라오게함 
+    //for (int x = 1; x < terrainData.heightmapResolution-1; x++)
+    //{
+    //for (int y = 1; y < terrainData.heightmapResolution-1; y++)
+    //{
+    ////굴곡 설정할때 쓰이는 노이즈 함수 PerlinNoise(너비,너비) 넣어주면 
+    ////heights[x, y] = perlin * heightScale; 너비 * 높이 설정된 높이 값만큼 위로 올라가면서 선형보간되서 굴곡이 완성됨
+    ////반대로 다음 너비까지 내려오면서 내려오는 굴곡 형성 나는 그냥 생성만하면 됨으로 안써도 됨 
+    ////float perlin = Mathf.PerlinNoise((float)x / resolution * scale, (float)y / resolution * scale);
+    ////heights[x, y] = resolution * heightScale;
+    //heights[y, x] = heightScale / terrainData.size.y;
+    //}
+
+    //terrainData.SetHeights(0, 0, heights);
+    //}
+    //// 새로운 해상도로 설정
+    ////terrainData.heightmapResolution = resolution;
+
+    //// 지형 데이터의 크기를 설정
+    ////terrainData.size = new Vector3(resolution, heightScale, resolution);
+
+    //// 새로운 해상도에 맞는 높이 배열 생성
+    ////int terrainWidth = terrainData.heightmapResolution;
+    ////int terrainHeight = terrainData.heightmapResolution;
+    ////float[,] heights = new float[terrainHeight, terrainWidth];
+    ////
+    ////// 높이 배열 설정 (모든 높이 값을 일정한 높이로 설정)
+    ////for (int y = 1; y < terrainHeight-1; y++)
+    ////{
+    ////    for (int x = 1; x < terrainWidth-1; x++)
+    ////    {
+    ////        heights[y, x] = heightScale / terrainData.size.y;
+    ////    }
+    ////}
+
+    //// 높이 값을 설정
+    //terrainData.SetHeights(0, 0, heights);
+
+    //}
     [SerializeField] GameObject _Obj;
     [SerializeField] private TerrainData terrainData;
-    [SerializeField] private int resolution = 32;//터레인 크기
-    //[SerializeField] private float scale = 1f; //설정할 터레인 사이즈,이건 PerlinNoise 노이즈= 굴곡 설정할떄 쓰임 
+    [SerializeField] private int resolution = 129; // 유효한 해상도 값
     [SerializeField] private float heightScale = 1.5f; // 터레인 높이
-    //public float digDistance = 1.0f;  // 땅을 팔 거리
-    void SetTerrainHeights()//터레인 생성 함수
-    {
-        terrainData.heightmapResolution = resolution;
-        terrainData.size = new Vector3(resolution, heightScale, resolution);
-        float[,] heights = new float[resolution, resolution];
+    [SerializeField] private float terrainWidth = 200f; // 지형 너비
+    [SerializeField] private float terrainLength = 200f; // 지형 길이
 
-        //for 문이라 0,0 에서부터 시작해서 x,y 0 좌표값 부터 시작됨 
-        //0,0 에서 resolution에 넣어준 값 까지 현재 100,100 까지 설정된 높이까지 올라오게함 
-        for (int x = 1; x < resolution; x++)
+    void SetTerrainHeights() // 터레인 생성 함수
+    {
+        // 유효한 해상도로 설정
+        terrainData.heightmapResolution = resolution;
+
+        // 지형 데이터의 크기를 설정 (너비와 길이 조정)
+        terrainData.size = new Vector3(terrainWidth, heightScale, terrainLength);
+
+        // 해상도에 맞는 높이 배열 생성
+        float[,] heights = new float[terrainData.heightmapResolution, terrainData.heightmapResolution];
+
+        // 높이 배열 설정 (모든 높이 값을 일정한 높이로 설정)
+        for (int y = 1; y < terrainData.heightmapResolution - 1; y++)
         {
-            for (int y = 1; y < resolution; y++)
+            for (int x = 1; x < terrainData.heightmapResolution - 1; x++)
             {
-                //굴곡 설정할때 쓰이는 노이즈 함수 PerlinNoise(너비,너비) 넣어주면 
-                //heights[x, y] = perlin * heightScale; 너비 * 높이 설정된 높이 값만큼 위로 올라가면서 선형보간되서 굴곡이 완성됨
-                //반대로 다음 너비까지 내려오면서 내려오는 굴곡 형성 나는 그냥 생성만하면 됨으로 안써도 됨 
-                //float perlin = Mathf.PerlinNoise((float)x / resolution * scale, (float)y / resolution * scale);
-                heights[x, y] = resolution * heightScale;
+                heights[y, x] = heightScale / terrainData.size.y;
             }
         }
 
+        // 높이 값을 설정
         terrainData.SetHeights(0, 0, heights);
+        // Terrain 컴포넌트를 가져와 Flush 호출
+        Terrain terrain = _Obj.GetComponent<Terrain>();
+        if (terrain != null)
+        {
+            terrain.Flush();  // 지형 데이터를 강제로 업데이트하여 변화를 적용합니다.
+
+        }
+
     }
+
     public void LowerTerrainHeight(int x, int z)//터레인 낮추는 함수 
     {
 
@@ -60,7 +133,7 @@ public class PlayerMove : MonoBehaviour
 
         terrainData.SetHeights(0, 0, heights);
     }
-    
+
 
     void Start()
     {
@@ -92,7 +165,8 @@ public class PlayerMove : MonoBehaviour
             _Obj.gameObject.SetActive(true);
             gameObject.SetActive(false);
         }
-       
+
+
 
     }
     void PlayermoveMent()
@@ -118,10 +192,10 @@ public class PlayerMove : MonoBehaviour
         animator.SetBool("IsJump", true);
     }
 
-   
+
     private void LateUpdate()
     {
         cam.transform.position = camPos.position;
     }
-    
+
 }

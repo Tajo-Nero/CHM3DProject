@@ -16,6 +16,6 @@ public class Navi : MonoBehaviour
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
-            nav.SetDestination(target.position);
+         nav.SetDestination(target.position);
     }
 }

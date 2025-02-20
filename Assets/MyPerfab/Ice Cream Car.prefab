@@ -191,7 +191,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3423277821389728182}
-  - component: {fileID: 8574808573225186752}
   - component: {fileID: 8126441472832510209}
   - component: {fileID: 3778282719988099813}
   - component: {fileID: 6789739337112752675}
@@ -224,36 +223,6 @@ Transform:
   - {fileID: 545530676179719096}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8574808573225186752
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3524384385267151811}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: 4670212bd55046e4cb0222a4e36df9a2, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: Keyboard&Mouse
-  m_DefaultActionMap: Player
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!114 &8126441472832510209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -266,10 +235,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c80e0e232fa06c4e8f03a8646086a0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rt: {fileID: 0}
   camPos: {fileID: 1791439045690941793}
   camRotSpeed: 1
   cam: {fileID: 0}
   target: {fileID: 3423277821389728182}
+  rotationSpeed: 5
+  moveSpeed: 4
 --- !u!54 &3778282719988099813
 Rigidbody:
   m_ObjectHideFlags: 0
