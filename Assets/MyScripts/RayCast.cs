@@ -53,12 +53,12 @@ public class RayCast : MonoBehaviour
                 }
             }
     
-            Debug.Log($"Collision Point: {collisionPoint}, Terrain Height Reduced around: ({xBase}, {yBase})");
+            //Debug.Log($"Collision Point: {collisionPoint}, Terrain Height Reduced around: ({xBase}, {yBase})");
         }
-        else
-        {
-            Debug.Log("Terrain이 아닙니다.");
-        }
+        //else
+        //{
+        //    Debug.Log("Terrain이 아닙니다.");
+        //}
     }
     private void Update()
     {
@@ -91,12 +91,12 @@ public class RayCast : MonoBehaviour
                 // 높이를 업데이트합니다.
                 terrainData.SetHeights(x, z, heights);
 
-                Debug.Log($"Hit Point: {hitPoint}, Terrain Height Reduced at: ({x}, {z})");
+               //Debug.Log($"Hit Point: {hitPoint}, Terrain Height Reduced at: ({x}, {z})");
             }
-            else
-            {
-                Debug.Log("Terrain이 아닙니다.");
-            }
+            //else
+            //{
+            //    Debug.Log("Terrain이 아닙니다.");
+            //}
         }
     }
 
