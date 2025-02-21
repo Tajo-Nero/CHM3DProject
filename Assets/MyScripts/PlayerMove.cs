@@ -1,4 +1,6 @@
+using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PlayerMove : MonoBehaviour
 {
@@ -15,7 +17,7 @@ public class PlayerMove : MonoBehaviour
     public Camera cam;
     public Transform target;
     Transform tr;
-
+    public NavMeshSurface navMeshSurface;
     //[SerializeField] GameObject _Obj;
     //[SerializeField] private TerrainData terrainData;
     //[SerializeField] private int resolution;//터레인 크기
@@ -86,10 +88,11 @@ public class PlayerMove : MonoBehaviour
     //}
     [SerializeField] GameObject _Obj;
     [SerializeField] private TerrainData terrainData;
-    [SerializeField] private int resolution = 129; // 유효한 해상도 값
+    [SerializeField] private int resolution = 65; // 유효한 해상도 값
     [SerializeField] private float heightScale = 1.5f; // 터레인 높이
     [SerializeField] private float terrainWidth = 200f; // 지형 너비
     [SerializeField] private float terrainLength = 200f; // 지형 길이
+    
 
     void SetTerrainHeights() // 터레인 생성 함수
     {
@@ -103,14 +106,16 @@ public class PlayerMove : MonoBehaviour
         float[,] heights = new float[terrainData.heightmapResolution, terrainData.heightmapResolution];
 
         // 높이 배열 설정 (모든 높이 값을 일정한 높이로 설정)
-        for (int y = 1; y < terrainData.heightmapResolution - 1; y++)
+        for (int y = 2; y < terrainData.heightmapResolution - 2; y++)
         {
-            for (int x = 1; x < terrainData.heightmapResolution - 1; x++)
+            for (int x = 2; x < terrainData.heightmapResolution - 2; x++)
             {
-                heights[y, x] = heightScale / terrainData.size.y;
+                heights[y, x] = heightScale / terrainData.size.y;              
+                
             }
         }
-
+        // 높이 값을 스무딩
+        SmoothTerrain(heights);
         // 높이 값을 설정
         terrainData.SetHeights(0, 0, heights);
         // Terrain 컴포넌트를 가져와 Flush 호출
@@ -121,6 +126,24 @@ public class PlayerMove : MonoBehaviour
 
         }
 
+    }
+    void SmoothTerrain(float[,] heights)
+    {
+        int width = heights.GetLength(0);
+        int height = heights.GetLength(1);
+
+        for (int i = 0; i < 5; i++) // 스무딩 반복 횟수
+        {
+            for (int y = 1; y < height - 1; y++)
+            {
+                for (int x = 1; x < width - 1; x++)
+                {
+                    // 주변 높이 값들의 평균을 계산하여 현재 높이 값에 설정
+                    float avgHeight = (heights[y - 1, x] + heights[y + 1, x] + heights[y, x - 1] + heights[y, x + 1]) / 4f;
+                    heights[y, x] = avgHeight;
+                }
+            }
+        }
     }
 
     public void LowerTerrainHeight(int x, int z)//터레인 낮추는 함수 
@@ -165,9 +188,18 @@ public class PlayerMove : MonoBehaviour
             _Obj.gameObject.SetActive(true);
             gameObject.SetActive(false);
         }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            BakeNavMesh();
+        }
 
 
-
+    }
+    void BakeNavMesh()
+    {
+        // NavMesh 다시 베이크
+        navMeshSurface.BuildNavMesh();
+        Debug.Log("NavMesh가 다시 베이크되었습니다.");
     }
     void PlayermoveMent()
     {
