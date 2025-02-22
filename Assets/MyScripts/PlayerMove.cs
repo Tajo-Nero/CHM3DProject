@@ -4,88 +4,24 @@ using UnityEngine.UIElements;
 
 public class PlayerMove : MonoBehaviour
 {
-    Animator animator;
-    Rigidbody rb;
-    Vector3 moveDir;
-    float moveSpeed = 5;
-    float jumpPow = 4;
+    [Header("Movement Settings")]
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float jumpPower = 4f;
+    [SerializeField] private float camRotSpeed = 1f;
+    [SerializeField] private Transform camPos;
+    private Animator animator;
+    private Rigidbody rb;
+    private Transform playerTransform;
 
-    public float mouseX;
-    public float mouseY;
-    public Transform camPos;
-    public float camRotSpeed = 1;
-    public Camera cam;
+    [Header("Camera Settings")]
+    private Camera cam;
+    private float mouseX, mouseY;
+
+    [Header("NavMesh Settings")]
     public Transform target;
-    Transform tr;
     public NavMeshSurface navMeshSurface;
-    //[SerializeField] GameObject _Obj;
-    //[SerializeField] private TerrainData terrainData;
-    //[SerializeField] private int resolution;//터레인 크기
-    //[SerializeField] private float scale = 1f; //설정할 터레인 사이즈,이건 PerlinNoise 노이즈= 굴곡 설정할떄 쓰임 
-    //[SerializeField] private float heightScale = 1.5f; // 터레인 높이
-                                                       //public float digDistance = 1.0f;  // 땅을 팔 거리
-                                                       //void SetTerrainHeights()//터레인 생성 함수
-                                                       //{
-                                                       //terrainData.heightmapResolution = resolution;
-                                                       //terrainData.size = new Vector3(resolution, heightScale, resolution);
-                                                       //float[,] heights = new float[terrainData.heightmapResolution, terrainData.heightmapResolution];
 
-
-    //// 지형 데이터의 현재 해상도를 가져오기
-    ////int currentResolution = terrainData.heightmapResolution;
-
-    //// 새로운 해상도로 설정
-    ////if (currentResolution != resolution)
-    ////{
-    ////    terrainData.heightmapResolution = resolution;
-    ////}
-
-    //// 지형 데이터의 크기를 설정
-    ////terrainData.size = new Vector3(resolution, heightScale, resolution);
-
-    //// 새로운 해상도에 맞는 높이 배열 생성
-    ////float[,] heights = new float[terrainData.heightmapResolution, terrainData.heightmapResolution];
-
-    ////for 문이라 0,0 에서부터 시작해서 x,y 0 좌표값 부터 시작됨 
-    ////0,0 에서 resolution에 넣어준 값 까지 현재 100,100 까지 설정된 높이까지 올라오게함 
-    //for (int x = 1; x < terrainData.heightmapResolution-1; x++)
-    //{
-    //for (int y = 1; y < terrainData.heightmapResolution-1; y++)
-    //{
-    ////굴곡 설정할때 쓰이는 노이즈 함수 PerlinNoise(너비,너비) 넣어주면 
-    ////heights[x, y] = perlin * heightScale; 너비 * 높이 설정된 높이 값만큼 위로 올라가면서 선형보간되서 굴곡이 완성됨
-    ////반대로 다음 너비까지 내려오면서 내려오는 굴곡 형성 나는 그냥 생성만하면 됨으로 안써도 됨 
-    ////float perlin = Mathf.PerlinNoise((float)x / resolution * scale, (float)y / resolution * scale);
-    ////heights[x, y] = resolution * heightScale;
-    //heights[y, x] = heightScale / terrainData.size.y;
-    //}
-
-    //terrainData.SetHeights(0, 0, heights);
-    //}
-    //// 새로운 해상도로 설정
-    ////terrainData.heightmapResolution = resolution;
-
-    //// 지형 데이터의 크기를 설정
-    ////terrainData.size = new Vector3(resolution, heightScale, resolution);
-
-    //// 새로운 해상도에 맞는 높이 배열 생성
-    ////int terrainWidth = terrainData.heightmapResolution;
-    ////int terrainHeight = terrainData.heightmapResolution;
-    ////float[,] heights = new float[terrainHeight, terrainWidth];
-    ////
-    ////// 높이 배열 설정 (모든 높이 값을 일정한 높이로 설정)
-    ////for (int y = 1; y < terrainHeight-1; y++)
-    ////{
-    ////    for (int x = 1; x < terrainWidth-1; x++)
-    ////    {
-    ////        heights[y, x] = heightScale / terrainData.size.y;
-    ////    }
-    ////}
-
-    //// 높이 값을 설정
-    //terrainData.SetHeights(0, 0, heights);
-
-    //}
+    [Header("Terrain Settings")]
     [SerializeField] GameObject _Obj;
     [SerializeField] private TerrainData terrainData;
     [SerializeField] private int resolution = 65; // 유효한 해상도 값
@@ -146,39 +82,26 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
-    public void LowerTerrainHeight(int x, int z)//터레인 낮추는 함수 
-    {
-
-        int width = terrainData.heightmapResolution;
-        int height = terrainData.heightmapResolution;
-        float[,] heights = terrainData.GetHeights(0, 0, width, height);
-        heights[x, z] -= 0.1f;
-
-        terrainData.SetHeights(0, 0, heights);
-    }
-
 
     void Start()
     {
         cam = Camera.main;
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
-        tr = GetComponent<Transform>();
+        playerTransform = GetComponent<Transform>();
 
     }
     void Update()
     {
-        mouseX += Input.GetAxis("Mouse X");
-        mouseY -= Input.GetAxis("Mouse Y");
-        cam.transform.rotation = Quaternion.Euler(mouseY * camRotSpeed, mouseX * camRotSpeed, 0);
-        transform.rotation = Quaternion.Euler(0, mouseX * camRotSpeed, 0);
-
-        PlayermoveMent();
+        HandleMovement();
+        HandleRotation();
+        HandleJump();
+        cam.transform.position = camPos.position;
 
         if (Input.GetMouseButton(1))
         {
             animator.SetBool("IsHammer", false);
-        }
+        }        
         if (Input.GetKeyDown(KeyCode.P))
         {
             SetTerrainHeights();
@@ -200,30 +123,38 @@ public class PlayerMove : MonoBehaviour
         // NavMesh 다시 베이크
         navMeshSurface.BuildNavMesh();
         Debug.Log("NavMesh가 다시 베이크되었습니다.");
-    }
-    void PlayermoveMent()
-    {
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
-
-        // 전후좌우 이동 방향 벡터 계산
-        moveDir = (Vector3.forward * v) + (Vector3.right * h);
-        // Translate(이동 방향 * 속력 * Time.deltaTime)
-        tr.Translate(moveDir.normalized * moveSpeed * Time.deltaTime);
-        animator.SetFloat("Move", moveDir.magnitude);
-
-    }
+    }  
 
     void OnAttack()
     {
         animator.SetBool("IsHammer", true);
     }
-    void OnJump()
+    private void HandleMovement()
     {
-        rb.AddForce(Vector3.up * jumpPow, ForceMode.Impulse);
-        animator.SetBool("IsJump", true);
-    }
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+        Vector3 moveDir = new Vector3(h, 0, v).normalized;
 
+        playerTransform.Translate(moveDir * moveSpeed * Time.deltaTime);
+        animator.SetFloat("Move", moveDir.magnitude);
+    }
+    private void HandleRotation()
+    {
+        mouseX += Input.GetAxis("Mouse X") * camRotSpeed;
+        mouseY -= Input.GetAxis("Mouse Y") * camRotSpeed;
+        cam.transform.rotation = Quaternion.Euler(mouseY, mouseX, 0);
+        playerTransform.rotation = Quaternion.Euler(0, mouseX, 0);
+    }
+    private void HandleJump()
+    {
+        if (Input.GetButtonDown("Jump"))
+        {
+            rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+            animator.SetBool("IsJump", true);
+        }
+
+
+    }
 
     private void LateUpdate()
     {

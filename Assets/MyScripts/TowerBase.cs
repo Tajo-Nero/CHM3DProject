@@ -28,64 +28,7 @@ public class TowerBase : MonoBehaviour
     //void DetectEnemiesInRange()//타워 범위내의 적 감지
     //{
     //    
-    //}
-    public float attackRange = 10.0f;  // 공격 범위
-    public float attackInterval = 1.0f;  // 공격 간격 (초)
-    public int attackDamage = 10;  // 공격 데미지
-    public string enemyTag = "Enemy";  // 적 태그
-
-    private float attackTimer;  // 공격 타이머
-
-    void Start()
-    {
-        attackTimer = 0f;
-    }
-
-    void Update()
-    {
-        attackTimer += Time.deltaTime;
-
-        if (attackTimer >= attackInterval)
-        {
-            DetectAndAttackEnemies();
-            attackTimer = 0f;
-        }
-    }
-
-    void DetectAndAttackEnemies()
-    {
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, attackRange);
-        foreach (Collider hitCollider in hitColliders)
-        {
-            if (hitCollider.CompareTag(enemyTag))
-            {
-                AttackEnemy(hitCollider.gameObject);
-                break;  // 한 번의 공격 간격 동안 한 적만 공격
-            }
-        }
-    }
-
-    void AttackEnemy(GameObject enemy)
-    {
-        // 적에게 데미지를 주는 로직
-        EnemyHp enemyHealth = enemy.GetComponent<EnemyHp>();
-        if (enemyHealth != null)
-        {
-            enemyHealth.TakeDamage(attackDamage);
-            Debug.Log("Attacked enemy: " + enemy.name);
-        }
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        // 공격 범위를 시각적으로 표시
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-    }
-
-
-
-
+    //}  
 
     //각각의 타워는 TowerBase를 상속받음
 
@@ -104,6 +47,36 @@ public class TowerBase : MonoBehaviour
     //1 : 14 2: 100 3: 5% 4: 3.5 5: 14 6: 좁은 부채꼴 범위
     //강화지속시간, 공격력 올려줄 변수 추가
     //범위내의 Towers 태그 붙어있는 타워들 공격력 수치 증가하는 함수 추가
+
+    // 1. 타워 공격력
+    [Header("Tower Settings")]
+    public int towerAttackPower;
+    // 2. 타워 관통력
+    public int towerPenetrationPower;
+    // 3. 치명타 확률
+    public float criticalHitRate;
+    // 4. 공격 속도
+    public float attackSpeed;
+    // 5. 설치 비용
+    public int installationCost;
+
+    // 적을 공격하는 함수
+    public virtual void TowerAttack()
+    {
+        // 공격 로직 구현
+    }
+
+    // 범위를 설정하는 함수
+    public virtual void SetRange(float range)
+    {
+        // 범위 설정 로직 구현
+    }
+
+    // 범위 내의 적을 탐지하는 함수
+    public virtual void DetectEnemiesInRange()
+    {
+        // 적 탐지 로직 구현
+    }
 
 
 

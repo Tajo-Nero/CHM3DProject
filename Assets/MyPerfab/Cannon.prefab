@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7840980777366907792}
   - component: {fileID: -7102115388602676831}
-  - component: {fileID: -7113410595287816722}
+  - component: {fileID: 8575021673185115764}
   m_Layer: 0
   m_Name: Cannon
   m_TagString: Towers
@@ -56,7 +56,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.8, y: 0.4, z: 0.8}
   m_Center: {x: 0, y: 0.2, z: 0}
---- !u!114 &-7113410595287816722
+--- !u!114 &8575021673185115764
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -65,14 +65,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 2055665458963272873}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec060fbe55346e843a79639b6888e0c2, type: 3}
+  m_Script: {fileID: 11500000, guid: 056d55ea43cb8574bac301e2988b1099, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRange: 0
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  rangeIndicator: {fileID: 8917760646876630574, guid: 45621ef9b585f6846885fbde70394cb7, type: 3}
+  towerAttackPower: 0
+  towerPenetrationPower: 0
+  criticalHitRate: 0
+  attackSpeed: 0
+  installationCost: 0
+  detectionRange: 10
+  cannonTowerTransform: {fileID: 4794206179834357247}
 --- !u!1001 &1038204577420257240
 PrefabInstance:
   m_ObjectHideFlags: 0
