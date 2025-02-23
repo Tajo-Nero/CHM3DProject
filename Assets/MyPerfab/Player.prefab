@@ -44,14 +44,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d84e337f7a65e294f9d90f1efefe672a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _craft_Cannon:
+  _CraftTower:
   - _craftName: Cannon
-    _Prefab: {fileID: 2055665458963272873, guid: 38ba78548930e6340a2fbdb368a3fb47, type: 3}
+    _TowerPrefab: {fileID: 2055665458963272873, guid: 38ba78548930e6340a2fbdb368a3fb47, type: 3}
     _PreviewPrefab: {fileID: 2055665458963272873, guid: 623507ddb5313bd47ba79254db0615ba, type: 3}
+  - _craftName: Lazer
+    _TowerPrefab: {fileID: 1229389129709629617, guid: e8ada64e2ca7f33468786e4f4a823087, type: 3}
+    _PreviewPrefab: {fileID: 1229389129709629617, guid: 5a6e95b7fbf6d0b47ad3d7a9cd9c3bd5, type: 3}
+  - _craftName: Rocket
+    _TowerPrefab: {fileID: 7098814355583657019, guid: 25854aaa9de9c6c4abdb41f39578ced7, type: 3}
+    _PreviewPrefab: {fileID: 7098814355583657019, guid: 797d781ce13a02d4ba892b9213ff66f9, type: 3}
+  - _craftName: EnforceTower
+    _TowerPrefab: {fileID: 8853853338503272906, guid: f990f0439da23564483c34680a32b227, type: 3}
+    _PreviewPrefab: {fileID: 1306695637626874746, guid: bec3d11007890b948be8b8cf26e87c43, type: 3}
   _Player: {fileID: 7620607172156828539}
-  _Preview: {fileID: 2055665458963272873, guid: 623507ddb5313bd47ba79254db0615ba, type: 3}
-  _TowerPrefab: {fileID: 2055665458963272873, guid: 38ba78548930e6340a2fbdb368a3fb47, type: 3}
-  _IsPreviewActivated: 0
+  _Materials:
+  - {fileID: 2100000, guid: 6082b650ee0af9a48b7f073c2f51f950, type: 2}
+  - {fileID: 2100000, guid: 529646af2724ffe42bf42d7023d791c5, type: 2}
+  currentPreview: {fileID: 0}
 --- !u!1 &4674170208383921210
 GameObject:
   m_ObjectHideFlags: 0
@@ -83,52 +93,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7620607172156828539}
   m_LocalEulerAnglesHint: {x: 20, y: 0, z: 0}
---- !u!1 &5684723607842789850
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1165938590630285331}
-  - component: {fileID: 7776386899169113025}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1165938590630285331
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5684723607842789850}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 7620607172156828539}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7776386899169113025
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5684723607842789850}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c72abe70491ee334d9c4c160a5e51b98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _maxDistance: 20
-  _ryrColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1001 &6690745185686178541
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -221,15 +185,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400128, guid: ac331b525a4577e46aa9942c1016219d, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 400128, guid: ac331b525a4577e46aa9942c1016219d, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 400128, guid: ac331b525a4577e46aa9942c1016219d, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 400128, guid: ac331b525a4577e46aa9942c1016219d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -300,9 +264,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 400128, guid: ac331b525a4577e46aa9942c1016219d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6930326225793496728}
-    - targetCorrespondingSourceObject: {fileID: 400128, guid: ac331b525a4577e46aa9942c1016219d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1165938590630285331}
     - targetCorrespondingSourceObject: {fileID: 400072, guid: ac331b525a4577e46aa9942c1016219d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4929980732888421934}
@@ -316,9 +277,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100128, guid: ac331b525a4577e46aa9942c1016219d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 867337286073265355}
-    - targetCorrespondingSourceObject: {fileID: 100128, guid: ac331b525a4577e46aa9942c1016219d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7468529510552904302}
   m_SourcePrefab: {fileID: 100100000, guid: ac331b525a4577e46aa9942c1016219d, type: 3}
 --- !u!4 &7620607172156828339 stripped
 Transform:
@@ -397,39 +355,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c1a65f4be97fd84b876465c65a3b3ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mouseX: 0
-  mouseY: 0
-  camPos: {fileID: 6930326225793496728}
+  moveSpeed: 5
+  jumpPower: 4
   camRotSpeed: 1
-  cam: {fileID: 0}
-  target: {fileID: 7620607172156828539}
---- !u!114 &7468529510552904302
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7620607172156864347}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: 4670212bd55046e4cb0222a4e36df9a2, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: Keyboard&Mouse
-  m_DefaultActionMap: Player
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
+  camPos: {fileID: 6930326225793496728}

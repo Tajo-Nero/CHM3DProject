@@ -50,18 +50,18 @@ public class TowerBase : MonoBehaviour
 
     // 1. 타워 공격력
     [Header("Tower Settings")]
-    public int towerAttackPower;
+    public float towerAttackPower;
     // 2. 타워 관통력
-    public int towerPenetrationPower;
+    public float towerPenetrationPower;
     // 3. 치명타 확률
     public float criticalHitRate;
     // 4. 공격 속도
     public float attackSpeed;
     // 5. 설치 비용
-    public int installationCost;
+    public float installationCost;
 
     // 적을 공격하는 함수
-    public virtual void TowerAttack()
+    public virtual void TowerAttack(List<Transform> targets)
     {
         // 공격 로직 구현
     }

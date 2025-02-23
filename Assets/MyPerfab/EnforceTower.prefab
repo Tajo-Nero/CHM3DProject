@@ -647,6 +647,7 @@ GameObject:
   - component: {fileID: 3202122585121102175}
   - component: {fileID: 1053805946075970684}
   - component: {fileID: 1953681746999218671}
+  - component: {fileID: 7990791859497326934}
   m_Layer: 0
   m_Name: EnforceTower
   m_TagString: Towers
@@ -717,3 +718,24 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.65, y: 0.85, z: 0.65}
   m_Center: {x: 0, y: 0.4, z: 0}
+--- !u!114 &7990791859497326934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8853853338503272906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fa4e7a0b77db804aba0ed8cd1d6ad73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  towerAttackPower: 0
+  towerPenetrationPower: 0
+  criticalHitRate: 0
+  attackSpeed: 0
+  installationCost: 0
+  buffRange: 10
+  attackPowerMultiplier: 1.2
+  buffDuration: 5
+  buffInterval: 6

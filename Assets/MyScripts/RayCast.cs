@@ -60,6 +60,9 @@ public class RayCast : MonoBehaviour
     //    //    Debug.Log("Terrain이 아닙니다.");
     //    //}
     //}
+
+    //2025-02-23
+    //땅이 파지긴하는대 약간 중간중간 걸리는 느낌이있음 어떻게해야하나 
     void OnCollisionStay(Collision collision)
     {
         // 충돌된 오브젝트가 터레인인지 확인합니다.

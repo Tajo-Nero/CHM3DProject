@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7489272883702821304}
   - component: {fileID: 5947022262889564915}
+  - component: {fileID: 2422869011277287754}
   m_Layer: 0
   m_Name: Rocket
   m_TagString: Towers
@@ -56,6 +57,30 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.8, y: 0.4, z: 0}
   m_Center: {x: 0, y: 0.2, z: 0}
+--- !u!114 &2422869011277287754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7098814355583657019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45cf67a361a37c3488786a9600976ebe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  towerAttackPower: 0
+  towerPenetrationPower: 0
+  criticalHitRate: 0
+  attackSpeed: 0
+  installationCost: 0
+  detectionRange: 10
+  splashRadius: 10
+  damageOverTime: 5
+  damageDuration: 5
+  rocketLaunchPoint: {fileID: 0}
+  attackConeAngle: 45
+  towerTransform: {fileID: 0}
 --- !u!1001 &273702288058959218
 PrefabInstance:
   m_ObjectHideFlags: 0
