@@ -90,5 +90,13 @@ public class Nexus : TowerBase
     //        GameManager.Instance.BakeNavMesh();
     //    }
     //}
+    IEnumerator OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            yield return new WaitForSeconds(1f);
+            GameManager.Instance.BakeNavMesh();
+        }
+    }
 }   
 

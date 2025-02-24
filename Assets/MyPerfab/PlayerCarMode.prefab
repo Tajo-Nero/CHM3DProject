@@ -47,9 +47,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72abe70491ee334d9c4c160a5e51b98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  digDistance: 1.5
-  digRadius: 1.5
-  digDepth: 0.1
+  digDistance: 2
+  digRadius: 2
+  digDepth: 0.2
 --- !u!54 &8203704431684660391
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -94,7 +94,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 3.5, y: 3, z: 1.57}
   m_Center: {x: 0, y: -0.2, z: -0.89}
@@ -115,12 +115,12 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 2
   m_Height: 4
   m_Direction: 1
-  m_Center: {x: 0, y: -0.2, z: 0}
+  m_Center: {x: 0, y: -0.2, z: -1.35}
 --- !u!1 &980764811435502600
 GameObject:
   m_ObjectHideFlags: 0
@@ -233,8 +233,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
-  m_ConstrainProportionsScale: 1
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.4}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5051844675981953053}
   - {fileID: 3648250917154885899}
