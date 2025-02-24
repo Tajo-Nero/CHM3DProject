@@ -9,9 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3446070343583260522}
-  - component: {fileID: 549488540832625844}
   m_Layer: 0
-  m_Name: EnemySpewer
+  m_Name: EnemySpewerPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26,26 +25,9 @@ Transform:
   m_GameObject: {fileID: 1272087387990586008}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 23.74, y: 1, z: -20.54}
+  m_LocalPosition: {x: 10, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &549488540832625844
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1272087387990586008}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 372b1a6e1842f524d87c7904a01c9398, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemyPrefabs:
-  - {fileID: 7819527783306013827, guid: d1cd81610a60d9447952ab17e3b27d92, type: 3}
-  - {fileID: 243143470300942330, guid: 262a8e87096c0bf42825351fd26779ad, type: 3}
-  - {fileID: 393127831579949386, guid: 888bfd332fc6de94dbc9be38a3056e06, type: 3}
-  - {fileID: 1550717235643762586, guid: 6e7a47278f15b6245ab9432a8e75e61b, type: 3}

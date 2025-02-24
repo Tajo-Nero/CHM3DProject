@@ -6,7 +6,7 @@ public class EnemySpewer : MonoBehaviour
 {
     //2025- 02 -23
     //네비매쉬 에이전트를 이용하여 적을 생성하고 이동시키는 스크립트
-    //하지만 베이게이션으로 베이크해야 소용있음 NavMeshSurface 에 있는 베이크 하면 몬스터 2개생성시 멈추는 현상있음
+    //하지만 네이게이션으로 베이크해야 소용있음 NavMeshSurface 에 있는 베이크 하면 몬스터 2개생성시 멈추는 현상있음
     public GameObject[] enemyPrefabs; // 적 프리팹 배열
     private bool isSpawning = false; // 생성 중 여부
 

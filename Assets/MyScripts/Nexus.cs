@@ -83,11 +83,12 @@ public class Nexus : TowerBase
         Gizmos.DrawWireSphere(transform.position, detectionRange); // 탐지 범위 그리기
     }
     //카 플레이어 모드일때 만나면 네비매쉬 배이크 해야하는대 태그가 안먹힘 지금
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            GameManager.Instance.BakeNavMesh();
-        }
-    }
-}
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    if (other.CompareTag("Player"))
+    //    {
+    //        GameManager.Instance.BakeNavMesh();
+    //    }
+    //}
+}   
+

@@ -105,7 +105,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9395147a82307b848a7faa1061ae5f4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 92292753080900013, guid: 3f177067e9ab12f42886cb5a10945b4b, type: 3}
+  enemyName: 
+  targetLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
   attackDamage: 10
   attackSpeed: 1
   health: 50

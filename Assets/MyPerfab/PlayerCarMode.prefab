@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 2675424227342286910}
   - component: {fileID: 8203704431684660391}
   - component: {fileID: 8728537229067906502}
+  - component: {fileID: 3008840763286032591}
   m_Layer: 0
-  m_Name: GameObject (1)
+  m_Name: Drill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,8 +47,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c72abe70491ee334d9c4c160a5e51b98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  digDistance: 1.8
-  digRadius: 1.8
+  digDistance: 1.5
+  digRadius: 1.5
   digDepth: 0.1
 --- !u!54 &8203704431684660391
 Rigidbody:
@@ -97,6 +98,29 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.5, y: 3, z: 1.57}
   m_Center: {x: 0, y: -0.2, z: -0.89}
+--- !u!136 &3008840763286032591
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291282102835995750}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Radius: 2
+  m_Height: 4
+  m_Direction: 1
+  m_Center: {x: 0, y: -0.2, z: 0}
 --- !u!1 &980764811435502600
 GameObject:
   m_ObjectHideFlags: 0
@@ -189,11 +213,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3423277821389728182}
-  - component: {fileID: 8126441472832510209}
   - component: {fileID: 3778282719988099813}
   - component: {fileID: 6789739337112752675}
+  - component: {fileID: 4227744874235893746}
   m_Layer: 0
-  m_Name: DrillCar
+  m_Name: PlayerCarMode
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -221,24 +245,6 @@ Transform:
   - {fileID: 545530676179719096}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8126441472832510209
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3524384385267151811}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c80e0e232fa06c4e8f03a8646086a0c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  camPos: {fileID: 1791439045690941793}
-  cam: {fileID: 0}
-  target: {fileID: 3423277821389728182}
-  rotationSpeed: 50
-  moveSpeed: 2
-  _Obj: {fileID: 7620607172156864347, guid: c94b039541aa54740a324f0398da259c, type: 3}
 --- !u!54 &3778282719988099813
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -287,6 +293,24 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.8, y: 4, z: 6.5}
   m_Center: {x: 0, y: 2, z: 0}
+--- !u!114 &4227744874235893746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3524384385267151811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8d8c8d24cf845740b773da6533bebf8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  camPos: {fileID: 1791439045690941793}
+  cam: {fileID: 0}
+  target: {fileID: 6056106704746141032, guid: 3f177067e9ab12f42886cb5a10945b4b, type: 3}
+  rotationSpeed: 50
+  moveSpeed: 2
+  _PlayerMode: {fileID: 7620607172156864347, guid: c94b039541aa54740a324f0398da259c, type: 3}
 --- !u!1 &4999732465524792496
 GameObject:
   m_ObjectHideFlags: 0
@@ -546,7 +570,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1791439045690941793}
   m_Layer: 0
-  m_Name: cam
+  m_Name: CamTransform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -561,7 +585,7 @@ Transform:
   m_GameObject: {fileID: 6528448175994504918}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 15, z: -12}
+  m_LocalPosition: {x: 0, y: 10.44, z: -12}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -4,31 +4,37 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-    //2025- 02 -23
-    //적이 넥서스만나면 공격하고 넥서스도 공격함
-    //오브젝트풀 사용햇는대 아직 잘작동되는지는 모름 저기 넥서스랑 게임매니저쪽 일이 되야 체크 가능
     public string enemyName;
-    public GameObject target;
+    public LayerMask targetLayerMask; // 타겟 레이어 마스크
     public float attackDamage = 10f;
     public float attackSpeed = 1f;
     public float health = 50f;
     private bool isAttacking = false;
     private NavMeshAgent navMeshAgent;
     private EnemyPool enemyPool;
+    private GameObject target;
 
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         enemyPool = FindObjectOfType<EnemyPool>();
+        FindTargetWithLayerMask();
+
         if (target == null)
         {
             Debug.LogError("타겟이 설정되지 않았습니다.");
         }
+
         Debug.Log("적 이름: " + enemyName);
     }
 
     void Update()
     {
+        if (target == null)
+        {
+            FindTargetWithLayerMask(); // 타겟이 null이면 다시 찾기 시도
+        }
+
         if (target != null)
         {
             navMeshAgent.SetDestination(target.transform.position);
@@ -45,6 +51,19 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
+    private void FindTargetWithLayerMask()
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 100f, targetLayerMask); // 일정 범위 내의 타겟 검색
+        if (hitColliders.Length > 0)
+        {
+            target = hitColliders[0].gameObject;
+        }
+        else
+        {
+            Debug.LogWarning("타겟 레이어 마스크로 타겟을 찾지 못했습니다.");
+        }
+    }
+
     private IEnumerator AttackTarget()
     {
         isAttacking = true;
@@ -56,7 +75,7 @@ public class EnemyAI : MonoBehaviour
                 if (targetNexus != null)
                 {
                     targetNexus.TakeDamage(attackDamage);
-                    Debug.Log("타겟을 공격했습니다! 데미지: " + attackDamage);
+                    Debug.Log("타겟을 공격했습니다! 피해량: " + attackDamage);
                 }
             }
             yield return new WaitForSeconds(attackSpeed);
@@ -67,7 +86,7 @@ public class EnemyAI : MonoBehaviour
     public void TakeDamage(float damage)
     {
         health -= damage;
-        Debug.Log(enemyName + "이(가) 데미지를 받았습니다! 현재 체력: " + health);
+        Debug.Log(enemyName + "이(가) 피해를 입었습니다! 남은 체력: " + health);
 
         if (health <= 0)
         {
@@ -77,7 +96,7 @@ public class EnemyAI : MonoBehaviour
 
     private void Die()
     {
-        Debug.Log(enemyName + "이(가) 파괴되었습니다!");
-        enemyPool.ReturnEnemy(gameObject); // 객체 풀에 반환
+        Debug.Log(enemyName + "이(가) 사망했습니다!");
+        enemyPool.ReturnEnemy(gameObject); // 객체 풀로 반환
     }
 }

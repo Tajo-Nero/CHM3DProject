@@ -13,9 +13,9 @@ public class PlayerMove : MonoBehaviour
     private Animator animator; // 애니메이터
     private Rigidbody rb; // 리지드바디
     private Transform playerTransform; // 플레이어 트랜스폼
+    public GameManager gameManager;
 
-
-    [Header("Camera Settings")]
+   [Header("Camera Settings")]
     private Camera cam; // 카메라
     private float mouseX, mouseY; // 마우스 입력 값
 
@@ -25,6 +25,7 @@ public class PlayerMove : MonoBehaviour
         animator = GetComponent<Animator>(); // 애니메이터 컴포넌트 할당
         rb = GetComponent<Rigidbody>(); // 리지드바디 컴포넌트 할당
         playerTransform = GetComponent<Transform>(); // 플레이어 트랜스폼 할당
+        gameManager = FindObjectOfType<GameManager>();
     }
 
     void Update() // 매 프레임마다 호출되는 함수
@@ -42,8 +43,19 @@ public class PlayerMove : MonoBehaviour
         {
             animator.SetBool("IsHammer", false); // 마우스 오른쪽 버튼 클릭 시 애니메이션 트리거 해제
         }
-    }
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            if (gameManager != null)
+            {
+                StartCoroutine(gameManager.SpawnEnemies()); // 비동기로 적을 생성합니다.
+            }
+            else
+            {
+                Debug.LogError("GameManager 인스턴스를 찾을 수 없습니다.");
 
+            }
+        }
+    }
     private void HandleMovement() // 이동 처리 함수
     {
         float h = Input.GetAxis("Horizontal"); // 수평 입력 값

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class RayCast : MonoBehaviour
+public class Drill : MonoBehaviour
 {
     [SerializeField]
     public float digDistance = 1.0f;
