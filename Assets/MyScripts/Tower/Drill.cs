@@ -18,6 +18,7 @@ public class Drill : MonoBehaviour
         TerrainCollider terrainCollider = other as TerrainCollider;
         if (terrainCollider != null)
         {
+           gameObject.transform.rotation = Quaternion.Euler(0,0,0);
             // Terrain 데이터를 가져옵니다.
             Terrain terrain = terrainCollider.GetComponent<Terrain>();
             TerrainData terrainData = terrain.terrainData;

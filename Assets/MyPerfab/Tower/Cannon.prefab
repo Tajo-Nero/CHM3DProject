@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: -7102115388602676831}
   - component: {fileID: 8575021673185115764}
   - component: {fileID: -8357642834174689909}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: Cannon
   m_TagString: Towers
   m_Icon: {fileID: 0}
@@ -202,7 +202,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5786559230512329471, guid: fe8543f03859dbf4fa7ef192ea93027e, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6650909654548280872, guid: fe8543f03859dbf4fa7ef192ea93027e, type: 3}
       propertyPath: m_RootOrder
@@ -316,7 +316,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5839377106348506521, guid: 1777e97210c83d742a8e67f3c2c8fe13, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6997383347592418138, guid: 1777e97210c83d742a8e67f3c2c8fe13, type: 3}
       propertyPath: m_Convex

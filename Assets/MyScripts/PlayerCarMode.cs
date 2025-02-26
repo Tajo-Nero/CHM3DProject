@@ -70,6 +70,7 @@ public class PlayerCarMode : MonoBehaviour
         // F5 키 누르면 지형 초기화
         if (Input.GetKeyDown(KeyCode.F5))
         {
+            Destroy(gameObject);
             gameManager.ResetTerrain();
         }
     }

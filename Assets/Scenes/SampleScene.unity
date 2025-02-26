@@ -755,11 +755,15 @@ PrefabInstance:
       objectReference: {fileID: 1296667316}
     - target: {fileID: 7647931875316734347, guid: 771e2d394c77fd74da315f5aee4a3928, type: 3}
       propertyPath: detectionRadius
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7647931875316734347, guid: 771e2d394c77fd74da315f5aee4a3928, type: 3}
       propertyPath: towerLayer.m_Bits
       value: 512
+      objectReference: {fileID: 0}
+    - target: {fileID: 7647931875316734347, guid: 771e2d394c77fd74da315f5aee4a3928, type: 3}
+      propertyPath: playerLayer.m_Bits
+      value: 256
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour
     private GameObject currentTerrain;
     private GameObject currentPlayer;
     private GameObject currentNexus;
+    Vector3 currentSpawnPoint;
 
     private void Awake()
     {
@@ -58,6 +59,8 @@ public class GameManager : MonoBehaviour
         SpawnNexus();
         InitializeGame();
         enemyPool = FindObjectOfType<EnemyPool>();
+        currentSpawnPoint = carPlayerPrefab.transform.position;
+        Debug.Log(carPlayerPrefab.transform.position);
     }
 
     private void InitializeGame()
@@ -203,11 +206,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SetupTerrain()
-    {
-        ResetTerrain();
-        SpawnTerrain();
-    }
+   
 
     private void SpawnTerrain()
     {
@@ -279,11 +278,16 @@ public class GameManager : MonoBehaviour
 
     public void ResetTerrain()
     {
-        if (currentTerrain != null)
+        if (_UpTerrain != null)
         {
-            Destroy(currentTerrain);
-        }
-        SetupTerrain();
+            //Destroy(_UpTerrain);
+            _UpTerrain.gameObject.SetActive(false);
+            
+        }            
+        SpawnPlayer(carPlayerPrefab.gameObject);
+        SpawnTerrain();
+        _UpTerrain.gameObject.SetActive(true);
+
     }
 
     public void SpawnPlayer(GameObject playerPrefab)
