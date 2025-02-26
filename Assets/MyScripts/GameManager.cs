@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
@@ -7,12 +8,13 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
+    [Header("Stage Settings")]
+    public Wave[] waves; // 웨이브 데이터를 배열로 저장
+    public int currentWaveIndex = 0; // 현재 웨이브 인덱스
+
     [Header("Enemy Settings")]
-    public EnemyPool enemyPool;
-    public Transform[] spawnPoints;
-    public float spawnInterval = 5f;
-    private int enemyCount = 0;
-    private int maxEnemies = 10;
+    public Transform[] spawnPoints; // 적 스폰 위치
+    private EnemyPool enemyPool;
 
     [Header("Terrain Settings")]
     public Terrain _UpTerrain;
@@ -33,7 +35,7 @@ public class GameManager : MonoBehaviour
     [Header("Nexus Settings")]
     public GameObject nexusPrefab;
     public Transform nexusSpawnPoint;
-
+    public bool IsWaveActive { get; private set; }
     private GameObject currentTerrain;
     private GameObject currentPlayer;
     private GameObject currentNexus;
@@ -55,13 +57,150 @@ public class GameManager : MonoBehaviour
     {
         SpawnNexus();
         InitializeGame();
+        enemyPool = FindObjectOfType<EnemyPool>();
     }
 
     private void InitializeGame()
     {
         SpawnTerrain();
-        //BakeNavMesh();
+        // BakeNavMesh();
         SpawnPlayer(carPlayerPrefab);
+    }
+    //public IEnumerator StartWave()
+    //{
+    //    if (currentWaveIndex < waves.Length)
+    //    {
+    //        Wave waveData = waves[currentWaveIndex];
+    //        int enemyCount = waveData.wave_enemyCount;
+
+    //        for (int i = 0; i < enemyCount; i++)
+    //        {
+    //            int spawnIndex = i % spawnPoints.Length;
+    //            EnemyData enemyData = waveData.wave_enemyData[i % waveData.wave_enemyData.Length];
+
+    //            Vector3 spawnPosition = spawnPoints[spawnIndex].position;
+    //            Quaternion spawnRotation = Quaternion.identity;
+
+    //            GameObject enemyInstance = enemyPool.SpawnEnemy(enemyData.enemyName, spawnPosition, spawnRotation); // GameObject를 반환받음
+    //            EnemyBase enemyComponent = enemyInstance.GetComponent<EnemyBase>();
+
+    //            if (enemyComponent != null)
+    //            {
+    //                // 자식 클래스에서 적절한 데이터를 설정합니다.
+    //                enemyComponent.enemy_attackDamage = enemyData.attackPower;
+    //                enemyComponent.enemy_attackSpeed = 1f; // 예시로 설정한 공격 속도
+    //                if (enemyComponent is Slime slime)
+    //                {
+    //                    slime.enemy_health = enemyData.health;
+    //                }
+    //                else if (enemyComponent is TurtleShell turtleShell)
+    //                {
+    //                    turtleShell.enemy_health = enemyData.health;
+    //                }
+    //                else if (enemyComponent is Beholder beholder)
+    //                {
+    //                    beholder.enemy_health = enemyData.health;
+    //                }
+    //                else if (enemyComponent is ChestMonster chestMonster)
+    //                {
+    //                    chestMonster.enemy_health = enemyData.health;
+    //                }
+
+    //            }
+
+    //            yield return new WaitForSeconds(1f);
+    //        }
+
+    //        while (enemyPool.ActiveEnemies > 0)
+    //        {
+    //            yield return null;
+    //        }
+
+    //        currentWaveIndex++;
+
+    //    }
+    //}
+
+    public IEnumerator StartWave()
+    {
+        if (currentWaveIndex < waves.Length)
+        {
+            Wave waveData = waves[currentWaveIndex];
+            int enemyCount = waveData.wave_enemyCount;
+
+            // 적 생성 코루틴 시작
+            StartCoroutine(SpawnEnemies(waveData, enemyCount));
+
+            // 적들이 모두 소멸할 때까지 대기
+            while (enemyPool.ActiveEnemies > 0)
+            {
+                yield return null;
+            }
+
+            // 웨이브 인덱스 증가
+            currentWaveIndex++;
+        }
+    }
+
+    private IEnumerator SpawnEnemies(Wave waveData, int enemyCount)
+    {
+        for (int i = 0; i < enemyCount; i++)
+        {
+            int spawnIndex = i % spawnPoints.Length;
+            EnemyData enemyData = waveData.wave_enemyData[i % waveData.wave_enemyData.Length];
+
+            Vector3 spawnPosition = spawnPoints[spawnIndex].position;
+            Quaternion spawnRotation = Quaternion.identity;
+
+            GameObject enemyInstance = enemyPool.SpawnEnemy(enemyData.enemyName, spawnPosition, spawnRotation); // GameObject를 반환받음
+            EnemyBase enemyComponent = enemyInstance.GetComponent<EnemyBase>();
+
+            if (enemyComponent != null)
+            {
+                // 자식 클래스에서 적절한 데이터를 설정합니다.
+                enemyComponent.enemy_attackDamage = enemyData.attackPower;
+                enemyComponent.enemy_attackSpeed = 1f; // 예시로 설정한 공격 속도
+                if (enemyComponent is Slime slime)
+                {
+                    slime.enemy_health = enemyData.health;
+                }
+                else if (enemyComponent is TurtleShell turtleShell)
+                {
+                    turtleShell.enemy_health = enemyData.health;
+                }
+                else if (enemyComponent is Beholder beholder)
+                {
+                    beholder.enemy_health = enemyData.health;
+                }
+                else if (enemyComponent is Bee bee)
+                {
+                    bee.enemy_health = enemyData.health;
+                }
+                else if (enemyComponent is ChestMonster chestMonster)
+                {
+                    chestMonster.enemy_health = enemyData.health;
+                }
+                else if (enemyComponent is Cactus cactus)
+                {
+                    cactus.enemy_health = enemyData.health;
+                }
+                else if (enemyComponent is Elite elite)
+                {
+                    elite.enemy_health = enemyData.health;
+                }
+                else if (enemyComponent is Cute cute)
+                {
+                    cute.enemy_health = enemyData.health;
+                }
+                else if (enemyComponent is Mushroom mushroom)
+                {
+                    mushroom.enemy_health = enemyData.health;
+                }
+
+            }
+
+            yield return new WaitForSeconds(1f);
+        }
     }
 
     public void SetupTerrain()
@@ -167,17 +306,7 @@ public class GameManager : MonoBehaviour
     public void BakeNavMesh()
     {
         navMeshSurface.BuildNavMesh();
-        Debug.Log("NavMesh가 빌드되었습니다.");
+        Debug.Log("NavMesh가 구워졌습니다.");
     }
 
-    public IEnumerator SpawnEnemies()
-    {
-        while (enemyCount < maxEnemies)
-        {
-            Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
-            enemyPool.SpawnEnemy(spawnPoint.position, spawnPoint.rotation);
-            enemyCount++;
-            yield return new WaitForSeconds(spawnInterval);
-        }
-    }
 }

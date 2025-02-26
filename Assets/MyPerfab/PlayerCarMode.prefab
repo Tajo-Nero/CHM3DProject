@@ -311,6 +311,7 @@ MonoBehaviour:
   rotationSpeed: 50
   moveSpeed: 2
   _PlayerMode: {fileID: 7620607172156864347, guid: c94b039541aa54740a324f0398da259c, type: 3}
+  cameraRotationX: 30
 --- !u!1 &4999732465524792496
 GameObject:
   m_ObjectHideFlags: 0
@@ -585,7 +586,7 @@ Transform:
   m_GameObject: {fileID: 6528448175994504918}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 10.44, z: -12}
+  m_LocalPosition: {x: 0, y: 25, z: -40}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

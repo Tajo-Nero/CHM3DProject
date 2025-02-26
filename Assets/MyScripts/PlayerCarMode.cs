@@ -13,6 +13,9 @@ public class PlayerCarMode : MonoBehaviour
     private GameManager gameManager;
     private bool isSpeedBoostActive = false; // 이동 속도 부스트 플래그
     private Drill drillScript;
+
+    public float cameraRotationX = 45f; // 카메라의 X축 회전 값을 조절할 입력값
+
     void Start()
     {
         cam = Camera.main;
@@ -31,23 +34,23 @@ public class PlayerCarMode : MonoBehaviour
             moveDir = transform.forward * verticalInput * moveSpeed * Time.deltaTime;
             transform.localPosition += moveDir;
 
-            // 마우스 왼쪽 버튼 클릭 시 이동 속도 부스트 활성화
+            // 마우스 왼쪽 버튼 클릭 시 이동 속도 부스트
             if (Input.GetMouseButton(0))
             {
                 isSpeedBoostActive = true;
-                moveSpeed = 3f; // 이동 속도 1.5배 증가
+                moveSpeed = 5f; // 이동 속도 부스트 3
                 if (drillScript != null)
                 {
-                    drillScript.digDepth = 0.3f; // Drill 스크립트의 digDepth 변경
+                    drillScript.digDepth = 0.5f; // Drill 스크립트의 digDepth 변경 0.3
                 }
             }
             else
             {
                 isSpeedBoostActive = false;
-                moveSpeed = 2f; // 원래 속도로 복귀
+                moveSpeed = 3f; // 기본 이동 속도 2
                 if (drillScript != null)
                 {
-                    drillScript.digDepth = 0.2f; // Drill 스크립트의 digDepth 원래 값으로 복귀
+                    drillScript.digDepth = 0.3f; // Drill 스크립트의 digDepth 기본값으로 변경 0.2
                 }
             }
 
@@ -56,18 +59,18 @@ public class PlayerCarMode : MonoBehaviour
             {
                 transform.Rotate(Vector3.up, horizontalInput * rotationSpeed * Time.deltaTime, Space.Self);
             }
+        }
 
-            // 카메라 회전 처리
-            if (cam != null)
-            {
-                cam.transform.localRotation = transform.localRotation;
-            }
+        // 카메라 회전 및 위치 고정
+        if (cam != null)
+        {
+            cam.transform.rotation = Quaternion.Euler(cameraRotationX, transform.rotation.eulerAngles.y, 0); // 카메라 회전 설정
+        }
 
-            // F5 키를 누르면 게임 매니저 초기화
-            if (Input.GetKeyDown(KeyCode.F5))
-            {
-                gameManager.ResetTerrain();
-            }
+        // F5 키 누르면 지형 초기화
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            gameManager.ResetTerrain();
         }
     }
 
@@ -80,21 +83,6 @@ public class PlayerCarMode : MonoBehaviour
         }
     }
 
-   //public IEnumerator OnTriggerEnter(Collider other)
-   //{
-   //    if (other.CompareTag("Nexus"))
-   //    {
-   //        Destroy(gameObject);
-   //        Debug.Log("게임 오브젝트가 파괴되었습니다.");
-   //        yield return new WaitForSeconds(1f);
-   //        Debug.Log("1초가 지났습니다.");
-   //        gameManager.SpawnPlayer(_PlayerMode);
-   //        Debug.Log("SpawnPlayer 함수가 호출되었습니다.");
-   //        gameManager.BakeNavMesh();
-   //        Debug.Log("BakeNavMesh 함수가 호출되었습니다.");
-   //        
-   //    }
-   //}
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Nexus"))
@@ -102,10 +90,7 @@ public class PlayerCarMode : MonoBehaviour
             gameManager.SpawnPlayer(_PlayerMode);
             Debug.Log("SpawnPlayer 함수가 호출되었습니다.");
             Destroy(gameObject);
-            Debug.Log("게임 오브젝트가 파괴되었습니다.");
-            
-           
+            Debug.Log("플레이어가 파괴되었습니다.");
         }
     }
-
 }
