@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4683896645907506792}
   - component: {fileID: 4438770319506330340}
   - component: {fileID: 2867283534013871571}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Blocks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -118,7 +118,7 @@ GameObject:
   - component: {fileID: 330511510833124516}
   - component: {fileID: 738068808583228139}
   - component: {fileID: 6843676198818852511}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Enterance
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -224,7 +224,7 @@ GameObject:
   - component: {fileID: 6927764363136002267}
   - component: {fileID: 6884447810401682010}
   - component: {fileID: 895892786704325192}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Crystal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -330,7 +330,7 @@ GameObject:
   - component: {fileID: 4612917230836052178}
   - component: {fileID: 8717978723064572857}
   - component: {fileID: 1687486880125431936}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Banners
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -436,7 +436,7 @@ GameObject:
   - component: {fileID: 2351384791626929867}
   - component: {fileID: 1824531921106450224}
   - component: {fileID: 6110553788453244955}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Woods
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -542,7 +542,7 @@ GameObject:
   - component: {fileID: 7403590464156934990}
   - component: {fileID: 6788429886884815617}
   - component: {fileID: 3331870444975254481}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Walls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -648,7 +648,7 @@ GameObject:
   - component: {fileID: 1053805946075970684}
   - component: {fileID: 1953681746999218671}
   - component: {fileID: 7990791859497326934}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: EnforceTower
   m_TagString: Towers
   m_Icon: {fileID: 0}
@@ -735,6 +735,7 @@ MonoBehaviour:
   criticalHitRate: 0
   attackSpeed: 0
   installationCost: 0
+  isAttackUp: 0
   buffRange: 10
   attackPowerMultiplier: 1.2
   buffDuration: 5

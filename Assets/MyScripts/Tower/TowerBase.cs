@@ -59,11 +59,13 @@ public class TowerBase : MonoBehaviour
     public float attackSpeed;
     // 5. 설치 비용
     public float installationCost;
+    // 6. 공격 강화 가능여부
+    public bool isAttackUp = false;
 
     // 적을 공격하는 함수
     public virtual void TowerAttack(List<Transform> targets)
     {
-        // 공격 로직 구현
+        // 공격 로직 구현        
     }
 
     // 범위를 설정하는 함수
@@ -77,7 +79,12 @@ public class TowerBase : MonoBehaviour
     {
         // 적 탐지 로직 구현
     }
-
-
-
+    public virtual void TowerPowUp()
+    {
+        if (isAttackUp)
+        {
+            towerAttackPower *= 2;
+            isAttackUp = false;
+        }
+    }
 }

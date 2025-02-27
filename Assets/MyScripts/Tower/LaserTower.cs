@@ -337,14 +337,14 @@ using UnityEngine;
 
 public class LaserTower : TowerBase
 {
-    [SerializeField] private float detectionRange = 10f;
+    [SerializeField] private float detectionRange = 10f;//레이저 길이
     [SerializeField] private Transform laserStartPoint;
     private bool isAttacking = false;
-    [SerializeField] private float laserLength = 10f;
+    
 
-    void Start()
+    void Awake()
     {
-        towerAttackPower = 50;
+        towerAttackPower = 100;
         attackSpeed = 4f;
         installationCost = 15;
 
@@ -369,7 +369,7 @@ public class LaserTower : TowerBase
             if (hitCollider.CompareTag("Enemy"))
             {
                 targets.Add(hitCollider.transform);
-                Debug.Log("박스 캐스트로 감지된 적: " + hitCollider.transform.name);
+                
             }
         }
 
@@ -377,10 +377,7 @@ public class LaserTower : TowerBase
         {
             StartCoroutine(AttackRoutine(targets));
         }
-        else
-        {
-            Debug.Log("범위 내 적 감지되지 않음.");
-        }
+        
     }
 
     private IEnumerator AttackRoutine(List<Transform> targets)
@@ -407,24 +404,21 @@ public class LaserTower : TowerBase
                 enemyHp.TakeDamage(towerAttackPower);
                 Debug.Log("적 " + target.name + "에게 피해를 입혔습니다! 데미지: " + towerAttackPower);
             }
-            else
-            {
-                Debug.LogWarning("EnemyBase 컴포넌트를 찾을 수 없습니다: " + target.name);
-            }
+            
         }
     }
 
     public override void SetRange(float range)
     {
         detectionRange = range;
-        Debug.Log("탐지 범위 설정: " + detectionRange);
+        
     }
 
     private void OnDrawGizmos()
     {
         if (laserStartPoint != null)
         {
-            Gizmos.color = Color.red;
+            Gizmos.color = Color.black;
             Vector3 boxCenter = laserStartPoint.position + laserStartPoint.forward * (detectionRange / 2);
             Vector3 boxSize = new Vector3(1f, 1f, detectionRange);
             Gizmos.matrix = Matrix4x4.TRS(boxCenter, laserStartPoint.rotation, Vector3.one);

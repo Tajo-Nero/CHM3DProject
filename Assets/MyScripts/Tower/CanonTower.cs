@@ -4,20 +4,24 @@ using UnityEngine;
 
 public class CanonTower : TowerBase
 {
-    [SerializeField] private float detectionRange = 10f; // 탐지 범위
+    [SerializeField] private float detectionRange = 8f; // 탐지 범위
     private bool isAttacking = false; // 공격 중인지 여부
     [SerializeField] private Transform cannonTowerTransform; // 캐논 타워 위치
     private List<Transform> targets = new List<Transform>(); // 타겟 리스트
     private LineRenderer lineRenderer; // 라인 렌더러
-   
-    void Start()
+                                       // 초기 값 설정 (필드 초기화)
+    void Awake()
     {
+        //일단 기본 셋팅
         towerAttackPower = 40;
         towerPenetrationPower = 25;
         criticalHitRate = 0.05f;
         attackSpeed = 0.7f;
         installationCost = 8;
-
+        isAttackUp = false;
+    }
+    void Start()
+    {      
         // 탐지 범위 설정
         SetRange(detectionRange);
 
@@ -31,13 +35,17 @@ public class CanonTower : TowerBase
 
     void Update()
     {
+        
         DetectEnemiesInRange();
         if (targets.Count > 0)
         {
             RotateTowardsTarget();
         }
     }
-
+    public override void TowerPowUp()
+    {
+        base.TowerPowUp();       
+    }
     private IEnumerator AttackRoutine(List<Transform> targets)
     {
 
@@ -115,9 +123,10 @@ public class CanonTower : TowerBase
         }
     }
 
-    void OnDrawGizmosSelected()
+    void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
     }
+    
 }

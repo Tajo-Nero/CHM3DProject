@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 7206484521538438532}
   - component: {fileID: 382029240751919034}
   - component: {fileID: 8375970895833107520}
-  m_Layer: 0
+  - component: {fileID: 2981492485054804480}
+  m_Layer: 10
   m_Name: Barrel
-  m_TagString: Untagged
+  m_TagString: TowerPowUp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -83,6 +84,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &2981492485054804480
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2096191436638483115}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300000, guid: 82fa7b7c287729a40add651099701bf7, type: 3}
 --- !u!1 &3852654655314689898
 GameObject:
   m_ObjectHideFlags: 0
@@ -92,10 +115,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6548227599642185535}
-  - component: {fileID: 7647931875316734347}
-  m_Layer: 0
+  - component: {fileID: 8657691430350510674}
+  m_Layer: 10
   m_Name: TowerPowerUpPos
-  m_TagString: Untagged
+  m_TagString: TowerPowUp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -109,14 +132,14 @@ Transform:
   m_GameObject: {fileID: 3852654655314689898}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 30, y: 0, z: 3}
+  m_LocalPosition: {x: 24.56, y: 0, z: 3.77}
   m_LocalScale: {x: 0.8, y: 0.4, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7206484521538438532}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7647931875316734347
+--- !u!114 &8657691430350510674
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -128,6 +151,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c4fdd6dde5081e4ab11695d0f7de2a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  powerUpMultiplier: 2
-  towerTag: Tower
-  centerPosition: {fileID: 6548227599642185535}
+  towerPowUpLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  towerDetectionRadius: 3
+  playerDetectionRadius: 3
+  stopDistance: 0
+  magnetForce: 30
+  detectionInterval: 1
+  towerGenerator: {fileID: 0}

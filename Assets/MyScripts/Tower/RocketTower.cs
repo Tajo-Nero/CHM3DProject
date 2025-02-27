@@ -4,24 +4,23 @@ using UnityEngine;
 
 public class RocketTower : TowerBase
 {
-    [SerializeField] private float detectionRange = 10f; // 탐지 범위 (부채꼴 길이)
-    [SerializeField] private float splashRadius = 10f; // 스플래쉬 범위 (부채꼴 길이)
+    [SerializeField] private float detectionRange = 10f; // 탐지 범위 (기본 설정)
+    [SerializeField] private float splashRadius = 10f; // 폭발 범위 (기본 설정)
     [SerializeField] private float damageOverTime = 5f; // 지속 데미지
     [SerializeField] private float damageDuration = 5f; // 지속 데미지 시간
     [SerializeField] private Transform rocketLaunchPoint; // 로켓 발사 지점
     private bool isAttacking = false;
-    [SerializeField] private float attackConeAngle = 45f; // 부채꼴 각도
-    [SerializeField] private Transform towerTransform; // 타워 트랜스폼
+    [SerializeField] private float attackConeAngle = 45f; // 공격 각도
 
-    void Start()
+    void Awake()
     {
-        towerAttackPower = 20; // 어택 파워 설정
+        towerAttackPower = 20; // 타워 공격력 설정
         towerPenetrationPower = 5;
         criticalHitRate = 0.05f;
         attackSpeed = 1.5f;
         installationCost = 10;
 
-        SetRange(detectionRange); // 탐지 범위를 부채꼴 길이와 같게 설정
+        SetRange(detectionRange); // 탐지 범위 초기화
     }
 
     void Update()
@@ -51,12 +50,10 @@ public class RocketTower : TowerBase
 
     private void RocketAttack(Transform target)
     {
-        // 로켓 발사 위치에서 목표 지점까지의 거리 계산
         Vector3 targetPosition = target.position;
         Vector3 direction = (targetPosition - rocketLaunchPoint.position).normalized;
 
-        // 목표 지점에 로켓 발사
-        Debug.Log("로켓 발사! " + target.name + "에 타격되었습니다!");
+        Debug.Log("로켓 발사! " + target.name + "이(가) 타겟되었습니다!");
 
         Collider[] hitColliders = Physics.OverlapSphere(targetPosition, splashRadius);
         foreach (var hitCollider in hitColliders)
@@ -66,7 +63,6 @@ public class RocketTower : TowerBase
                 Vector3 toCollider = (hitCollider.transform.position - rocketLaunchPoint.position).normalized;
                 float angle = Vector3.Angle(direction, toCollider);
 
-                // 적이 원뿔 범위 내에 있는지 확인
                 if (angle <= attackConeAngle / 2)
                 {
                     EnemyBase enemyHp = hitCollider.GetComponent<EnemyBase>();
@@ -92,7 +88,7 @@ public class RocketTower : TowerBase
             }
             else
             {
-                break; // enemyHp가 null이거나 비활성화된 경우 코루틴 종료
+                break; // enemyHp가 null이거나 비활성화된 경우 루프 종료
             }
             elapsed += 1f;
             yield return new WaitForSeconds(1f);
@@ -102,15 +98,14 @@ public class RocketTower : TowerBase
     public override void SetRange(float range)
     {
         detectionRange = range;
-        Debug.Log("탐지 범위 설정됨: " + detectionRange);
+        Debug.Log("탐지 범위 설정: " + detectionRange);
     }
 
-    void OnDrawGizmosSelected()
+    void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
+        Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
 
-        // 왼쪽 끝과 오른쪽 끝 표시
         Vector3 forward = rocketLaunchPoint.forward * splashRadius;
         Vector3 right = Quaternion.Euler(0, attackConeAngle / 2, 0) * forward;
         Vector3 left = Quaternion.Euler(0, -attackConeAngle / 2, 0) * forward;
@@ -118,6 +113,6 @@ public class RocketTower : TowerBase
         Gizmos.color = Color.yellow;
         Gizmos.DrawLine(rocketLaunchPoint.position, rocketLaunchPoint.position + right);
         Gizmos.DrawLine(rocketLaunchPoint.position, rocketLaunchPoint.position + left);
-
     }
+
 }

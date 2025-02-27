@@ -81,7 +81,7 @@ public class BuffTower : TowerBase
         Debug.Log("강화 범위 설정됨: " + buffRange);
     }
 
-    void OnDrawGizmosSelected()
+    void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, buffRange); // 강화 범위를 시각적으로 표시

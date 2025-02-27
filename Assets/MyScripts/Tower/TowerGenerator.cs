@@ -1,8 +1,17 @@
-using System;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 
+public interface IObserver
+{
+    void OnNotify(GameObject obj, string eventMessage);
+}
+
+public interface ISubject
+{
+    void AddObserver(IObserver observer);
+    void RemoveObserver(IObserver observer);
+    void NotifyObservers(GameObject obj, string eventMessage);
+}
 
 [System.Serializable]
 public class TowerCraft
@@ -12,116 +21,211 @@ public class TowerCraft
     public GameObject _PreviewPrefab;
 }
 
-public class TowerGenerator : MonoBehaviour
+public class TowerGenerator : MonoBehaviour, ISubject
 {
     [SerializeField]
-    private TowerCraft[] _CraftTower; // 프리팹들 담아줄 클래스
+    private TowerCraft[] _CraftTower;
     [SerializeField]
-    private Transform _Player; // 플레이어 앞에 타워 설치될 거라 플레이어 좌표 받아옴
+    private Transform _Player;
     [SerializeField]
-    private Material[] _Materials; // 설치 가능할 때의 초록색 메테리얼과 설치 불가능할 때의 빨간색 메테리얼을 배열로 받음
+    private Material[] _Materials;
     [SerializeField]
-    private GameObject currentPreview;
+    public GameObject currentPreview;
     private int currentPreviewIndex = -1;
     private bool canPlaceTower = true;
+    public bool canApplyAttackUp = false; // 공격력 업 가능 여부를 판단하는 변수
+    [SerializeField] private float maxDistanceFromInitialPosition = 3f;
+
+    private List<IObserver> observers = new List<IObserver>(); // 옵저버 목록
+
+    void Start()
+    {
+        HandlePreviewCreationInput();
+    }
+
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            CreatePreview(0); // 1번 키를 누르면 캐논 프리뷰 생성
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            CreatePreview(1); // 2번 키를 누르면 레이저 프리뷰 생성
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            CreatePreview(2); // 3번 키를 누르면 로켓 프리뷰 생성
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            CreatePreview(3);
-        }
+        HandlePreviewCreationInput();
 
         if (Input.GetMouseButtonDown(0) && currentPreview != null && canPlaceTower)
         {
-            {
-                PlaceTower(currentPreviewIndex); // 마우스를 클릭하면 실제 타워 생성
-            }
-        }
+            PlaceTower(currentPreviewIndex);
+        }       
 
-        void CreatePreview(int index)
+        CheckAndResetPreviewPosition();
+    }
+
+    public void AddObserver(IObserver observer)
+    {
+        observers.Add(observer);
+    }
+
+    public void RemoveObserver(IObserver observer)
+    {
+        observers.Remove(observer);
+    }
+
+    public void NotifyObservers(GameObject obj, string eventMessage)
+    {
+        foreach (IObserver observer in observers)
         {
-            if (index >= 0 && index < _CraftTower.Length)
-            {
-                if (currentPreview != null)
-                {
-                    Destroy(currentPreview); // 기존의 프리뷰가 있을 경우 제거
-                }
-                currentPreview = Instantiate(_CraftTower[index]._PreviewPrefab, _Player.position + _Player.forward, _Player.rotation, _Player.transform);
-                Renderer renderer = currentPreview.GetComponent<Renderer>();
-                if (renderer != null)
-                {
-                    renderer.material = _Materials[0]; // 초기 메테리얼을 초록색으로 설정
-                }
-                else
-                {
-                    // 자식 오브젝트에서 Renderer를 찾아 설정
-                    Renderer childRenderer = currentPreview.GetComponentInChildren<Renderer>();
-                    if (childRenderer != null)
-                    {
-                        childRenderer.material = _Materials[0]; // 초기 메테리얼을 초록색으로 설정
-                    }
-                }
-                currentPreview.AddComponent<PreviewCollisionDetector>().Setup(this, _Materials);
-                currentPreviewIndex = index; // 현재 프리뷰의 인덱스 저장
-            }
-        }
-
-        void PlaceTower(int index)
-        {
-            if (index >= 0 && index < _CraftTower.Length)
-            {
-                Instantiate(_CraftTower[index]._TowerPrefab, _Player.position + _Player.forward, _Player.rotation);
-                Destroy(currentPreview); // 타워를 설치한 후 프리뷰 제거
-                currentPreview = null; // 현재 프리뷰 변수 초기화
-                currentPreviewIndex = -1; // 현재 프리뷰 인덱스 초기화
-            }
-
+            observer.OnNotify(obj, eventMessage);
         }
     }
+
+    void HandlePreviewCreationInput()
+    {
+        for (int i = 0; i <= 3; i++)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+            {
+                CreatePreview(i);
+                break;
+            }
+        }
+    }
+
+    void CreatePreview(int index)
+    {
+        if (index >= 0 && index < _CraftTower.Length)
+        {
+            if (currentPreview != null)
+            {
+                Destroy(currentPreview);
+            }
+            currentPreview = Instantiate(_CraftTower[index]._PreviewPrefab, _Player.position + _Player.forward, _Player.rotation, _Player.transform);
+
+            Renderer renderer = currentPreview.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.material = _Materials[0];
+            }
+            else
+            {
+                Renderer childRenderer = currentPreview.GetComponentInChildren<Renderer>();
+                if (childRenderer != null)
+                {
+                    childRenderer.material = _Materials[0];
+                }
+            }
+            PreviewCollisionDetector previewCollision = currentPreview.AddComponent<PreviewCollisionDetector>();
+            previewCollision.Setup(this, _Materials);
+            currentPreviewIndex = index;
+
+            // 옵저버에게 알림을 보냅니다.
+            NotifyObservers(currentPreview, "PreviewCreated");
+        }
+    }
+
+    void PlaceTower(int index)
+    {
+        if (index >= 0 && index < _CraftTower.Length)
+        {
+            GameObject newTower = Instantiate(_CraftTower[index]._TowerPrefab, currentPreview.transform.position, currentPreview.transform.rotation);
+            Destroy(currentPreview);
+            currentPreview = null;
+            currentPreviewIndex = -1;
+
+            // 옵저버에게 알림을 보냅니다.
+            NotifyObservers(newTower, "TowerPlaced");
+
+            // 공격력 업 여부를 적용합니다.
+            if (canApplyAttackUp)
+            {
+                TowerBase towerBase = newTower.GetComponent<TowerBase>();
+                if (towerBase != null)
+                {
+                    towerBase.isAttackUp = true;
+                    towerBase.towerAttackPower *= 2;
+                    Debug.Log("타워 생성 시 공격력 업 적용됨: " + towerBase.towerAttackPower);
+                }
+            }
+        }
+    }
+
     public void SetCanPlaceTower(bool value)
     {
         canPlaceTower = value;
+    }
 
+    GameObject DetectTower()
+    {
+        Ray ray = new Ray(_Player.position, _Player.forward);
+        if (Physics.Raycast(ray, out RaycastHit hitInfo, 3.0f))
+        {
+            if (hitInfo.collider.CompareTag("Towers"))
+            {
+                return hitInfo.collider.gameObject;
+            }
+        }
+        return null;
+    }
+
+    void CheckAndResetPreviewPosition()
+    {
+        if (currentPreview != null)
+        {
+            float distance = Vector3.Distance(_Player.transform.position, currentPreview.transform.position);
+            if (distance > maxDistanceFromInitialPosition)
+            {
+                currentPreview.transform.position = _Player.transform.position + _Player.transform.forward;
+
+                Quaternion newRotation = Quaternion.Euler(_Player.rotation.eulerAngles.x, _Player.rotation.eulerAngles.y + currentPreview.transform.rotation.y, _Player.rotation.eulerAngles.z);
+                currentPreview.transform.rotation = newRotation;
+            }
+        }
+    }
+    public void RemoveTower(GameObject tower)
+    {
+        if (tower != null)
+        {
+            Destroy(tower);
+        }
     }
 }
-public class PreviewCollisionDetector : MonoBehaviour
+
+
+
+
+public class PreviewCollisionDetector : MonoBehaviour, IObserver
 {
     private TowerGenerator towerManager;
     private Material[] materials;
     private bool isCollidingWithTower = false;
     private bool isCollidingWithTerrain = false;
+    private bool isCollidingWithPowerUp = false;
 
     public void Setup(TowerGenerator manager, Material[] mats)
     {
         towerManager = manager;
         materials = mats;
+        towerManager.AddObserver(this); // 옵저버로 등록
         CheckPlacementValidity();
+    }
+
+    void OnDestroy()
+    {
+        if (towerManager != null)
+        {
+            towerManager.RemoveObserver(this); // 옵저버에서 제거
+        }
     }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Towers"))
         {
-            Debug.Log("충돌 감지: " + other.name);
             isCollidingWithTower = true;
             CheckPlacementValidity();
         }
         else if (other.CompareTag("Floor"))
         {
-            Debug.Log("터레인 감지: " + other.name);
             isCollidingWithTerrain = true;
+            CheckPlacementValidity();
+        }
+        else if (other.CompareTag("TowerPowUp"))
+        {
+            isCollidingWithPowerUp = true;
             CheckPlacementValidity();
         }
     }
@@ -130,23 +234,30 @@ public class PreviewCollisionDetector : MonoBehaviour
     {
         if (other.CompareTag("Towers"))
         {
-            Debug.Log("충돌 종료: " + other.name);
             isCollidingWithTower = false;
             CheckPlacementValidity();
         }
         else if (other.CompareTag("Floor"))
         {
-            Debug.Log("터레인 종료: " + other.name);
             isCollidingWithTerrain = false;
+            CheckPlacementValidity();
+        }
+        else if (other.CompareTag("TowerPowUp"))
+        {
+            isCollidingWithPowerUp = false;
             CheckPlacementValidity();
         }
     }
 
-    void OnTriggerStay(Collider other)
+    public void OnNotify(GameObject obj, string eventMessage)
     {
-        if (other.CompareTag("Floor"))
+        if (eventMessage == "PreviewCreated" && obj == gameObject)
         {
-            isCollidingWithTerrain = true;
+            CheckPlacementValidity();
+        }
+        else if (eventMessage == "TowerPlaced" && obj == gameObject)
+        {
+            CheckPlacementValidity();
         }
     }
 
@@ -161,15 +272,21 @@ public class PreviewCollisionDetector : MonoBehaviour
 
     private void CheckPlacementValidity()
     {
-        if (isCollidingWithTerrain && !isCollidingWithTower)
+        if (isCollidingWithTerrain && !isCollidingWithTower || isCollidingWithPowerUp)
         {
-            SetMaterial(materials[0]); // 초록색 메테리얼로 설정
+            SetMaterial(materials[0]);
             towerManager.SetCanPlaceTower(true);
+
+            // 공격력 업 가능 여부를 설정합니다.
+            towerManager.canApplyAttackUp = isCollidingWithPowerUp;
         }
         else
         {
-            SetMaterial(materials[1]); // 빨간색 메테리얼로 설정
+            SetMaterial(materials[1]);
             towerManager.SetCanPlaceTower(false);
         }
     }
 }
+
+
+

@@ -35,6 +35,12 @@ public class GameManager : MonoBehaviour
     [Header("Nexus Settings")]
     public GameObject nexusPrefab;
     public Transform nexusSpawnPoint;
+
+    [Header("Power-Up Settings")]
+    public GameObject towerPowerUpForcePrefab; // 추가된 부분
+    private GameObject[] towerPowerUpForceInstances; // 추가된 부분 6개 생성할거임
+    public GameObject[] towerPrefabs;
+
     public bool IsWaveActive { get; private set; }
     private GameObject currentTerrain;
     private GameObject currentPlayer;
@@ -65,64 +71,9 @@ public class GameManager : MonoBehaviour
 
     private void InitializeGame()
     {
-        SpawnTerrain();
-        // BakeNavMesh();
+        SpawnTerrain();        
         SpawnPlayer(carPlayerPrefab);
-    }
-    //public IEnumerator StartWave()
-    //{
-    //    if (currentWaveIndex < waves.Length)
-    //    {
-    //        Wave waveData = waves[currentWaveIndex];
-    //        int enemyCount = waveData.wave_enemyCount;
-
-    //        for (int i = 0; i < enemyCount; i++)
-    //        {
-    //            int spawnIndex = i % spawnPoints.Length;
-    //            EnemyData enemyData = waveData.wave_enemyData[i % waveData.wave_enemyData.Length];
-
-    //            Vector3 spawnPosition = spawnPoints[spawnIndex].position;
-    //            Quaternion spawnRotation = Quaternion.identity;
-
-    //            GameObject enemyInstance = enemyPool.SpawnEnemy(enemyData.enemyName, spawnPosition, spawnRotation); // GameObject를 반환받음
-    //            EnemyBase enemyComponent = enemyInstance.GetComponent<EnemyBase>();
-
-    //            if (enemyComponent != null)
-    //            {
-    //                // 자식 클래스에서 적절한 데이터를 설정합니다.
-    //                enemyComponent.enemy_attackDamage = enemyData.attackPower;
-    //                enemyComponent.enemy_attackSpeed = 1f; // 예시로 설정한 공격 속도
-    //                if (enemyComponent is Slime slime)
-    //                {
-    //                    slime.enemy_health = enemyData.health;
-    //                }
-    //                else if (enemyComponent is TurtleShell turtleShell)
-    //                {
-    //                    turtleShell.enemy_health = enemyData.health;
-    //                }
-    //                else if (enemyComponent is Beholder beholder)
-    //                {
-    //                    beholder.enemy_health = enemyData.health;
-    //                }
-    //                else if (enemyComponent is ChestMonster chestMonster)
-    //                {
-    //                    chestMonster.enemy_health = enemyData.health;
-    //                }
-
-    //            }
-
-    //            yield return new WaitForSeconds(1f);
-    //        }
-
-    //        while (enemyPool.ActiveEnemies > 0)
-    //        {
-    //            yield return null;
-    //        }
-
-    //        currentWaveIndex++;
-
-    //    }
-    //}
+    }   
 
     public IEnumerator StartWave()
     {
@@ -206,13 +157,34 @@ public class GameManager : MonoBehaviour
         }
     }
 
-   
+
+    private void SpawnTowerPowerUpForces(int count)
+    {
+        if (towerPowerUpForcePrefab == null)
+        {
+            return;
+        }
+
+        towerPowerUpForceInstances = new GameObject[count];
+
+        for (int i = 0; i < count; i++)
+        {
+            float randomX = Random.Range(4, terrainWidth-4);
+            float randomZ = Random.Range(4, terrainLength-4);
+            Vector3 randomPosition = new Vector3(randomX, 0, randomZ) + _UpTerrain.transform.position;
+
+            towerPowerUpForceInstances[i] = Instantiate(towerPowerUpForcePrefab, randomPosition, Quaternion.identity);
+        }
+
+        // 타워 설치
+        PlaceRandomTowers();
+    }
+
 
     private void SpawnTerrain()
     {
         if (_UpTerrain == null)
-        {
-            Debug.LogError("_UpTerrain이 설정되지 않았습니다.");
+        {            
             return;
         }
 
@@ -228,6 +200,7 @@ public class GameManager : MonoBehaviour
             terrainCollider = _UpTerrain.gameObject.AddComponent<TerrainCollider>();
         }
         terrainCollider.terrainData = _UpTerrain.terrainData;
+        SpawnTowerPowerUpForces(6);
     }
 
     private void InitializeTerrainData(TerrainData terrainData)
@@ -275,6 +248,35 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    private void PlaceRandomTowers()//랜덤타워 생성
+    {
+        foreach (GameObject powerUp in towerPowerUpForceInstances)
+        {
+            if (powerUp != null)
+            {
+                // 랜덤 타워 선택
+                int randomIndex = Random.Range(0, towerPrefabs.Length);
+                GameObject randomTowerPrefab = towerPrefabs[randomIndex];
+
+                // 타워 위치 및 회전 설정
+                Vector3 towerPosition = new Vector3(powerUp.transform.position.x, 2f, powerUp.transform.position.z);
+                Quaternion towerRotation = Quaternion.Euler(0, Random.Range(0, 360f), 0);
+
+                GameObject newTower = Instantiate(randomTowerPrefab, towerPosition, towerRotation);
+
+                // 파워업 적용
+                TowerBase towerBase = newTower.GetComponent<TowerBase>();
+                if (towerBase != null)
+                {
+                    towerBase.isAttackUp = true;
+                    towerBase.towerAttackPower *= 2;
+                    Debug.Log("타워 생성 시 공격력 업 적용됨: " + towerBase.towerAttackPower);
+                }
+            }
+        }
+    }
+    
+
 
     public void ResetTerrain()
     {
@@ -301,16 +303,12 @@ public class GameManager : MonoBehaviour
         {
             currentNexus = Instantiate(nexusPrefab, nexusSpawnPoint.position, nexusSpawnPoint.rotation);
         }
-        else
-        {
-            Debug.LogError("NexusPrefab이 설정되지 않았습니다!");
-        }
+        
     }
 
     public void BakeNavMesh()
     {
-        navMeshSurface.BuildNavMesh();
-        Debug.Log("NavMesh가 구워졌습니다.");
+        navMeshSurface.BuildNavMesh();        
     }
 
 }

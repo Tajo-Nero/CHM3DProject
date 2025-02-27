@@ -10,8 +10,7 @@ public class PlayerCarMode : MonoBehaviour
     public float moveSpeed = 2f;
     private Vector3 moveDir;
     public GameObject _PlayerMode;
-    private GameManager gameManager;
-    private bool isSpeedBoostActive = false; // 이동 속도 부스트 플래그
+    private GameManager gameManager;    
     private Drill drillScript;
 
     public float cameraRotationX = 45f; // 카메라의 X축 회전 값을 조절할 입력값
@@ -37,7 +36,7 @@ public class PlayerCarMode : MonoBehaviour
             // 마우스 왼쪽 버튼 클릭 시 이동 속도 부스트
             if (Input.GetMouseButton(0))
             {
-                isSpeedBoostActive = true;
+                
                 moveSpeed = 5f; // 이동 속도 부스트 3
                 if (drillScript != null)
                 {
@@ -46,7 +45,7 @@ public class PlayerCarMode : MonoBehaviour
             }
             else
             {
-                isSpeedBoostActive = false;
+                
                 moveSpeed = 3f; // 기본 이동 속도 2
                 if (drillScript != null)
                 {
@@ -72,6 +71,7 @@ public class PlayerCarMode : MonoBehaviour
         {
             Destroy(gameObject);
             gameManager.ResetTerrain();
+           
         }
     }
 
@@ -89,9 +89,9 @@ public class PlayerCarMode : MonoBehaviour
         if (collision.gameObject.CompareTag("Nexus"))
         {
             gameManager.SpawnPlayer(_PlayerMode);
-            Debug.Log("SpawnPlayer 함수가 호출되었습니다.");
+            
             Destroy(gameObject);
-            Debug.Log("플레이어가 파괴되었습니다.");
+            
         }
     }
 }

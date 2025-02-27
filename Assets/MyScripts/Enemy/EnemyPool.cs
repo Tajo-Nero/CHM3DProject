@@ -49,7 +49,7 @@ public class EnemyPool : MonoBehaviour
             );
 
             poolDictionary.Add(prefab.name, pool);
-            Debug.Log($"Àû ÇÁ¸®ÆÕ Ãß°¡µÊ: {prefab.name}");
+            ;
         }
     }
 
