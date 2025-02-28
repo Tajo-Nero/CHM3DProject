@@ -122,7 +122,7 @@ NavMeshSettings:
     preserveTilesOutsideBounds: 0
     debug:
       m_Flags: 0
-  m_NavMeshData: {fileID: 0}
+  m_NavMeshData: {fileID: 23800000, guid: a7fc08a6934f49a42af78268f8fb5f6b, type: 2}
 --- !u!1 &178007086
 GameObject:
   m_ObjectHideFlags: 0
@@ -498,9 +498,9 @@ GameObject:
   - component: {fileID: 1224200632}
   - component: {fileID: 1224200631}
   - component: {fileID: 1224200630}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Terrain
-  m_TagString: Untagged
+  m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 126
@@ -595,7 +595,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1345901729
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -633,11 +633,11 @@ MonoBehaviour:
   playerPrefab: {fileID: 7620607172156864347, guid: c94b039541aa54740a324f0398da259c, type: 3}
   carPlayerPrefab: {fileID: 3524384385267151811, guid: 89ca953a138d2724cbed7ed263b4fcca, type: 3}
   playerSpawnPoint: {fileID: 4469273657927019661, guid: cacd6b9801ccee64ab230b9a9cd59e46, type: 3}
-  nexusPrefab: {fileID: 92292753080900013, guid: 3f177067e9ab12f42886cb5a10945b4b, type: 3}
+  nexusPrefab: {fileID: 8961772740767177616, guid: 3f177067e9ab12f42886cb5a10945b4b, type: 3}
   nexusSpawnPoint: {fileID: 2097204850680251578, guid: 223d2c7793b55d4448704ca1a79f5e0d, type: 3}
   towerPowerUpForcePrefab: {fileID: 3852654655314689898, guid: 771e2d394c77fd74da315f5aee4a3928, type: 3}
   towerPrefabs:
-  - {fileID: 2055665458963272873, guid: 38ba78548930e6340a2fbdb368a3fb47, type: 3}
+  - {fileID: 7098814355583657019, guid: 25854aaa9de9c6c4abdb41f39578ced7, type: 3}
   - {fileID: 1229389129709629617, guid: e8ada64e2ca7f33468786e4f4a823087, type: 3}
 --- !u!4 &1345901730
 Transform:
@@ -712,7 +712,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7620607172156864347, guid: c94b039541aa54740a324f0398da259c, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

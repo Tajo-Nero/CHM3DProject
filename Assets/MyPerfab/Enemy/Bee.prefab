@@ -330,6 +330,7 @@ GameObject:
   m_Component:
   - component: {fileID: 74255257245527287}
   - component: {fileID: 6989345058950631219}
+  - component: {fileID: 1459546059191347466}
   m_Layer: 7
   m_Name: Swarm09
   m_TagString: Untagged
@@ -417,6 +418,29 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.7485279, y: -0.32041705, z: 0.015267372}
     m_Extent: {x: 0.7517066, y: 0.64350116, z: 0.6666688}
   m_DirtyAABB: 0
+--- !u!136 &1459546059191347466
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6637550460317976993}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.90896076
+  m_Height: 1.6755863
+  m_Direction: 1
+  m_Center: {x: 0.015267463, y: -0.083536506, z: 0.8099278}
 --- !u!1 &6919133999309253894
 GameObject:
   m_ObjectHideFlags: 0
@@ -491,8 +515,8 @@ GameObject:
   - component: {fileID: 523074081970785891}
   - component: {fileID: 8387296239827921529}
   - component: {fileID: 6091673212622747597}
-  - component: {fileID: 7722692057068358350}
   - component: {fileID: 583238829970718707}
+  - component: {fileID: -3632640460819864062}
   m_Layer: 7
   m_Name: Bee
   m_TagString: Enemy
@@ -547,12 +571,12 @@ NavMeshAgent:
   m_GameObject: {fileID: 9107608812774186470}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 5
+  m_Radius: 1
+  m_Speed: 8
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 2
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -560,7 +584,22 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!136 &7722692057068358350
+--- !u!114 &583238829970718707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9107608812774186470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a4ed44fad20893409311f12158ddbd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemy_attackDamage: 0
+  enemy_attackSpeed: 0
+  enemy_health: 0
+--- !u!136 &-3632640460819864062
 CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -583,18 +622,3 @@ CapsuleCollider:
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &583238829970718707
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9107608812774186470}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a4ed44fad20893409311f12158ddbd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemy_attackDamage: 0
-  enemy_attackSpeed: 0
-  enemy_health: 0

@@ -483,15 +483,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400128, guid: ac331b525a4577e46aa9942c1016219d, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 400128, guid: ac331b525a4577e46aa9942c1016219d, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 400128, guid: ac331b525a4577e46aa9942c1016219d, type: 3}
       propertyPath: m_LocalScale.z
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 400128, guid: ac331b525a4577e46aa9942c1016219d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -653,8 +653,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c1a65f4be97fd84b876465c65a3b3ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
-  jumpPower: 4
+  moveSpeed: 8
+  jumpPower: 6
   camRotSpeed: 1
   camPos: {fileID: 6930326225793496728}
   gameManager: {fileID: 0}

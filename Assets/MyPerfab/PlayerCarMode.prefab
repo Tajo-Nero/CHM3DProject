@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3008840763286032591}
   m_Layer: 0
   m_Name: Drill
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -112,7 +112,7 @@ GameObject:
   - component: {fileID: 4213203106050193753}
   m_Layer: 0
   m_Name: Wheel_FR
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -285,7 +285,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   camPos: {fileID: 1791439045690941793}
   cam: {fileID: 0}
-  target: {fileID: 6056106704746141032, guid: 3f177067e9ab12f42886cb5a10945b4b, type: 3}
+  target: {fileID: 2005926775401804638, guid: 3f177067e9ab12f42886cb5a10945b4b, type: 3}
   rotationSpeed: 50
   moveSpeed: 2
   _PlayerMode: {fileID: 7620607172156864347, guid: c94b039541aa54740a324f0398da259c, type: 3}
@@ -303,7 +303,7 @@ GameObject:
   - component: {fileID: 4207722074106810202}
   m_Layer: 0
   m_Name: Wheel_BR
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -386,7 +386,7 @@ GameObject:
   - component: {fileID: 6730660199804617637}
   m_Layer: 0
   m_Name: Wheel_BL
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -469,7 +469,7 @@ GameObject:
   - component: {fileID: 3577840254891308616}
   m_Layer: 0
   m_Name: Body
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -550,7 +550,7 @@ GameObject:
   - component: {fileID: 1791439045690941793}
   m_Layer: 0
   m_Name: CamTransform
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -583,7 +583,7 @@ GameObject:
   - component: {fileID: 3626094292660695452}
   m_Layer: 0
   m_Name: Wheel_FL
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

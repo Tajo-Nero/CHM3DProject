@@ -94,4 +94,13 @@ public class PlayerCarMode : MonoBehaviour
             
         }
     }
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    if (other.CompareTag("Player"))
+    //    {
+    //        gameManager.SpawnPlayer(_PlayerMode);
+    //                
+    //        Destroy(gameObject);
+    //    }
+    //}
 }

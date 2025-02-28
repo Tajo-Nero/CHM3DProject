@@ -74,7 +74,7 @@ public class Nexus : TowerBase
     public override void SetRange(float range)
     {
         detectionRange = range; // 탐지 범위 설정
-        Debug.Log("탐지 범위가 설정되었습니다: " + detectionRange);
+        
     }
 
     void OnDrawGizmosSelected()
@@ -98,5 +98,13 @@ public class Nexus : TowerBase
             GameManager.Instance.BakeNavMesh();
         }
     }
+    //IEnumerator OnTriggerEnter(Collider other)
+    //{
+    //    if (other.gameObject.tag == "Player")
+    //    {
+    //        yield return new WaitForSeconds(1f);
+    //        GameManager.Instance.BakeNavMesh();
+    //    }
+    //}
 }   
 

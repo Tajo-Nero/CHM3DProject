@@ -259,7 +259,7 @@ public class GameManager : MonoBehaviour
                 GameObject randomTowerPrefab = towerPrefabs[randomIndex];
 
                 // 타워 위치 및 회전 설정
-                Vector3 towerPosition = new Vector3(powerUp.transform.position.x, 2f, powerUp.transform.position.z);
+                Vector3 towerPosition = new Vector3(powerUp.transform.position.x, 2.2f, powerUp.transform.position.z);
                 Quaternion towerRotation = Quaternion.Euler(0, Random.Range(0, 360f), 0);
 
                 GameObject newTower = Instantiate(randomTowerPrefab, towerPosition, towerRotation);
