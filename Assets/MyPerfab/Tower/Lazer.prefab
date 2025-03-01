@@ -75,9 +75,8 @@ MonoBehaviour:
   attackSpeed: 0
   installationCost: 0
   isAttackUp: 0
-  detectionRange: 10
+  detectionRange: 20
   laserStartPoint: {fileID: 6467481287587556718}
-  laserLength: 20
 --- !u!120 &4275051539852091550
 LineRenderer:
   serializedVersion: 2
@@ -206,6 +205,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: 4533904720731388727, guid: 825ad59c617def045a3607fab784aa01, type: 3}
+      propertyPath: m_TagString
+      value: Towers
+      objectReference: {fileID: 0}
     - target: {fileID: 7337844801627918287, guid: 825ad59c617def045a3607fab784aa01, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -319,6 +322,10 @@ PrefabInstance:
     - target: {fileID: 3873495716677904016, guid: e7437d3fa8a3c5e4da1e5ef6506d7690, type: 3}
       propertyPath: m_Layer
       value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 3873495716677904016, guid: e7437d3fa8a3c5e4da1e5ef6506d7690, type: 3}
+      propertyPath: m_TagString
+      value: Towers
       objectReference: {fileID: 0}
     - target: {fileID: 6693124448814727296, guid: e7437d3fa8a3c5e4da1e5ef6506d7690, type: 3}
       propertyPath: m_Convex

@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2005926775401804638}
-  - component: {fileID: 4042469802795427456}
   - component: {fileID: 8343960252540962959}
   - component: {fileID: 4303375660337114502}
+  - component: {fileID: 4748515571652061975}
   m_Layer: 6
   m_Name: Nexus
   m_TagString: Nexus
@@ -39,28 +39,6 @@ Transform:
   - {fileID: 3429765837644053407}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4042469802795427456
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8961772740767177616}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56bfc554d6193d34fa0b09fb0dc1b07d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  towerAttackPower: 0
-  towerPenetrationPower: 0
-  criticalHitRate: 0
-  attackSpeed: 0
-  installationCost: 0
-  isAttackUp: 0
-  detectionRange: 10
-  attackDamage: 20
-  attackInterval: 2
-  health: 1000
 --- !u!136 &8343960252540962959
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -80,8 +58,8 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.4
-  m_Height: 3
+  m_Radius: 0.6
+  m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!54 &4303375660337114502
@@ -111,6 +89,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 0
+--- !u!114 &4748515571652061975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8961772740767177616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56bfc554d6193d34fa0b09fb0dc1b07d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRange: 5
+  attackDamage: 50
+  attackInterval: 2
+  health: 1000
 --- !u!1001 &504168414924720283
 PrefabInstance:
   m_ObjectHideFlags: 0

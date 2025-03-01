@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ChestMonster : EnemyBase
 {
-    public float enemy_health;
+    //public float enemy_health;
 
     protected override void Awake()
     {

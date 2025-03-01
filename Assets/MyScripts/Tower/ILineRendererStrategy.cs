@@ -2,21 +2,27 @@ using UnityEngine;
 
 public interface ILineRendererStrategy
 {
-    void Setup(LineRenderer lineRenderer);
-    void GeneratePattern(LineRenderer lineRenderer, Vector3 origin, Transform launchPoint, int segments, float parameter, float length);
+    void Setup(GameObject tower);
+    void GeneratePattern(GameObject tower, Vector3 origin, Transform launchPoint, int segments, float parameter, float length);
 }
 
 public class CircleRendererStrategy : ILineRendererStrategy
 {
-    public void Setup(LineRenderer lineRenderer)
+    public void Setup(GameObject tower)
     {
+        LineRenderer lineRenderer = tower.GetComponent<LineRenderer>();
+        if (lineRenderer == null)
+        {
+            lineRenderer = tower.AddComponent<LineRenderer>();
+        }
         lineRenderer.startWidth = 0.1f;
         lineRenderer.endWidth = 0.1f;
         lineRenderer.loop = true;
     }
 
-    public void GeneratePattern(LineRenderer lineRenderer, Vector3 origin, Transform launchPoint, int segments, float radius, float length)
+    public void GeneratePattern(GameObject tower, Vector3 origin, Transform launchPoint, int segments, float radius, float length)
     {
+        LineRenderer lineRenderer = tower.GetComponent<LineRenderer>();
         lineRenderer.positionCount = segments + 1;
         float angleStep = 360f / segments;
 
@@ -32,20 +38,27 @@ public class CircleRendererStrategy : ILineRendererStrategy
 
 public class FanRendererStrategy : ILineRendererStrategy
 {
-    public void Setup(LineRenderer lineRenderer)
+    public void Setup(GameObject tower)
     {
-        // Setup ÄÚµå
+        LineRenderer lineRenderer = tower.GetComponent<LineRenderer>();
+        if (lineRenderer == null)
+        {
+            lineRenderer = tower.AddComponent<LineRenderer>();
+        }
+        lineRenderer.startWidth = 0.1f;
+        lineRenderer.endWidth = 0.1f;
     }
 
-    public void GeneratePattern(LineRenderer lineRenderer, Vector3 origin, Transform launchPoint, int segments, float coneAngle, float length)
+    public void GeneratePattern(GameObject tower, Vector3 origin, Transform launchPoint, int segments, float coneAngle, float length)
     {
+        LineRenderer lineRenderer = tower.GetComponent<LineRenderer>();
         lineRenderer.positionCount = segments + 2;
         float angleStep = coneAngle / (segments - 1);
         lineRenderer.SetPosition(0, origin);
 
         for (int i = 0; i <= segments; i++)
         {
-            float angle = (angleStep * i - coneAngle / 2) * Mathf.Deg2Rad;
+            float angle = (angleStep * i - coneAngle) * Mathf.Deg2Rad;
             float x = Mathf.Cos(angle) * length;
             float z = Mathf.Sin(angle) * length;
             Vector3 position = origin + launchPoint.forward * x + launchPoint.right * z;
@@ -58,16 +71,24 @@ public class FanRendererStrategy : ILineRendererStrategy
 
 public class LaserRendererStrategy : ILineRendererStrategy
 {
-    public void Setup(LineRenderer lineRenderer)
+    public void Setup(GameObject tower)
     {
+        LineRenderer lineRenderer = tower.GetComponent<LineRenderer>();
+        if (lineRenderer == null)
+        {
+            lineRenderer = tower.AddComponent<LineRenderer>();
+        }
         lineRenderer.startWidth = 0.1f;
         lineRenderer.endWidth = 0.1f;
     }
 
-    public void GeneratePattern(LineRenderer lineRenderer, Vector3 origin, Transform launchPoint, int segments, float detectionRange, float length)
+    public void GeneratePattern(GameObject tower, Vector3 origin, Transform launchPoint, int segments, float detectionRange, float length)
     {
-        Vector3 boxCenter = launchPoint.position + launchPoint.forward * (detectionRange / 2);
-        Vector3 boxSize = new Vector3(2f, 2f, detectionRange);
+        LineRenderer lineRenderer = tower.GetComponent<LineRenderer>();
+        
+
+        Vector3 boxCenter = launchPoint.position + launchPoint.forward * length;
+        Vector3 boxSize = new Vector3(2f, 2f, length);
 
         Vector3[] vertices = new Vector3[8];
 

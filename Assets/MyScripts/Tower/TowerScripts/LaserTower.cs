@@ -4,46 +4,39 @@ using UnityEngine;
 
 public class LaserTower : TowerBase
 {
-    [SerializeField] private float detectionRange = 10f;
-    [SerializeField] private Transform laserStartPoint;
-    private LineRenderer lineRenderer;
-    private bool isAttacking = false;
-    [SerializeField] private float laserLength = 10f;
+    [SerializeField] private float detectionRange = 20f; // 탐지 범위
+    [SerializeField] private Transform laserStartPoint; // 레이저 시작점
     private ILineRendererStrategy lineRendererStrategy;
+    private bool isAttacking = false; // 공격 중인지 여부
+
+    // 초기값을 설정합니다.
+    void Awake()
+    {
+        towerAttackPower = 50; // 공격력 설정
+        attackSpeed = 1f; // 공격 속도 설정
+        installationCost = 15; // 설치 비용 설정
+    }
 
     void Start()
     {
-        towerAttackPower = 50;
-        attackSpeed = 4f;
-        installationCost = 15;
+        SetRange(detectionRange); // 탐지 범위 설정
 
-        SetRange(detectionRange);
-
-        lineRenderer = GetComponent<LineRenderer>();
-        if (lineRenderer == null)
-        {
-            lineRenderer = gameObject.AddComponent<LineRenderer>();
-        }
-
-        // 원하는 전략을 초기화하고 설정
+        // 라인렌더러 전략 초기화
         lineRendererStrategy = new LaserRendererStrategy();
-        lineRendererStrategy.Setup(lineRenderer);
-
-        lineRenderer.positionCount = 5;
-        lineRenderer.startWidth = 0.1f;
-        lineRenderer.endWidth = 0.1f;
-        lineRenderer.enabled = false;
+        lineRendererStrategy.Setup(gameObject);
+        lineRendererStrategy.GeneratePattern(gameObject, transform.position, laserStartPoint, 4, detectionRange, 20f);
     }
 
     void Update()
     {
-        DetectEnemiesInRange();
+        DetectEnemiesInRange(); // 적 탐지
     }
 
     public override void DetectEnemiesInRange()
     {
         List<Transform> targets = new List<Transform>();
 
+        // 탐지 범위 설정
         Vector3 boxCenter = laserStartPoint.position + laserStartPoint.forward * (detectionRange / 2);
         Vector3 boxHalfExtents = new Vector3(2f, 2f, detectionRange / 2);
 
@@ -59,12 +52,8 @@ public class LaserTower : TowerBase
 
         if (targets.Count > 0 && !isAttacking)
         {
-            StartCoroutine(AttackRoutine(targets));
+            StartCoroutine(AttackRoutine(targets)); // 공격 루틴 시작
         }
-
-        // 패턴 생성
-        lineRendererStrategy.GeneratePattern(lineRenderer, laserStartPoint.position, transform, 8, detectionRange, laserLength);
-    
     }
 
     private IEnumerator AttackRoutine(List<Transform> targets)
@@ -72,31 +61,22 @@ public class LaserTower : TowerBase
         isAttacking = true;
         while (targets.Count > 0)
         {
-            lineRenderer.enabled = true; // Enable line renderer
-            TowerAttack(targets);
+            TowerAttack(targets); // 타워 공격
+            yield return new WaitForSeconds(attackSpeed); // 공격 대기 시간
 
-            yield return new WaitForSeconds(1.0f); // Show the laser for 1 second
-
-            lineRenderer.enabled = false; // Disable line renderer
-            yield return new WaitForSeconds(attackSpeed - 1.0f); // Wait for the rest of the attack speed
-
-            targets.RemoveAll(t => t == null || !t.gameObject.activeSelf);
+            targets.RemoveAll(t => t == null || !t.gameObject.activeSelf); // 비활성화된 적 제거
         }
         isAttacking = false;
     }
 
     public override void TowerAttack(List<Transform> targets)
     {
-        lineRenderer.enabled = true;
-        lineRenderer.SetPosition(0, laserStartPoint.position);
-        lineRenderer.SetPosition(1, laserStartPoint.position + laserStartPoint.forward * laserLength);
-
         foreach (var target in targets)
         {
             EnemyBase enemyHp = target.GetComponent<EnemyBase>();
             if (enemyHp != null)
             {
-                enemyHp.TakeDamage(towerAttackPower);
+                enemyHp.TakeDamage(towerAttackPower); // 적에게 데미지 주기
                 Debug.Log("Laser hit " + target.name + " for " + towerAttackPower + " damage!");
             }
         }
@@ -104,14 +84,20 @@ public class LaserTower : TowerBase
 
     public override void SetRange(float range)
     {
-        detectionRange = range;
-        Debug.Log("Detection range set to: " + detectionRange);
+        detectionRange = range; // 탐지 범위 설정
+    }
+
+    public override void TowerPowUp()
+    {
+        towerAttackPower *= 2; // 공격력 두 배로 증가
+        Debug.Log("레이저 타워의 공격력이 강화되었습니다: " + towerAttackPower);
     }
 
     private void OnDrawGizmos()
     {
         if (laserStartPoint != null)
         {
+            // 탐지 범위 시각화
             Gizmos.color = Color.red;
             Vector3 boxCenter = laserStartPoint.position + laserStartPoint.forward * (detectionRange / 2);
             Vector3 boxSize = new Vector3(2f, 2f, detectionRange);

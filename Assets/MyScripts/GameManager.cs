@@ -1,51 +1,31 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine;
-using UnityEngine.AI;
 
-public class GameManager : MonoBehaviour
+/// <summary>
+/// 게임 관리 클래스, 게임 상태를 관리하고 업데이트합니다.
+/// </summary>
+public class GameManager : MonoBehaviour, IObserver
 {
-    public static GameManager Instance { get; private set; }
+    public static GameManager Instance { get; private set; } // 게임 매니저 인스턴스
+    public NavMeshSurface navMeshSurface; // 내비게이션 메쉬
+    public PauseMenuController pauseMenuController; // PauseMenuController 참조
+    public int installationCost = 40; // 설치 비용
+    public int shopCost = 0; // 샵 비용
 
-    [Header("Stage Settings")]
-    public Wave[] waves; // 웨이브 데이터를 배열로 저장
-    public int currentWaveIndex = 0; // 현재 웨이브 인덱스
-
-    [Header("Enemy Settings")]
-    public Transform[] spawnPoints; // 적 스폰 위치
-    private EnemyPool enemyPool;
-
-    [Header("Terrain Settings")]
-    public Terrain _UpTerrain;
-    public Transform terrainSpawnPoint;
-    [SerializeField] private int resolution = 129;
-    [SerializeField] private float heightScale = 3f;
-    [SerializeField] private float terrainWidth = 60;
-    [SerializeField] private float terrainLength = 60;
-
-    [Header("NavMesh Settings")]
-    public NavMeshSurface navMeshSurface;
+    [Header("Wave Manager")]
+    public WaveManager waveManager; // 웨이브 매니저
 
     [Header("Player Settings")]
-    public GameObject playerPrefab;
-    public GameObject carPlayerPrefab;
-    public Transform playerSpawnPoint;
+    public GameObject playerPrefab; // 플레이어 프리팹
+    public GameObject carPlayerPrefab; // 차량 플레이어 프리팹
+    public Transform playerSpawnPoint; // 플레이어 스폰 지점
 
     [Header("Nexus Settings")]
-    public GameObject nexusPrefab;
-    public Transform nexusSpawnPoint;
+    public GameObject nexusPrefab; // 넥서스 프리팹
+    public Transform nexusSpawnPoint; // 넥서스 스폰 지점
 
-    [Header("Power-Up Settings")]
-    public GameObject towerPowerUpForcePrefab; // 추가된 부분
-    private GameObject[] towerPowerUpForceInstances; // 추가된 부분 6개 생성할거임
-    public GameObject[] towerPrefabs;
-
-    public bool IsWaveActive { get; private set; }
-    private GameObject currentTerrain;
-    private GameObject currentPlayer;
-    private GameObject currentNexus;
-    Vector3 currentSpawnPoint;
+    [Header("Terrain Settings")]
+    public TerrainManager terrainManager; // 지형 매니저
 
     private void Awake()
     {
@@ -62,253 +42,179 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        SpawnNexus();
-        InitializeGame();
-        enemyPool = FindObjectOfType<EnemyPool>();
-        currentSpawnPoint = carPlayerPrefab.transform.position;
-        Debug.Log(carPlayerPrefab.transform.position);
+        if (terrainManager != null)
+        {
+            terrainManager.InitializeTerrain(); // 지형 초기화
+        }      
+
+        SpawnNexus(); // 넥서스 스폰
+        InitializeGame(); // 게임 초기화
+        UpdateUI(); // 초기 UI 업데이트
     }
 
     private void InitializeGame()
     {
-        SpawnTerrain();        
-        SpawnPlayer(carPlayerPrefab);
-    }   
+        SpawnPlayer(carPlayerPrefab); // 차량 플레이어 스폰
 
-    public IEnumerator StartWave()
-    {
-        if (currentWaveIndex < waves.Length)
+        if (waveManager == null)
         {
-            Wave waveData = waves[currentWaveIndex];
-            int enemyCount = waveData.wave_enemyCount;
+            waveManager = FindObjectOfType<WaveManager>();
+        }
 
-            // 적 생성 코루틴 시작
-            StartCoroutine(SpawnEnemies(waveData, enemyCount));
-
-            // 적들이 모두 소멸할 때까지 대기
-            while (enemyPool.ActiveEnemies > 0)
-            {
-                yield return null;
-            }
-
-            // 웨이브 인덱스 증가
-            currentWaveIndex++;
+        if (waveManager == null)
+        {
+            Debug.LogError("WaveManager 인스턴스를 찾을 수 없습니다.");
         }
     }
 
-    private IEnumerator SpawnEnemies(Wave waveData, int enemyCount)
+    public bool CanAffordInstallation(int cost)
     {
-        for (int i = 0; i < enemyCount; i++)
+        return installationCost >= cost; // 설치 비용을 감당할 수 있는지 확인
+    }
+
+    public void DeductCost(int cost)
+    {
+        installationCost -= cost; // 설치 비용 차감
+    }
+
+    /// <summary>
+    /// 샵 비용과 설치 비용을 확률적으로 증가시킵니다.
+    /// </summary>
+    /// <param name="shopIncrement">샵 비용 증가량</param>
+    /// <param name="installationIncrement">설치 비용 증가량</param>
+    /// <param name="shopProbability">샵 비용 증가 확률 (0.0에서 1.0 사이)</param>
+    /// <param name="installationProbability">설치 비용 증가 확률 (0.0에서 1.0 사이)</param>
+    public void IncreaseCosts(int shopIncrement, int installationIncrement, float shopProbability, float installationProbability)
+    {
+        float shopRandomValue = Random.Range(0f, 1f);
+        if (shopRandomValue <= shopProbability)
         {
-            int spawnIndex = i % spawnPoints.Length;
-            EnemyData enemyData = waveData.wave_enemyData[i % waveData.wave_enemyData.Length];
+            shopCost += shopIncrement;
+            Debug.Log($"적이 죽었습니다. 샵 비용이 {shopIncrement} 만큼 증가했습니다. 현재 샵 비용: {shopCost}");
+        }
 
-            Vector3 spawnPosition = spawnPoints[spawnIndex].position;
-            Quaternion spawnRotation = Quaternion.identity;
+        float installationRandomValue = Random.Range(0f, 1f);
+        if (installationRandomValue <= installationProbability)
+        {
+            installationCost += installationIncrement;
+            Debug.Log($"적이 죽었습니다. 설치 비용이 {installationIncrement} 만큼 증가했습니다. 현재 설치 비용: {installationCost}");
+        }
 
-            GameObject enemyInstance = enemyPool.SpawnEnemy(enemyData.enemyName, spawnPosition, spawnRotation); // GameObject를 반환받음
-            EnemyBase enemyComponent = enemyInstance.GetComponent<EnemyBase>();
+        UpdateUI();
+    }
 
-            if (enemyComponent != null)
+    public void UpdateUI()
+    {
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.UpdateShopCost(shopCost);
+            UIManager.Instance.UpdateInstallationCost(installationCost);
+            UIManager.Instance.UpdateWaveProgress(waveManager.GetCurrentWaveIndex(), waveManager.GetTotalWaves());
+        }
+    }
+    void Update()
+    {
+        // Esc 키를 누르면 메뉴 활성화/비활성화
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (pauseMenuController.gameObject.activeSelf)
             {
-                // 자식 클래스에서 적절한 데이터를 설정합니다.
-                enemyComponent.enemy_attackDamage = enemyData.attackPower;
-                enemyComponent.enemy_attackSpeed = 1f; // 예시로 설정한 공격 속도
-                if (enemyComponent is Slime slime)
-                {
-                    slime.enemy_health = enemyData.health;
-                }
-                else if (enemyComponent is TurtleShell turtleShell)
-                {
-                    turtleShell.enemy_health = enemyData.health;
-                }
-                else if (enemyComponent is Beholder beholder)
-                {
-                    beholder.enemy_health = enemyData.health;
-                }
-                else if (enemyComponent is Bee bee)
-                {
-                    bee.enemy_health = enemyData.health;
-                }
-                else if (enemyComponent is ChestMonster chestMonster)
-                {
-                    chestMonster.enemy_health = enemyData.health;
-                }
-                else if (enemyComponent is Cactus cactus)
-                {
-                    cactus.enemy_health = enemyData.health;
-                }
-                else if (enemyComponent is Elite elite)
-                {
-                    elite.enemy_health = enemyData.health;
-                }
-                else if (enemyComponent is Cute cute)
-                {
-                    cute.enemy_health = enemyData.health;
-                }
-                else if (enemyComponent is Mushroom mushroom)
-                {
-                    mushroom.enemy_health = enemyData.health;
-                }
-
+                pauseMenuController.CloseMenu();
             }
-
-            yield return new WaitForSeconds(1f);
+            else
+            {
+                pauseMenuController.OpenMenu();
+            }
         }
     }
 
-
-    private void SpawnTowerPowerUpForces(int count)
+    public void AdvanceWave()
     {
-        if (towerPowerUpForcePrefab == null)
+        if (waveManager == null)
         {
+            Debug.LogError("WaveManager 인스턴스가 null입니다.");
             return;
         }
 
-        towerPowerUpForceInstances = new GameObject[count];
+        waveManager.StartNextWave(); // 다음 웨이브 시작
 
-        for (int i = 0; i < count; i++)
+        int currentWave = waveManager.GetCurrentWaveIndex();
+        if (currentWave == 2 || currentWave == 3 || currentWave == 7 || currentWave == 8)
         {
-            float randomX = Random.Range(4, terrainWidth-4);
-            float randomZ = Random.Range(4, terrainLength-4);
-            Vector3 randomPosition = new Vector3(randomX, 0, randomZ) + _UpTerrain.transform.position;
-
-            towerPowerUpForceInstances[i] = Instantiate(towerPowerUpForcePrefab, randomPosition, Quaternion.identity);
+            IncreaseCosts(0, 3, 1.0f, 1.0f); // 샵 비용 0, 설치 비용 3 증가 (확률 100%)
         }
 
-        // 타워 설치
-        PlaceRandomTowers();
+        UpdateUI(); // 웨이브 진행 후 UI 업데이트
     }
 
-
-    private void SpawnTerrain()
+    public void EnemyDefeated()
     {
-        if (_UpTerrain == null)
-        {            
-            return;
-        }
-
-        Vector3 spawnPosition = terrainSpawnPoint.position;
-        _UpTerrain.transform.position = spawnPosition;
-        _UpTerrain.terrainData = new TerrainData();
-        InitializeTerrainData(_UpTerrain.terrainData);
-        SetTerrainHeights(_UpTerrain.terrainData);
-
-        TerrainCollider terrainCollider = _UpTerrain.gameObject.GetComponent<TerrainCollider>();
-        if (terrainCollider == null)
-        {
-            terrainCollider = _UpTerrain.gameObject.AddComponent<TerrainCollider>();
-        }
-        terrainCollider.terrainData = _UpTerrain.terrainData;
-        SpawnTowerPowerUpForces(6);
+        IncreaseCosts(3, 2, 0.2f, 0.2f); // 샵 비용 5, 설치 비용 3증가 (확률값은 설정에 맞게 조정)
     }
 
-    private void InitializeTerrainData(TerrainData terrainData)
+    public void InstallationCostBonus(int bonusAmount)
     {
-        terrainData.heightmapResolution = resolution;
-        terrainData.size = new Vector3(terrainWidth, heightScale, terrainLength);
+        installationCost += bonusAmount;
+        Debug.Log("설치 비용 보너스가 추가되었습니다: " + bonusAmount);
     }
 
-    private void SetTerrainHeights(TerrainData terrainData)
+    public void OnWaveCompleted()
     {
-        float[,] heights = new float[terrainData.heightmapResolution, terrainData.heightmapResolution];
+        Debug.Log("웨이브 완료! 다음 웨이브를 시작하려면 'G' 키를 누르세요.");
 
-        for (int y = 2; y < terrainData.heightmapResolution - 2; y++)
+        int currentWave = waveManager.GetCurrentWaveIndex();
+        if (currentWave == 5 || currentWave == 10)
         {
-            for (int x = 2; x < terrainData.heightmapResolution - 2; x++)
-            {
-                heights[y, x] = heightScale / terrainData.size.y;
-            }
+            OpenShop();
         }
 
-        SmoothTerrain(heights);
-        terrainData.SetHeights(0, 0, heights);
-
-        Terrain terrain = GetComponent<Terrain>();
-        if (terrain != null)
-        {
-            terrain.Flush();
-        }
+        UpdateUI(); // 웨이브 완료 후 UI 업데이트
     }
 
-    private void SmoothTerrain(float[,] heights)
+    private void OpenShop()
     {
-        int width = heights.GetLength(0);
-        int height = heights.GetLength(1);
-
-        for (int i = 0; i < 5; i++)
-        {
-            for (int y = 1; y < height - 1; y++)
-            {
-                for (int x = 1; x < width - 1; x++)
-                {
-                    float average = (heights[y, x] + heights[y - 1, x] + heights[y + 1, x] + heights[y, x - 1] + heights[y, x + 1]) / 5f;
-                    heights[y, x] = average;
-                }
-            }
-        }
-    }
-    private void PlaceRandomTowers()//랜덤타워 생성
-    {
-        foreach (GameObject powerUp in towerPowerUpForceInstances)
-        {
-            if (powerUp != null)
-            {
-                // 랜덤 타워 선택
-                int randomIndex = Random.Range(0, towerPrefabs.Length);
-                GameObject randomTowerPrefab = towerPrefabs[randomIndex];
-
-                // 타워 위치 및 회전 설정
-                Vector3 towerPosition = new Vector3(powerUp.transform.position.x, 2.2f, powerUp.transform.position.z);
-                Quaternion towerRotation = Quaternion.Euler(0, Random.Range(0, 360f), 0);
-
-                GameObject newTower = Instantiate(randomTowerPrefab, towerPosition, towerRotation);
-
-                // 파워업 적용
-                TowerBase towerBase = newTower.GetComponent<TowerBase>();
-                if (towerBase != null)
-                {
-                    towerBase.isAttackUp = true;
-                    towerBase.towerAttackPower *= 2;
-                    Debug.Log("타워 생성 시 공격력 업 적용됨: " + towerBase.towerAttackPower);
-                }
-            }
-        }
-    }
-    
-
-
-    public void ResetTerrain()
-    {
-        if (_UpTerrain != null)
-        {
-            //Destroy(_UpTerrain);
-            _UpTerrain.gameObject.SetActive(false);
-            
-        }            
-        SpawnPlayer(carPlayerPrefab.gameObject);
-        SpawnTerrain();
-        _UpTerrain.gameObject.SetActive(true);
-
+        Debug.Log("상점이 열렸습니다! 필요한 물품을 구매하세요.");
     }
 
     public void SpawnPlayer(GameObject playerPrefab)
     {
-        currentPlayer = Instantiate(playerPrefab, playerSpawnPoint.position, playerSpawnPoint.rotation);
+        Instantiate(playerPrefab, playerSpawnPoint.position, playerSpawnPoint.rotation); // 플레이어 스폰
     }
 
     private void SpawnNexus()
     {
         if (nexusPrefab != null)
         {
-            currentNexus = Instantiate(nexusPrefab, nexusSpawnPoint.position, nexusSpawnPoint.rotation);
+            Instantiate(nexusPrefab, nexusSpawnPoint.position, nexusSpawnPoint.rotation); // 넥서스 스폰
         }
-        
+    }
+
+    public void ResetTerrain()
+    {
+        if (terrainManager != null)
+        {
+            terrainManager.ResetTerrain(); // 지형 초기화
+        }
     }
 
     public void BakeNavMesh()
     {
-        navMeshSurface.BuildNavMesh();        
+        if (navMeshSurface != null)
+        {
+            navMeshSurface.BuildNavMesh(); // 내비게이션 메쉬 빌드
+            Debug.Log("NavMesh 빌드 완료");
+        }
+        else
+        {
+            Debug.LogError("NavMeshSurface가 지정되지 않았습니다.");
+        }
     }
 
+    public void OnNotify(GameObject obj, string eventMessage)
+    {
+        if (eventMessage == "EnemyDefeated")
+        {
+            EnemyDefeated();
+        }
+    }
 }

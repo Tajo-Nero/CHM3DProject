@@ -45,16 +45,9 @@ public class PlayerMove : MonoBehaviour
         {
             animator.SetBool("IsHammer", false);
         }
-        if (Input.GetKeyDown(KeyCode.G) && !gameManager.IsWaveActive)
+        if (Input.GetKeyDown(KeyCode.G) && gameManager != null)
         {
-            if (gameManager != null)
-            {
-                StartCoroutine(gameManager.StartWave());
-            }
-            else
-            {
-                Debug.LogError("GameManager 인스턴스를 찾을 수 없습니다.");
-            }
+            gameManager.AdvanceWave(); // AdvanceWave 메서드 호출
         }
 
         HandleTowerDeletion();
@@ -74,7 +67,7 @@ public class PlayerMove : MonoBehaviour
     {
         mouseX += Input.GetAxis("Mouse X") * camRotSpeed;
         mouseY -= Input.GetAxis("Mouse Y") * camRotSpeed;
-        mouseY = Mathf.Clamp(mouseY, minYRotation, maxYRotation); // Y축 회전 값 제한
+        mouseY = Mathf.Clamp(mouseY, minYRotation, maxYRotation); // Y축 회전 제한 설정
 
         cam.transform.rotation = Quaternion.Euler(mouseY, mouseX, 0);
         playerTransform.rotation = Quaternion.Euler(0, mouseX, 0);
@@ -93,25 +86,25 @@ public class PlayerMove : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.X))
         {
-            Vector3 rayOrigin = new Vector3(playerTransform.position.x, 2.0f, playerTransform.position.z);
+            Vector3 rayOrigin = new Vector3(playerTransform.position.x, playerTransform.position.y + 1.0f, playerTransform.position.z);
             Ray ray = new Ray(rayOrigin, playerTransform.forward);
             RaycastHit hit;
 
-            // 레이를 시각적으로 확인하기 위해 기즈모를 그립니다.
-            Debug.DrawRay(rayOrigin, playerTransform.forward * 3.0f, Color.red, 1.0f);
+            // 레이캐스트를 확인하기 위해 디버그 라인 그리기.
+            Debug.DrawRay(rayOrigin, playerTransform.forward * 4.0f, Color.red, 1.0f);
 
             if (Physics.Raycast(ray, out hit, 3.0f))
             {
-                Debug.Log("레이 감지됨: " + hit.collider.name);
+                Debug.Log("충돌한 객체: " + hit.collider.name);
                 if (hit.collider.CompareTag("Towers"))
                 {
-                    towerGenerator.RemoveTower(hit.collider.gameObject); // Tower 제거 함수 호출
-                    Debug.Log("타워 제거됨: " + hit.collider.name);
+                    towerGenerator.RemoveTower(hit.collider.gameObject); // Tower 삭제 메서드 호출
+                    Debug.Log("타워 삭제됨: " + hit.collider.name);
                 }
             }
             else
             {
-                Debug.Log("레이 감지되지 않음");
+                Debug.Log("타워와 충돌하지 않음");
             }
         }
     }
@@ -121,10 +114,11 @@ public class PlayerMove : MonoBehaviour
         if (playerTransform != null)
         {
             Gizmos.color = Color.red;
-            Vector3 rayOrigin = new Vector3(playerTransform.position.x, 2.0f, playerTransform.position.z);
+            Vector3 rayOrigin = new Vector3(playerTransform.position.x, playerTransform.position.y + 2.0f, playerTransform.position.z);
             Gizmos.DrawRay(rayOrigin, playerTransform.forward * 3.0f);
         }
-    }   
+    }
+
     private void LateUpdate()
     {
         cam.transform.position = camPos.position;

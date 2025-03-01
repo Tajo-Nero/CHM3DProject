@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TowerBase : MonoBehaviour 
+public abstract class TowerBase : MonoBehaviour
 {
     //1.타워 공격력
     //public int towerAttackPower;
@@ -48,8 +48,7 @@ public class TowerBase : MonoBehaviour
     //강화지속시간, 공격력 올려줄 변수 추가
     //범위내의 Towers 태그 붙어있는 타워들 공격력 수치 증가하는 함수 추가
 
-    // 1. 타워 공격력
-    [Header("Tower Settings")]
+    // 1. 타워 공격력    
     public float towerAttackPower;
     // 2. 타워 관통력
     public float towerPenetrationPower;
@@ -58,33 +57,15 @@ public class TowerBase : MonoBehaviour
     // 4. 공격 속도
     public float attackSpeed;
     // 5. 설치 비용
-    public float installationCost;
+    public int installationCost;
     // 6. 공격 강화 가능여부
     public bool isAttackUp = false;
 
+    public abstract void TowerPowUp();
     // 적을 공격하는 함수
-    public virtual void TowerAttack(List<Transform> targets)
-    {
-        // 공격 로직 구현        
-    }
-
+    public abstract void TowerAttack(List<Transform> targets);
     // 범위를 설정하는 함수
-    public virtual void SetRange(float range)
-    {
-        // 범위 설정 로직 구현
-    }
-
+    public abstract void SetRange(float range);
     // 범위 내의 적을 탐지하는 함수
-    public virtual void DetectEnemiesInRange()
-    {
-        // 적 탐지 로직 구현
-    }
-    public virtual void TowerPowUp()
-    {
-        if (isAttackUp)
-        {
-            towerAttackPower *= 2;
-            isAttackUp = false;
-        }
-    }
-}
+    public abstract void DetectEnemiesInRange();
+  }      

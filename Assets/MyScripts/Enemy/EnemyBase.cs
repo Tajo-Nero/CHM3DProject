@@ -2,17 +2,17 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
-//적 클래스의 부모를 상속하여 자식에서 구체화를 진행합니다
 public abstract class EnemyBase : MonoBehaviour
 {
     public float enemy_attackDamage;
     public float enemy_attackSpeed;
+    public float enemy_health;
     private bool isAttacking = false;
     private NavMeshAgent navMeshAgent;
     private EnemyPool enemyPool;
     private GameObject target;
     protected Animator animator;
-
+    private TowerGenerator towerGenerator;
 
     protected virtual void Awake()
     {
@@ -21,6 +21,7 @@ public abstract class EnemyBase : MonoBehaviour
         animator = GetComponent<Animator>();
         target = FindObjectOfType<Nexus>().gameObject;
         NavMeshAgent agent = GetComponent<NavMeshAgent>();
+        towerGenerator = FindObjectOfType<TowerGenerator>();
 
         if (target == null)
         {
@@ -32,7 +33,7 @@ public abstract class EnemyBase : MonoBehaviour
     {
         if (!navMeshAgent.isOnNavMesh)
         {
-            Debug.LogError("NavMesh 에이전트가 유효한 NavMesh 위에 있지 않습니다.");
+            Debug.LogError("NavMesh 에이전트가 유효한 NavMesh 안에 있지 않습니다.");
             return;
         }
     }
@@ -47,7 +48,7 @@ public abstract class EnemyBase : MonoBehaviour
             if (distanceToTarget <= navMeshAgent.stoppingDistance)
             {
                 navMeshAgent.isStopped = true;
-                Debug.Log("타겟 도달 후 멈춤");
+                Debug.Log("타겟 도착");
             }
 
             if (distanceToTarget <= 1.5f && !isAttacking)
@@ -69,7 +70,7 @@ public abstract class EnemyBase : MonoBehaviour
         if (collision.gameObject == target)
         {
             navMeshAgent.isStopped = true;
-            Debug.Log("넥서스와 충돌하여 멈춤");
+            Debug.Log("타겟과 충돌하여 정지");
         }
     }
 
@@ -78,7 +79,6 @@ public abstract class EnemyBase : MonoBehaviour
         if (other.gameObject == target)
         {
             navMeshAgent.isStopped = true;
-            Debug.Log("넥서스와 트리거 이벤트로 멈춤");
         }
     }
 
@@ -94,7 +94,7 @@ public abstract class EnemyBase : MonoBehaviour
                 if (targetNexus != null)
                 {
                     targetNexus.TakeDamage(enemy_attackDamage);
-                    Debug.Log("타겟을 공격했습니다! 데미지: " + enemy_attackDamage);
+                    //Debug.Log("타겟에 데미지를 입혔습니다! 공격력: " + enemy_attackDamage);
                 }
             }
             yield return new WaitForSeconds(enemy_attackSpeed);
@@ -104,7 +104,7 @@ public abstract class EnemyBase : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        Debug.Log("적이 데미지를 받았습니다! 현재 체력: " + GetCurrentHealth());
+        //Debug.Log("데미지를 입었습니다! 남은 체력: " + GetCurrentHealth());
         ApplyDamage(damage);
         if (GetCurrentHealth() <= 0)
         {
@@ -118,6 +118,11 @@ public abstract class EnemyBase : MonoBehaviour
     private void Die()
     {
         Debug.Log("적이 사망했습니다!");
+        // 옵저버에 알림
+        if (towerGenerator != null)
+        {
+            towerGenerator.NotifyObservers(gameObject, "EnemyDefeated");
+        }
         enemyPool.ReturnEnemy(gameObject);
     }
 

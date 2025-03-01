@@ -52,8 +52,8 @@ MonoBehaviour:
     _TowerPrefab: {fileID: 1229389129709629617, guid: e8ada64e2ca7f33468786e4f4a823087, type: 3}
     _PreviewPrefab: {fileID: 1229389129709629617, guid: 5a6e95b7fbf6d0b47ad3d7a9cd9c3bd5, type: 3}
   - _craftName: Rocket
-    _TowerPrefab: {fileID: 7098814355583657019, guid: 25854aaa9de9c6c4abdb41f39578ced7, type: 3}
-    _PreviewPrefab: {fileID: 7098814355583657019, guid: 797d781ce13a02d4ba892b9213ff66f9, type: 3}
+    _TowerPrefab: {fileID: 8962895865803140103, guid: 6b373629b96018643995df1090fcea53, type: 3}
+    _PreviewPrefab: {fileID: 7098814355583657019, guid: 694f584d110a164488045e83149e137d, type: 3}
   - _craftName: EnforceTower
     _TowerPrefab: {fileID: 8853853338503272906, guid: f990f0439da23564483c34680a32b227, type: 3}
     _PreviewPrefab: {fileID: 1306695637626874746, guid: bec3d11007890b948be8b8cf26e87c43, type: 3}

@@ -5,7 +5,7 @@ using UnityEngine;
 public class Boss : EnemyBase
 {
 
-    public float enemy_health;
+    //public float enemy_health;
 
     protected override void Awake()
     {

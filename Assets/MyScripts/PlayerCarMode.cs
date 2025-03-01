@@ -10,10 +10,14 @@ public class PlayerCarMode : MonoBehaviour
     public float moveSpeed = 2f;
     private Vector3 moveDir;
     public GameObject _PlayerMode;
-    private GameManager gameManager;    
-    private Drill drillScript;
+    private GameManager gameManager;
 
-    public float cameraRotationX = 45f; // 카메라의 X축 회전 값을 조절할 입력값
+    public float cameraRotationX = 45f; // 카메라 X축 회전 각도
+    private GameObject drillSphere;
+    [SerializeField]
+    private float digDistance = 3f; // 드릴 거리
+    public float digRadius = 3f; // 드릴 범위 반경
+    public float digDepth = 0.2f; // 드릴 깊이
 
     void Start()
     {
@@ -33,24 +37,16 @@ public class PlayerCarMode : MonoBehaviour
             moveDir = transform.forward * verticalInput * moveSpeed * Time.deltaTime;
             transform.localPosition += moveDir;
 
-            // 마우스 왼쪽 버튼 클릭 시 이동 속도 부스트
+            // 마우스 왼쪽 버튼 클릭 시 이동 속도 증가
             if (Input.GetMouseButton(0))
             {
-                
-                moveSpeed = 5f; // 이동 속도 부스트 3
-                if (drillScript != null)
-                {
-                    drillScript.digDepth = 0.5f; // Drill 스크립트의 digDepth 변경 0.3
-                }
+                moveSpeed = 5f; // 이동 속도 증가
+                digDepth = 0.4f; // 드릴 깊이 증가
             }
             else
             {
-                
-                moveSpeed = 3f; // 기본 이동 속도 2
-                if (drillScript != null)
-                {
-                    drillScript.digDepth = 0.3f; // Drill 스크립트의 digDepth 기본값으로 변경 0.2
-                }
+                moveSpeed = 3f; // 기본 이동 속도
+                digDepth = 0.3f; // 기본 드릴 깊이
             }
 
             // 좌우 회전 처리
@@ -60,19 +56,24 @@ public class PlayerCarMode : MonoBehaviour
             }
         }
 
-        // 카메라 회전 및 위치 고정
+        // 카메라 회전 및 위치 업데이트
         if (cam != null)
         {
-            cam.transform.rotation = Quaternion.Euler(cameraRotationX, transform.rotation.eulerAngles.y, 0); // 카메라 회전 설정
+            cam.transform.rotation = Quaternion.Euler(cameraRotationX, transform.rotation.eulerAngles.y, 0); // 카메라 회전 처리
         }
 
-        // F5 키 누르면 지형 초기화
+        // F5 키 입력 시 오브젝트 파괴 및 Terrain 리셋
         if (Input.GetKeyDown(KeyCode.F5))
         {
             Destroy(gameObject);
-            gameManager.ResetTerrain();
-           
+            TerrainManager terrainManager = FindObjectOfType<TerrainManager>();
+            if (terrainManager != null)
+            {
+                terrainManager.ResetTerrain();
+            }
         }
+
+        PerformDig(); // 드릴링 및 지형 파괴 처리
     }
 
     private void LateUpdate()
@@ -89,18 +90,83 @@ public class PlayerCarMode : MonoBehaviour
         if (collision.gameObject.CompareTag("Nexus"))
         {
             gameManager.SpawnPlayer(_PlayerMode);
-            
             Destroy(gameObject);
-            
         }
     }
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    if (other.CompareTag("Player"))
-    //    {
-    //        gameManager.SpawnPlayer(_PlayerMode);
-    //                
-    //        Destroy(gameObject);
-    //    }
-    //}
+
+    private void PerformDig()
+    {
+        Ray ray = new Ray(transform.position, transform.forward);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, digDistance))
+        {
+            TerrainCollider terrainCollider = hit.collider as TerrainCollider;
+            if (terrainCollider != null)
+            {
+                Dig(terrainCollider, hit.point);
+            }
+            if (drillSphere != null)
+            {
+                drillSphere.transform.position = hit.point;
+                drillSphere.SetActive(true); // 오브젝트 활성화
+            }
+        }
+        else
+        {
+            if (drillSphere != null)
+            {
+                drillSphere.SetActive(false); // 오브젝트 비활성화
+            }
+        }
+    }
+
+    private void Dig(TerrainCollider terrainCollider, Vector3 hitPoint)
+    {
+        Terrain terrain = terrainCollider.GetComponent<Terrain>();
+        TerrainData terrainData = terrain.terrainData;
+        Vector3 terrainPosition = terrain.transform.position;
+
+        // 히트 포인트의 Heightmap 좌표 계산
+        int xBase = Mathf.FloorToInt((hitPoint.x - terrainPosition.x) / terrainData.size.x * terrainData.heightmapResolution);
+        int yBase = Mathf.FloorToInt((hitPoint.z - terrainPosition.z) / terrainData.size.z * terrainData.heightmapResolution);
+
+        // 반경 내의 지형 파괴
+        int radius = Mathf.FloorToInt(digRadius / terrainData.size.x * terrainData.heightmapResolution);
+        for (int x = -radius; x <= radius; x++)
+        {
+            for (int y = -radius; y <= radius; y++)
+            {
+                int xPos = xBase + x;
+                int yPos = yBase + y;
+
+                if (xPos >= 0 && xPos < terrainData.heightmapResolution && yPos >= 0 && yPos < terrainData.heightmapResolution)
+                {
+                    float distance = Mathf.Sqrt(x * x + y * y);
+                    if (distance <= radius)
+                    {
+                        float[,] heights = terrainData.GetHeights(xPos, yPos, 1, 1);
+                        float depthFactor = Mathf.Lerp(1, 0, distance / radius); // 거리 비례 깊이
+                        heights[0, 0] = Mathf.Max(0, heights[0, 0] - digDepth * depthFactor); // 지형 파괴
+
+                        // 업데이트된 Heightmap을 TerrainData에 적용
+                        terrainData.SetHeights(xPos, yPos, heights);
+                    }
+                }
+            }
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        // 드릴 레이저를 시각적으로 표시
+        Gizmos.color = Color.red;
+        Vector3 startPosition = transform.position;
+        Vector3 endPosition = startPosition + transform.forward * digDistance;
+        Gizmos.DrawLine(startPosition, endPosition);
+
+        // 히트 포인트를 중심으로 드릴 범위를 시각적으로 표시
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(endPosition, digRadius);
+    }
 }

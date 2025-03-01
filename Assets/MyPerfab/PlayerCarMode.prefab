@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 545530676179719096}
-  - component: {fileID: 2675424227342286910}
   - component: {fileID: 8203704431684660391}
   - component: {fileID: 3008840763286032591}
   m_Layer: 0
@@ -18,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &545530676179719096
 Transform:
   m_ObjectHideFlags: 0
@@ -34,21 +33,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3423277821389728182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2675424227342286910
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 291282102835995750}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c72abe70491ee334d9c4c160a5e51b98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  digDistance: 3
-  digRadius: 3
-  digDepth: 0.2
 --- !u!54 &8203704431684660391
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -248,7 +232,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 84
+  m_Constraints: 126
   m_CollisionDetection: 0
 --- !u!65 &6789739337112752675
 BoxCollider:
@@ -290,6 +274,10 @@ MonoBehaviour:
   moveSpeed: 2
   _PlayerMode: {fileID: 7620607172156864347, guid: c94b039541aa54740a324f0398da259c, type: 3}
   cameraRotationX: 30
+  drillSpherePrefab: {fileID: 0}
+  digDistance: 4
+  digRadius: 3
+  digDepth: 0.2
 --- !u!1 &4999732465524792496
 GameObject:
   m_ObjectHideFlags: 0
