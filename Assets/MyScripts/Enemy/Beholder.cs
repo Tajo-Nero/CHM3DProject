@@ -4,14 +4,20 @@ using UnityEngine;
 
 public class Beholder : EnemyBase
 {
-    //public float enemy_health;
+    public EnemyData enemyData; // ScriptableObject 데이터
 
     protected override void Awake()
     {
         base.Awake();
-        enemy_attackDamage = 10f;
-        enemy_attackSpeed = 1.5f;
-       
+        enemy_attackDamage = enemyData.attackPower;
+        enemy_health = enemyData.health;
+
+        // MyHealthBar 초기화
+        healthBar = GetComponentInChildren<MyHealthBar>();
+        if (healthBar != null)
+        {
+            healthBar.Initialize(enemyData.health);
+        }
     }
 
     public override float GetCurrentHealth()
@@ -22,6 +28,16 @@ public class Beholder : EnemyBase
     protected override void ApplyDamage(float damage)
     {
         enemy_health -= damage;
-        Debug.Log($"{gameObject.name}가 {damage}만큼의 데미지를 받았습니다. 남은 체력: {enemy_health}");
+        Debug.Log($"{gameObject.name}이 {damage}만큼의 피해를 받았습니다. 현재 체력: {enemy_health}");
+    }
+
+    new void Update()
+    {
+        base.Update();
+        // MyHealthBar 업데이트
+        if (healthBar != null)
+        {
+            healthBar.UpdateHealth(GetCurrentHealth(), enemyData.health);
+        }
     }
 }

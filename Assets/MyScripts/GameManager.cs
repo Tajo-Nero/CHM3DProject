@@ -114,18 +114,7 @@ public class GameManager : MonoBehaviour, IObserver
     }
     void Update()
     {
-        // Esc 키를 누르면 메뉴 활성화/비활성화
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (pauseMenuController.gameObject.activeSelf)
-            {
-                pauseMenuController.CloseMenu();
-            }
-            else
-            {
-                pauseMenuController.OpenMenu();
-            }
-        }
+        
     }
 
     public void AdvanceWave()

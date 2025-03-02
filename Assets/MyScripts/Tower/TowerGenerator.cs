@@ -209,20 +209,14 @@ public class TowerGenerator : MonoBehaviour, ISubject
     {
         if (currentPreview != null)
         {
-            bool cancelKeyPressed = Input.anyKeyDown &&
-                                    !Input.GetMouseButtonDown(0) &&
-                                    !Input.GetMouseButtonDown(1) &&
-                                    !Input.GetKeyDown(KeyCode.W) &&
-                                    !Input.GetKeyDown(KeyCode.A) &&
-                                    !Input.GetKeyDown(KeyCode.S) &&
-                                    !Input.GetKeyDown(KeyCode.D);
+            bool cancelKeyPressed = Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape);
 
             if (cancelKeyPressed)
             {
                 Destroy(currentPreview);
                 currentPreview = null;
                 currentPreviewIndex = -1;
-                Debug.Log("프리뷰 타워가 취소되었습니다.");
+                Debug.Log("프리뷰가 취소되었습니다.");
             }
         }
     }
