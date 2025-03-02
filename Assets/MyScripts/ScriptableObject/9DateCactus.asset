@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff4026baf09f92c4eaa544427e78cc67, type: 3}
   m_Name: 9DateCactus
   m_EditorClassIdentifier: 
+  healthBarPrefab: {fileID: 4106307019301860967, guid: 47a9037c16223c94599e1151a4b71da7, type: 3}
   enemyName: Cactus
   health: 360
   attackPower: 30
+  attackSpeed: 4
+  movementSpeed: 3
