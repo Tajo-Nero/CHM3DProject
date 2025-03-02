@@ -165,6 +165,21 @@ public class CanonTower : TowerBase
         lineRendererStrategy.GeneratePattern(gameObject, transform.position, cannonTowerTransform, segments, detectionRange, 0);
 
         SetRange(detectionRange);
+        void Start()
+        {
+            lineRendererStrategy.Setup(gameObject);
+            lineRendererStrategy.GeneratePattern(gameObject, transform.position, cannonTowerTransform, segments, detectionRange, 0);
+
+            SetRange(detectionRange);
+
+            // Particle System 초기화
+            attackParticleSystem = GetComponent<ParticleSystem>();
+            if (attackParticleSystem == null)
+            {
+                Debug.LogError("ParticleSystem 컴포넌트를 찾을 수 없습니다!");
+            }
+        }
+
     }
 
     void Update()
