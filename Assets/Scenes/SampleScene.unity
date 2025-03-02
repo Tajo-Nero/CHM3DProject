@@ -1241,7 +1241,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 891c02248599009499922ae4a2e924e6, type: 2}
   spawnPoints:
   - {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
-  waveProgressBar: {fileID: 303224030}
+  waveProgressBar: {fileID: 0}
 --- !u!4 &484055444
 Transform:
   m_ObjectHideFlags: 0
@@ -2524,7 +2524,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1465412203
 RectTransform:
   m_ObjectHideFlags: 0

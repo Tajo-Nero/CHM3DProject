@@ -1,14 +1,149 @@
+//using System.Collections;
+//using UnityEngine;
+//using UnityEngine.AI;
+
+//public abstract class EnemyBase : MonoBehaviour
+//{
+//    public float enemy_attackDamage;
+//    public float enemy_attackSpeed;
+//    public float enemy_health;
+//    private bool isAttacking = false;
+//    private NavMeshAgent navMeshAgent;
+//    private EnemyPool enemyPool;
+//    private GameObject target;
+//    protected Animator animator;
+//    private TowerGenerator towerGenerator;
+
+//    protected virtual void Awake()
+//    {
+//        navMeshAgent = GetComponent<NavMeshAgent>();
+//        enemyPool = FindObjectOfType<EnemyPool>();
+//        animator = GetComponent<Animator>();
+//        target = FindObjectOfType<Nexus>().gameObject;
+//        NavMeshAgent agent = GetComponent<NavMeshAgent>();
+//        towerGenerator = FindObjectOfType<TowerGenerator>();
+
+//        if (target == null)
+//        {
+//            Debug.LogError("Target을 찾을 수 없습니다.");
+//        }
+//    }
+
+//    void Start()
+//    {
+//        if (!navMeshAgent.isOnNavMesh)
+//        {
+//            Debug.LogError("NavMesh 에이전트가 유효한 NavMesh 안에 있지 않습니다.");
+//            return;
+//        }
+//    }
+
+//    void Update()
+//    {
+//        if (target != null)
+//        {
+//            navMeshAgent.SetDestination(target.transform.position);
+//            float distanceToTarget = Vector3.Distance(transform.position, target.transform.position);
+
+//            if (distanceToTarget <= navMeshAgent.stoppingDistance)
+//            {
+//                navMeshAgent.isStopped = true;
+//                Debug.Log("타겟 도착");
+//            }
+
+//            if (distanceToTarget <= 1.5f && !isAttacking)
+//            {
+//                StartCoroutine(AttackTarget());
+//                Debug.Log("공격 시작");
+//            }
+
+//            animator.SetFloat("Run", navMeshAgent.velocity.magnitude);
+//        }
+//        else
+//        {
+//            Debug.LogWarning("Target이 null입니다.");
+//        }
+//    }
+
+//    private void OnCollisionEnter(Collision collision)
+//    {
+//        if (collision.gameObject == target)
+//        {
+//            navMeshAgent.isStopped = true;
+//            Debug.Log("타겟과 충돌하여 정지");
+//        }
+//    }
+
+//    private void OnTriggerEnter(Collider other)
+//    {
+//        if (other.gameObject == target)
+//        {
+//            navMeshAgent.isStopped = true;
+//        }
+//    }
+
+//    private IEnumerator AttackTarget()
+//    {
+//        isAttacking = true;
+//        animator.SetTrigger("Attack");
+//        while (Vector3.Distance(transform.position, target.transform.position) <= 1.5f)
+//        {
+//            if (target != null)
+//            {
+//                Nexus targetNexus = target.GetComponent<Nexus>();
+//                if (targetNexus != null)
+//                {
+//                    targetNexus.TakeDamage(enemy_attackDamage);
+//                    //Debug.Log("타겟에 데미지를 입혔습니다! 공격력: " + enemy_attackDamage);
+//                }
+//            }
+//            yield return new WaitForSeconds(enemy_attackSpeed);
+//        }
+//        isAttacking = false;
+//    }
+
+//    public void TakeDamage(float damage)
+//    {
+//        //Debug.Log("데미지를 입었습니다! 남은 체력: " + GetCurrentHealth());
+//        ApplyDamage(damage);
+//        if (GetCurrentHealth() <= 0)
+//        {
+//            Die();
+//        }
+//    }
+
+//    public abstract float GetCurrentHealth();
+//    protected abstract void ApplyDamage(float damage);
+
+//    private void Die()
+//    {
+//        Debug.Log("적이 사망했습니다!");
+//        // 옵저버에 알림
+//        if (towerGenerator != null)
+//        {
+//            towerGenerator.NotifyObservers(gameObject, "EnemyDefeated");
+//        }
+//        enemyPool.ReturnEnemy(gameObject);
+//    }
+
+//    public void Victory()
+//    {
+//        animator.SetBool("isVictory", true);
+//        animator.SetTrigger("Attack");
+//    }
+//}
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
 public abstract class EnemyBase : MonoBehaviour
 {
-    public EnemyData enemyData;
     public float enemy_attackDamage;
-    public float enemy_health;
     public float enemy_attackSpeed;
+    public float enemy_health;
+    public GameObject healthBarPrefab; // 체력바 프리팹
     public MyHealthBar healthBar; // MyHealthBar 필드 추가
+    private GameObject healthBarInstance; // 체력바 인스턴스
     private bool isAttacking = false;
     private NavMeshAgent navMeshAgent;
     private EnemyPool enemyPool;
@@ -23,19 +158,10 @@ public abstract class EnemyBase : MonoBehaviour
         animator = GetComponent<Animator>();
         target = FindObjectOfType<Nexus>().gameObject;
         towerGenerator = FindObjectOfType<TowerGenerator>();
-        enemy_attackDamage = enemyData.attackPower;
-        enemy_attackSpeed = enemyData.attackSpeed;
-        enemy_health = enemyData.health;
 
         if (target == null)
         {
             Debug.LogError("Target을 찾을 수 없습니다.");
-        }
-
-        // 추가된 옵션 설정
-        if (navMeshAgent != null)
-        {
-            navMeshAgent.speed = enemyData.movementSpeed;
         }
     }
 
@@ -47,16 +173,11 @@ public abstract class EnemyBase : MonoBehaviour
             return;
         }
 
-        // 체력 바 초기화 (생성은 EnemyPool에서 이미 수행됨)
-        InitializeHealthBar();
-    }
-
-    void InitializeHealthBar()
-    {
-        // EnemyPool에서 전달된 healthBar를 설정합니다.
-        healthBar = GetComponentInChildren<MyHealthBar>();
-        if (healthBar != null)
+        // 체력바 초기화
+        if (healthBarPrefab != null)
         {
+            healthBarInstance = Instantiate(healthBarPrefab, transform);
+            healthBar = healthBarInstance.GetComponent<MyHealthBar>();
             healthBar.Initialize(enemy_health);
         }
     }
@@ -71,7 +192,7 @@ public abstract class EnemyBase : MonoBehaviour
             if (distanceToTarget <= navMeshAgent.stoppingDistance)
             {
                 navMeshAgent.isStopped = true;
-                Debug.Log("타겟 근처");
+                Debug.Log("타겟 도달");
             }
 
             if (distanceToTarget <= 1.5f && !isAttacking)
@@ -93,7 +214,7 @@ public abstract class EnemyBase : MonoBehaviour
         if (collision.gameObject == target)
         {
             navMeshAgent.isStopped = true;
-            Debug.Log("타겟과 충돌");
+            Debug.Log("타겟과 충돌하여 멈춤");
         }
     }
 
@@ -116,10 +237,10 @@ public abstract class EnemyBase : MonoBehaviour
                 Nexus targetNexus = target.GetComponent<Nexus>();
                 if (targetNexus != null)
                 {
-                    targetNexus.TakeDamage(enemyData.attackPower);
+                    targetNexus.TakeDamage(enemy_attackDamage);
                 }
             }
-            yield return new WaitForSeconds(enemyData.attackSpeed); // enemyData.attackSpeed 사용
+            yield return new WaitForSeconds(enemy_attackSpeed);
         }
         isAttacking = false;
     }
@@ -128,10 +249,10 @@ public abstract class EnemyBase : MonoBehaviour
     {
         ApplyDamage(damage);
 
-        // 체력 바 업데이트
-        if (healthBar != null)
+        // 체력바 업데이트
+        if (healthBarInstance != null)
         {
-            healthBar.UpdateHealth(GetCurrentHealth(), enemyData.health);
+            healthBar.UpdateHealth(GetCurrentHealth(), enemy_health);
         }
 
         if (GetCurrentHealth() <= 0)
@@ -140,15 +261,8 @@ public abstract class EnemyBase : MonoBehaviour
         }
     }
 
-    public virtual float GetCurrentHealth()
-    {
-        return enemy_health;
-    }
-
-    protected virtual void ApplyDamage(float damage)
-    {
-        enemy_health -= damage;
-    }
+    public abstract float GetCurrentHealth();
+    protected abstract void ApplyDamage(float damage);
 
     private void Die()
     {
@@ -158,6 +272,7 @@ public abstract class EnemyBase : MonoBehaviour
             towerGenerator.NotifyObservers(gameObject, "EnemyDefeated");
         }
         enemyPool.ReturnEnemy(gameObject);
+        Destroy(healthBarInstance); // 체력바 인스턴스 삭제
     }
 
     public void Victory()
@@ -166,3 +281,5 @@ public abstract class EnemyBase : MonoBehaviour
         animator.SetTrigger("Attack");
     }
 }
+
+
