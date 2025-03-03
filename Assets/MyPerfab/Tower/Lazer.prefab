@@ -75,8 +75,9 @@ MonoBehaviour:
   attackSpeed: 0
   installationCost: 0
   isAttackUp: 0
-  detectionRange: 20
+  detectionRange: 15
   laserStartPoint: {fileID: 6467481287587556718}
+  laserImpactEffectPrefab: {fileID: 785308381026150055, guid: 1df02f1feed0c164fbab982738c12522, type: 3}
 --- !u!120 &4275051539852091550
 LineRenderer:
   serializedVersion: 2

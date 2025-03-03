@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class LaserTower : TowerBase
 {
-    [SerializeField] private float detectionRange = 20f; // 탐지 범위
+    [SerializeField] private float detectionRange = 20f; // 탐지 거리
     [SerializeField] private Transform laserStartPoint; // 레이저 시작점
+    [SerializeField] private ParticleSystem laserImpactEffectPrefab; // 레이저 충돌 파티클 효과 프리팹
     private ILineRendererStrategy lineRendererStrategy;
     private bool isAttacking = false; // 공격 중인지 여부
 
-    // 초기값을 설정합니다.
     void Awake()
     {
         towerAttackPower = 50; // 공격력 설정
@@ -19,12 +19,12 @@ public class LaserTower : TowerBase
 
     void Start()
     {
-        SetRange(detectionRange); // 탐지 범위 설정
+        SetRange(detectionRange); // 탐지 거리 설정
 
-        // 라인렌더러 전략 초기화
+        // 라인 렌더러 전략을 초기화
         lineRendererStrategy = new LaserRendererStrategy();
         lineRendererStrategy.Setup(gameObject);
-        lineRendererStrategy.GeneratePattern(gameObject, transform.position, laserStartPoint, 4, detectionRange, 20f);
+        lineRendererStrategy.GeneratePattern(gameObject, transform.position, laserStartPoint, 4, detectionRange, detectionRange);
     }
 
     void Update()
@@ -36,17 +36,20 @@ public class LaserTower : TowerBase
     {
         List<Transform> targets = new List<Transform>();
 
-        // 탐지 범위 설정
-        Vector3 boxCenter = laserStartPoint.position + laserStartPoint.forward * (detectionRange / 2);
+        // 자기 자신의 위치에서 탐지 박스 설정
+        Vector3 boxCenter = transform.position + transform.forward * (detectionRange / 2);
         Vector3 boxHalfExtents = new Vector3(2f, 2f, detectionRange / 2);
+        Quaternion boxOrientation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
 
-        Collider[] hitColliders = Physics.OverlapBox(boxCenter, boxHalfExtents, laserStartPoint.rotation);
-        foreach (var hitCollider in hitColliders)
+        // 박스 캐스트로 적 탐지
+        RaycastHit[] hits = Physics.BoxCastAll(boxCenter, boxHalfExtents, transform.forward, boxOrientation, detectionRange);
+
+        foreach (var hit in hits)
         {
-            if (hitCollider.CompareTag("Enemy"))
+            if (hit.collider.CompareTag("Enemy"))
             {
-                targets.Add(hitCollider.transform);
-                Debug.Log("Detected Enemy: " + hitCollider.transform.name);
+                targets.Add(hit.transform);
+                Debug.Log("Detected Enemy: " + hit.transform.name);
             }
         }
 
@@ -64,7 +67,7 @@ public class LaserTower : TowerBase
             TowerAttack(targets); // 타워 공격
             yield return new WaitForSeconds(attackSpeed); // 공격 대기 시간
 
-            targets.RemoveAll(t => t == null || !t.gameObject.activeSelf); // 비활성화된 적 제거
+            targets.RemoveAll(t => t == null || !t.gameObject.activeSelf); // 비활성화된 타겟 제거
         }
         isAttacking = false;
     }
@@ -76,33 +79,49 @@ public class LaserTower : TowerBase
             EnemyBase enemyHp = target.GetComponent<EnemyBase>();
             if (enemyHp != null)
             {
-                enemyHp.TakeDamage(towerAttackPower); // 적에게 데미지 주기
+                enemyHp.TakeDamage(towerAttackPower); // 적에게 데미지 입힘
                 Debug.Log("Laser hit " + target.name + " for " + towerAttackPower + " damage!");
+
+                // 레이저 충돌 파티클 효과 재생
+                if (laserImpactEffectPrefab != null)
+                {
+                    ParticleSystem laserImpactEffect = Instantiate(laserImpactEffectPrefab, target.position, Quaternion.LookRotation(target.position - laserStartPoint.position));
+                    StartCoroutine(PlayParticleEffect(laserImpactEffect));
+                }
             }
         }
     }
 
+    private IEnumerator PlayParticleEffect(ParticleSystem laserImpactEffect)
+    {
+        laserImpactEffect.Play();
+        yield return new WaitForSeconds(0.5f); // 파티클 효과 재생 시간
+        laserImpactEffect.Stop();
+        Destroy(laserImpactEffect.gameObject); // 파티클 오브젝트 파괴
+    }
+
     public override void SetRange(float range)
     {
-        detectionRange = range; // 탐지 범위 설정
+        detectionRange = range; // 탐지 거리 설정
     }
 
     public override void TowerPowUp()
     {
         towerAttackPower *= 2; // 공격력 두 배로 증가
-        Debug.Log("레이저 타워의 공격력이 강화되었습니다: " + towerAttackPower);
+        Debug.Log("파워업! 타워의 공격력이 두 배로 증가했습니다: " + towerAttackPower);
     }
 
+    // 기즈모를 그리는 함수
     private void OnDrawGizmos()
     {
-        if (laserStartPoint != null)
+        if (Application.isPlaying)
         {
-            // 탐지 범위 시각화
-            Gizmos.color = Color.red;
-            Vector3 boxCenter = laserStartPoint.position + laserStartPoint.forward * (detectionRange / 2);
-            Vector3 boxSize = new Vector3(2f, 2f, detectionRange);
-            Gizmos.matrix = Matrix4x4.TRS(boxCenter, laserStartPoint.rotation, Vector3.one);
-            Gizmos.DrawWireCube(Vector3.zero, boxSize);
+            Vector3 boxCenter = transform.position + transform.forward * (detectionRange / 2);
+            Vector3 boxHalfExtents = new Vector3(2f, 2f, detectionRange / 2);
+            Quaternion boxOrientation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
+
+            Gizmos.color = Color.red; // 기즈모 색상 설정
+            Gizmos.DrawWireCube(boxCenter, boxHalfExtents * 2); // 박스 캐스트 모양의 기즈모 그리기
         }
     }
 }
