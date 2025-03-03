@@ -5,23 +5,9 @@ using UnityEngine;
 public class Elite : EnemyBase
 {
 
-    //public float enemy_health;
-
     protected override void Awake()
     {
         base.Awake();
-        enemy_attackDamage = 10f;
-        enemy_attackSpeed = 1.5f;
-
-    }
-
-    public override float GetCurrentHealth()
-    {
-        return enemy_health;
-    }
-
-    protected override void ApplyDamage(float damage)
-    {
-        enemy_health -= damage;
+        // 개별적인 초기화가 필요한 경우 추가 로직 작성
     }
 }

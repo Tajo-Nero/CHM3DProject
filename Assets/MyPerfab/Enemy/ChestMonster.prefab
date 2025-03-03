@@ -147,9 +147,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75a498e4d8e0e68459312779a65911be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyData: {fileID: 11400000, guid: f6f526037cc64fe42b8f3578f7a62340, type: 2}
   enemy_attackDamage: 10
   enemy_attackSpeed: 1
   enemy_health: 100
+  healthBarPrefab: {fileID: 7406556536078814920, guid: 47a9037c16223c94599e1151a4b71da7, type: 3}
 --- !u!1 &689062765267460320
 GameObject:
   m_ObjectHideFlags: 0

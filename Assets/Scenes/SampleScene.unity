@@ -243,7 +243,7 @@ MonoBehaviour:
   - {fileID: 940485957724764862, guid: c53ddb82d132c4a428a168a8b1b688f1, type: 3}
   - {fileID: 1318307798755763279, guid: af53ac75b41dc8442bf77f39ac3f9c8e, type: 3}
   - {fileID: 9163465238740143843, guid: ad6c48fd7a157bc41bd921033b01a934, type: 3}
-  healthBarPrefab: {fileID: 4106307019301860967, guid: 47a9037c16223c94599e1151a4b71da7, type: 3}
+  healthBarPrefab: {fileID: 7406556536078814920, guid: 47a9037c16223c94599e1151a4b71da7, type: 3}
 --- !u!4 &178007088
 Transform:
   m_ObjectHideFlags: 0
@@ -1241,7 +1241,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 891c02248599009499922ae4a2e924e6, type: 2}
   spawnPoints:
   - {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
-  waveProgressBar: {fileID: 0}
+  waveProgressBar: {fileID: 303224030}
 --- !u!4 &484055444
 Transform:
   m_ObjectHideFlags: 0
@@ -2524,7 +2524,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1465412203
 RectTransform:
   m_ObjectHideFlags: 0
