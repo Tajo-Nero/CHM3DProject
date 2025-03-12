@@ -6,9 +6,9 @@ public class PreviewCollisionDetector : MonoBehaviour, IObserver
 {
     private TowerGenerator towerManager;
     private Material[] materials;
-    private bool isCollidingWithTower = false;
-    private bool isCollidingWithTerrain = false;
-    private bool isCollidingWithPowerUp = false;
+    private bool isCollidingWithTower = false; //타워설치 가능여부
+    private bool isCollidingWithTerrain = false; //타워프리뷰 설치 가능여부
+    private bool isCollidingWithPowerUp = false; //타워 파워업 가능 여부
 
     public void Setup(TowerGenerator manager, Material[] mats)
     {
@@ -76,6 +76,7 @@ public class PreviewCollisionDetector : MonoBehaviour, IObserver
         }
     }
 
+    //머테리얼색으로 타워 건설 가능 불가능여부 판단
     private void SetMaterial(Material material)
     {
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
@@ -90,7 +91,7 @@ public class PreviewCollisionDetector : MonoBehaviour, IObserver
         if (isCollidingWithTerrain && !isCollidingWithTower || isCollidingWithPowerUp)
         {
             SetMaterial(materials[0]);
-            towerManager.SetCanPlaceTower(true);
+            towerManager.SetCanPlaceTower(true);//초록색이면 트루 반환
 
             // 공격력 업 가능 여부를 설정합니다.
             towerManager.canApplyAttackUp = isCollidingWithPowerUp;
@@ -98,7 +99,7 @@ public class PreviewCollisionDetector : MonoBehaviour, IObserver
         else
         {
             SetMaterial(materials[1]);
-            towerManager.SetCanPlaceTower(false);
+            towerManager.SetCanPlaceTower(false);//빨강색이면 설치 불가
         }
     }
 }

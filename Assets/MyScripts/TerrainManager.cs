@@ -22,6 +22,12 @@ public class TerrainManager : MonoBehaviour
         SpawnTerrain();
     }
 
+    // 지형 데이터 초기화
+    private void InitializeTerrainData(TerrainData terrainData)
+    {
+        terrainData.heightmapResolution = resolution;
+        terrainData.size = new Vector3(terrainWidth, heightScale, terrainLength);
+    }
     // 지형 스폰
     private void SpawnTerrain()
     {
@@ -45,12 +51,6 @@ public class TerrainManager : MonoBehaviour
         SpawnTowerPowerUpForces(6);
     }
 
-    // 지형 데이터 초기화
-    private void InitializeTerrainData(TerrainData terrainData)
-    {
-        terrainData.heightmapResolution = resolution;
-        terrainData.size = new Vector3(terrainWidth, heightScale, terrainLength);
-    }
 
     // 지형 높이 설정
     private void SetTerrainHeights(TerrainData terrainData)

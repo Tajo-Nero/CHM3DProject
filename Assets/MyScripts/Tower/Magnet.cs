@@ -16,7 +16,9 @@ public class Magnet : MonoBehaviour
     private bool isPlayerInRange = false;
     private Collider[] towerColliders;
     private List<Rigidbody> affectedRigidbodies = new List<Rigidbody>();
+    //원래 포지션을 담을 딕셔너리
     private Dictionary<Rigidbody, Vector3> originalPositions = new Dictionary<Rigidbody, Vector3>();
+    //원래 로테이션을 담을 딕셔너리
     private Dictionary<Rigidbody, Quaternion> originalRotations = new Dictionary<Rigidbody, Quaternion>();
 
 
@@ -36,22 +38,21 @@ public class Magnet : MonoBehaviour
         DetectTowers();
     }
 
+    //플레이어가 감지에 들어오면 중력 적용 시키고 , 벗어나면 중력을 멈춤
     public void CheckPlayerInRange()
     {
         Collider[] playerColliders = Physics.OverlapSphere(transform.position, playerDetectionRadius, playerLayer);
         isPlayerInRange = playerColliders.Length > 0;
 
         if (isPlayerInRange)
-        {
-            
+        {            
             if (towerColliders != null)
             {
                 ApplyGravity(towerColliders);
             }
         }
         else
-        {
-            
+        {            
             if (towerColliders != null)
             {
                 StopGravity(towerColliders);
@@ -63,6 +64,7 @@ public class Magnet : MonoBehaviour
         }
     }
 
+    //중력 적용 시키고 타워태그를 가졌으면 타워의 공격력 2배 증가
     public void DetectTowers()
     {
         if (isPlayerInRange)
@@ -95,9 +97,9 @@ public class Magnet : MonoBehaviour
                 }
             }
         }
-
     }
 
+    //끌어오고자 하는 중심지 설정
     public void MoveTowersToCenter(Collider[] towerColliders)
     {
         if (towerColliders != null)
@@ -123,7 +125,7 @@ public class Magnet : MonoBehaviour
             }
         }
     }
-
+    //중력 설정
     public void ApplyGravity(Collider[] towerColliders)
     {
         foreach (Collider collider in towerColliders)
@@ -133,8 +135,8 @@ public class Magnet : MonoBehaviour
                 Rigidbody rb = collider.GetComponent<Rigidbody>();
                 if (rb != null && !affectedRigidbodies.Contains(rb))
                 {
-                    rb.useGravity = true;
-                    rb.isKinematic = false;
+                    rb.useGravity = true; //중력적용
+                    rb.isKinematic = false;//물리법칙에 따라 움직이게 설정
 
                     affectedRigidbodies.Add(rb);
                 }
@@ -142,7 +144,7 @@ public class Magnet : MonoBehaviour
         }
     }
 
-
+    //중력 멈추기
     public void StopGravity(Collider[] towerColliders)
     {
         foreach (Collider collider in towerColliders)
@@ -161,7 +163,7 @@ public class Magnet : MonoBehaviour
                         rb.transform.position = new Vector3(0, 0, 0);
                         rb.transform.rotation = originalRotations[rb];
 
-                        // 오리지널 로테이션 Y 값만 초기화합니다.
+                        // 오리지널(원래 있었던) 로테이션 Y 값만 초기화합니다.
                         Vector3 eulerRotation = rb.transform.rotation.eulerAngles;
                         eulerRotation.y = 0; // 또는 초기화할 값으로 설정
                         rb.transform.rotation = Quaternion.Euler(eulerRotation);

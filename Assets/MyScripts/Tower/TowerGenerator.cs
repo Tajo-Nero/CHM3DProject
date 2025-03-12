@@ -40,20 +40,7 @@ public class TowerGenerator : MonoBehaviour, ISubject
             PlaceTower(currentPreviewIndex);
         }
 
-        CheckAndResetPreviewPosition();
-
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            GameObject tower = DetectTower();
-            if (tower != null)
-            {
-                TowerBase towerBase = tower.GetComponent<TowerBase>();
-                if (towerBase != null)
-                {
-                    towerBase.TowerPowUp();
-                }
-            }
-        }
+        CheckAndResetPreviewPosition();       
 
         HandlePreviewCancellation(); // 프리뷰 타워 취소 처리
     }
@@ -75,7 +62,7 @@ public class TowerGenerator : MonoBehaviour, ISubject
             observer.OnNotify(obj, eventMessage);
         }
     }
-
+    //1,2,3,4 타워 입력
     void HandlePreviewCreationInput()
     {
         for (int i = 0; i <= 3; i++)
@@ -87,7 +74,7 @@ public class TowerGenerator : MonoBehaviour, ISubject
             }
         }
     }
-
+    //입력된 타워 프리뷰 보여주고 설치가능여부 판단함
     void CreatePreview(int index)
     {
         if (index >= 0 && index < _CraftTower.Length)
@@ -118,24 +105,18 @@ public class TowerGenerator : MonoBehaviour, ISubject
             NotifyObservers(currentPreview, "PreviewCreated");
         }
     }
-
+    //프리뷰가 초록색이면 설치가능함, 그중 타워파워업에 위치하면 공격력 2배
     void PlaceTower(int index)
     {
         if (index >= 0 && index < _CraftTower.Length)
         {
-            GameObject newTower = Instantiate(_CraftTower[index]._TowerPrefab, currentPreview.transform.position, currentPreview.transform.rotation);
-
-            if (newTower == null)
-            {
-                Debug.LogError("Rocket 생성자에서 생성된 타워를 찾을 수 없습니다!");
-                return;
-            }
+            GameObject newTower = Instantiate(_CraftTower[index]._TowerPrefab, currentPreview.transform.position, currentPreview.transform.rotation);          
 
             Destroy(currentPreview);
             currentPreview = null;
             currentPreviewIndex = -1;
 
-            NotifyObservers(newTower, "TowerPlaced");
+            NotifyObservers(newTower, "TowerPlaced");//참이면 설치함
 
             TowerBase towerBase = newTower.GetComponent<TowerBase>();
             if (towerBase != null)
@@ -181,7 +162,7 @@ public class TowerGenerator : MonoBehaviour, ISubject
         }
         return null;
     }
-
+    //마그넷에 붙었다 떼졋을때 위치할 프리뷰 플레이어 앞으로 설정,원래자리로 위치하게함
     void CheckAndResetPreviewPosition()
     {
         if (currentPreview != null)
@@ -196,7 +177,7 @@ public class TowerGenerator : MonoBehaviour, ISubject
             }
         }
     }
-
+    //타워 제거
     public void RemoveTower(GameObject tower)
     {
         if (tower != null)
@@ -204,7 +185,7 @@ public class TowerGenerator : MonoBehaviour, ISubject
             Destroy(tower);
         }
     }
-
+    //프리뷰가 캔슬 할 키 마우스 버튼 과 Esc 제외하면 제거되게 함
     void HandlePreviewCancellation()
     {
         if (currentPreview != null)

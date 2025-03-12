@@ -68,4 +68,6 @@ public abstract class TowerBase : MonoBehaviour
     public abstract void SetRange(float range);
     // 범위 내의 적을 탐지하는 함수
     public abstract void DetectEnemiesInRange();
+
+
   }      
