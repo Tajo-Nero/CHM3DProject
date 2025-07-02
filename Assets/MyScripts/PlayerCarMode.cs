@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using UnityEngine;
 
 public class PlayerCarMode : MonoBehaviour
@@ -12,57 +12,61 @@ public class PlayerCarMode : MonoBehaviour
     public GameObject _PlayerMode;
     private GameManager gameManager;
 
-    public float cameraRotationX = 45f; // Ä«¸Ş¶ó XÃà È¸Àü °¢µµ
+    public float cameraRotationX = 45f; // ì¹´ë©”ë¼ Xì¶• íšŒì „ ê°ë„
     private GameObject drillSphere;
     [SerializeField]
-    private float digDistance = 3f; // µå¸± °Å¸®
-    public float digRadius = 3f; // µå¸± ¹üÀ§ ¹İ°æ
-    public float digDepth = 0.2f; // µå¸± ±íÀÌ
+    private float digDistance = 3f; // ë“œë¦´ ê±°ë¦¬
+    public float digRadius = 3f; // ë“œë¦´ ë²”ìœ„ ë°˜ê²½
+    public float digDepth = 0.2f; // ë“œë¦´ ê¹Šì´
+
+    // â­ ì„±ëŠ¥ ìµœì í™”: ë“œë¦´ë§ ì¿¨ë‹¤ìš´ ì¶”ê°€
+    private float lastDigTime;
+    private float digCooldown = 0.05f; // 0.05ì´ˆë§ˆë‹¤ ë“œë¦´ë§ (ì´ˆë‹¹ 20íšŒë¡œ ì œí•œ)
 
     void Start()
     {
         cam = Camera.main;
-        gameManager = FindObjectOfType<GameManager>(); // GameManager ÀÎ½ºÅÏ½º Ã£±â
+        gameManager = FindObjectOfType<GameManager>(); // GameManager ì¸ìŠ¤í„´ìŠ¤ ì°¾ê¸°
     }
 
     void Update()
     {
-        // ÀÔ·Â °ª ¹Ş±â
+        // ì…ë ¥ ê°’ ë°›ê¸°
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
-        // ÀÌµ¿ Ã³¸®
+        // ì´ë™ ì²˜ë¦¬
         if (verticalInput != 0)
         {
             moveDir = transform.forward * verticalInput * moveSpeed * Time.deltaTime;
             transform.localPosition += moveDir;
 
-            // ¸¶¿ì½º ¿ŞÂÊ ¹öÆ° Å¬¸¯ ½Ã ÀÌµ¿ ¼Óµµ Áõ°¡
+            // ë§ˆìš°ìŠ¤ ì™¼ìª½ ë²„íŠ¼ í´ë¦­ ì‹œ ì´ë™ ì†ë„ ì¦ê°€
             if (Input.GetMouseButton(0))
             {
-                moveSpeed = 5f; // ÀÌµ¿ ¼Óµµ Áõ°¡
-                digDepth = 0.4f; // µå¸± ±íÀÌ Áõ°¡
+                moveSpeed = 5f; // ì´ë™ ì†ë„ ì¦ê°€
+                digDepth = 0.4f; // ë“œë¦´ ê¹Šì´ ì¦ê°€
             }
             else
             {
-                moveSpeed = 3f; // ±âº» ÀÌµ¿ ¼Óµµ
-                digDepth = 0.3f; // ±âº» µå¸± ±íÀÌ
+                moveSpeed = 3f; // ê¸°ë³¸ ì´ë™ ì†ë„
+                digDepth = 0.3f; // ê¸°ë³¸ ë“œë¦´ ê¹Šì´
             }
 
-            // ÁÂ¿ì È¸Àü Ã³¸®
+            // ì¢Œìš° íšŒì „ ì²˜ë¦¬
             if (horizontalInput != 0)
             {
                 transform.Rotate(Vector3.up, horizontalInput * rotationSpeed * Time.deltaTime, Space.Self);
             }
         }
 
-        // Ä«¸Ş¶ó È¸Àü ¹× À§Ä¡ ¾÷µ¥ÀÌÆ®
+        // ì¹´ë©”ë¼ íšŒì „ ë° ìœ„ì¹˜ ì—…ë°ì´íŠ¸
         if (cam != null)
         {
-            cam.transform.rotation = Quaternion.Euler(cameraRotationX, transform.rotation.eulerAngles.y, 0); // Ä«¸Ş¶ó È¸Àü Ã³¸®
+            cam.transform.rotation = Quaternion.Euler(cameraRotationX, transform.rotation.eulerAngles.y, 0); // ì¹´ë©”ë¼ íšŒì „ ì²˜ë¦¬
         }
 
-        // F5 Å° ÀÔ·Â ½Ã ¿ÀºêÁ§Æ® ÆÄ±« ¹× Terrain ¸®¼Â
+        // F5 í‚¤ ì…ë ¥ ì‹œ ì˜¤ë¸Œì íŠ¸ íŒŒê´´ ë° Terrain ë¦¬ì…‹
         if (Input.GetKeyDown(KeyCode.F5))
         {
             Destroy(gameObject);
@@ -73,12 +77,17 @@ public class PlayerCarMode : MonoBehaviour
             }
         }
 
-        PerformDig(); // µå¸±¸µ ¹× ÁöÇü ÆÄ±« Ã³¸®
+        // â­ ìˆ˜ì •ëœ ë¶€ë¶„: ì¿¨ë‹¤ìš´ì„ ì ìš©í•œ ë“œë¦´ë§
+        if (Time.time - lastDigTime >= digCooldown)
+        {
+            PerformDig(); // ë“œë¦´ë§ ë° ì§€í˜• íŒŒê´´ ì²˜ë¦¬
+            lastDigTime = Time.time;
+        }
     }
 
     private void LateUpdate()
     {
-        // Ä«¸Ş¶ó À§Ä¡ ¾÷µ¥ÀÌÆ®
+        // ì¹´ë©”ë¼ ìœ„ì¹˜ ì—…ë°ì´íŠ¸
         if (cam != null && camPos != null)
         {
             cam.transform.position = camPos.position;
@@ -109,14 +118,14 @@ public class PlayerCarMode : MonoBehaviour
             if (drillSphere != null)
             {
                 drillSphere.transform.position = hit.point;
-                drillSphere.SetActive(true); // ¿ÀºêÁ§Æ® È°¼ºÈ­
+                drillSphere.SetActive(true); // ì˜¤ë¸Œì íŠ¸ í™œì„±í™”
             }
         }
         else
         {
             if (drillSphere != null)
             {
-                drillSphere.SetActive(false); // ¿ÀºêÁ§Æ® ºñÈ°¼ºÈ­
+                drillSphere.SetActive(false); // ì˜¤ë¸Œì íŠ¸ ë¹„í™œì„±í™”
             }
         }
     }
@@ -127,11 +136,11 @@ public class PlayerCarMode : MonoBehaviour
         TerrainData terrainData = terrain.terrainData;
         Vector3 terrainPosition = terrain.transform.position;
 
-        // È÷Æ® Æ÷ÀÎÆ®ÀÇ Heightmap ÁÂÇ¥ °è»ê
+        // íˆíŠ¸ í¬ì¸íŠ¸ì˜ Heightmap ì¢Œí‘œ ê³„ì‚°
         int xBase = Mathf.FloorToInt((hitPoint.x - terrainPosition.x) / terrainData.size.x * terrainData.heightmapResolution);
         int yBase = Mathf.FloorToInt((hitPoint.z - terrainPosition.z) / terrainData.size.z * terrainData.heightmapResolution);
 
-        // ¹İ°æ ³»ÀÇ ÁöÇü ÆÄ±«
+        // ë°˜ê²½ ë‚´ì˜ ì§€í˜• íŒŒê´´
         int radius = Mathf.FloorToInt(digRadius / terrainData.size.x * terrainData.heightmapResolution);
         for (int x = -radius; x <= radius; x++)
         {
@@ -146,10 +155,10 @@ public class PlayerCarMode : MonoBehaviour
                     if (distance <= radius)
                     {
                         float[,] heights = terrainData.GetHeights(xPos, yPos, 1, 1);
-                        float depthFactor = Mathf.Lerp(1, 0, distance / radius); // °Å¸® ºñ·Ê ±íÀÌ
-                        heights[0, 0] = Mathf.Max(0, heights[0, 0] - digDepth * depthFactor); // ÁöÇü ÆÄ±«
+                        float depthFactor = Mathf.Lerp(1, 0, distance / radius); // ê±°ë¦¬ ë¹„ë¡€ ê¹Šì´
+                        heights[0, 0] = Mathf.Max(0, heights[0, 0] - digDepth * depthFactor); // ì§€í˜• íŒŒê´´
 
-                        // ¾÷µ¥ÀÌÆ®µÈ HeightmapÀ» TerrainData¿¡ Àû¿ë
+                        // ì—…ë°ì´íŠ¸ëœ Heightmapë¥¼ TerrainDataì— ì ìš©
                         terrainData.SetHeights(xPos, yPos, heights);
                     }
                 }
@@ -159,13 +168,13 @@ public class PlayerCarMode : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        // µå¸± ·¹ÀÌÀú¸¦ ½Ã°¢ÀûÀ¸·Î Ç¥½Ã
+        // ë“œë¦´ ë ˆì´ì €ë¥¼ ì‹œê°ì ìœ¼ë¡œ í‘œì‹œ
         Gizmos.color = Color.red;
         Vector3 startPosition = transform.position;
         Vector3 endPosition = startPosition + transform.forward * digDistance;
         Gizmos.DrawLine(startPosition, endPosition);
 
-        // È÷Æ® Æ÷ÀÎÆ®¸¦ Áß½ÉÀ¸·Î µå¸± ¹üÀ§¸¦ ½Ã°¢ÀûÀ¸·Î Ç¥½Ã
+        // íˆíŠ¸ í¬ì¸íŠ¸ë¥¼ ì¤‘ì‹¬ìœ¼ë¡œ ë“œë¦´ ë²”ìœ„ë¥¼ ì‹œê°ì ìœ¼ë¡œ í‘œì‹œ
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(endPosition, digRadius);
     }

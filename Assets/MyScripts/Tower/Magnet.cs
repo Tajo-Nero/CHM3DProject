@@ -1,5 +1,4 @@
-
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,16 +10,15 @@ public class Magnet : MonoBehaviour
     [SerializeField] public float playerDetectionRadius = 5f;
     public float stopDistance = 0.1f;
     [SerializeField] private float magnetForce = 20f;
-    [SerializeField] private float detectionInterval = 1f; // Å¸¿ö °¨Áö °£°İ
+    [SerializeField] private float detectionInterval = 1f; // íƒ€ì›Œ ê°ì§€ ê°„ê²©
 
     private bool isPlayerInRange = false;
     private Collider[] towerColliders;
     private List<Rigidbody> affectedRigidbodies = new List<Rigidbody>();
-    //¿ø·¡ Æ÷Áö¼ÇÀ» ´ãÀ» µñ¼Å³Ê¸®
+    // ì›ë˜ í¬ì§€ì…˜ì„ ë‹´ì„ ë”•ì…”ë„ˆë¦¬
     private Dictionary<Rigidbody, Vector3> originalPositions = new Dictionary<Rigidbody, Vector3>();
-    //¿ø·¡ ·ÎÅ×ÀÌ¼ÇÀ» ´ãÀ» µñ¼Å³Ê¸®
+    // ì›ë˜ ë¡œí…Œì´ì…˜ì„ ë‹´ì„ ë”•ì…”ë„ˆë¦¬
     private Dictionary<Rigidbody, Quaternion> originalRotations = new Dictionary<Rigidbody, Quaternion>();
-
 
     private void Start()
     {
@@ -29,77 +27,82 @@ public class Magnet : MonoBehaviour
 
     private void FixedUpdate()
     {
-        ApplyMagnetForce();
-    }
-
-    public void ApplyMagnetForce()
-    {
+        // â­ ìˆ˜ì •: ë¶ˆí•„ìš”í•œ ì¤‘ë³µ í˜¸ì¶œ ì œê±°
         CheckPlayerInRange();
-        DetectTowers();
+
+        // í”Œë ˆì´ì–´ê°€ ë²”ìœ„ì— ìˆì„ ë•Œë§Œ íƒ€ì›Œ ì´ë™ ì²˜ë¦¬
+        if (isPlayerInRange && towerColliders != null)
+        {
+            MoveTowersToCenter(towerColliders);
+        }
     }
 
-    //ÇÃ·¹ÀÌ¾î°¡ °¨Áö¿¡ µé¾î¿À¸é Áß·Â Àû¿ë ½ÃÅ°°í , ¹ş¾î³ª¸é Áß·ÂÀ» ¸ØÃã
+    // í”Œë ˆì´ì–´ê°€ ê°ì§€ì— ë“¤ì–´ì˜¤ë©´ ì¤‘ë ¥ ì ìš© ì‹œí‚¤ê³ , ë²—ì–´ë‚˜ë©´ ì¤‘ë ¥ì„ ë©ˆì¶¤
     public void CheckPlayerInRange()
     {
         Collider[] playerColliders = Physics.OverlapSphere(transform.position, playerDetectionRadius, playerLayer);
+        bool wasPlayerInRange = isPlayerInRange;
         isPlayerInRange = playerColliders.Length > 0;
 
-        if (isPlayerInRange)
-        {            
-            if (towerColliders != null)
+        // í”Œë ˆì´ì–´ ìƒíƒœê°€ ë³€ê²½ëœ ê²½ìš°ì—ë§Œ ì²˜ë¦¬
+        if (isPlayerInRange != wasPlayerInRange)
+        {
+            if (isPlayerInRange)
             {
-                ApplyGravity(towerColliders);
+                // í”Œë ˆì´ì–´ê°€ ë“¤ì–´ì™”ì„ ë•Œ
+                DetectTowers(); // íƒ€ì›Œ íƒì§€ ë° ì›ë³¸ ìœ„ì¹˜ ì €ì¥
+                if (towerColliders != null)
+                {
+                    ApplyGravity(towerColliders);
+                }
             }
-        }
-        else
-        {            
-            if (towerColliders != null)
+            else
             {
-                StopGravity(towerColliders);
+                // í”Œë ˆì´ì–´ê°€ ë²—ì–´ë‚¬ì„ ë•Œ
+                if (towerColliders != null)
+                {
+                    StopGravity(towerColliders);
+                }
+                // ë”•ì…”ë„ˆë¦¬ ì´ˆê¸°í™”
+                originalPositions.Clear();
+                originalRotations.Clear();
+                affectedRigidbodies.Clear();
+                towerColliders = null; // íƒ€ì›Œ ë°°ì—´ë„ ì´ˆê¸°í™”
             }
-            // ÇÃ·¹ÀÌ¾î°¡ ¹üÀ§¸¦ ¹ş¾î³µÀ» ¶§ µñ¼Å³Ê¸® ÃÊ±âÈ­
-            originalPositions.Clear();
-            originalRotations.Clear();
-            towerColliders = null; // Å¸¿ö ¹è¿­µµ ÃÊ±âÈ­
         }
     }
 
-    //Áß·Â Àû¿ë ½ÃÅ°°í Å¸¿öÅÂ±×¸¦ °¡Á³À¸¸é Å¸¿öÀÇ °ø°İ·Â 2¹è Áõ°¡
+    // ì¤‘ë ¥ ì ìš© ì‹œí‚¤ê³  íƒ€ì›Œíƒœê·¸ë¥¼ ê°€ì§„ íƒ€ì›Œì˜ ê³µê²©ë ¥ 2ë°° ì¦ê°€
     public void DetectTowers()
     {
-        if (isPlayerInRange)
+        // â­ ìˆ˜ì •: ì¤‘ë³µ ì´ˆê¸°í™” ë°©ì§€
+        if (!isPlayerInRange) return;
+
+        towerColliders = Physics.OverlapSphere(transform.position, towerDetectionRadius, towerPowUpLayer);
+
+        foreach (Collider collider in towerColliders)
         {
-            originalPositions.Clear();
-            originalRotations.Clear();
-
-            towerColliders = Physics.OverlapSphere(transform.position, towerDetectionRadius, towerPowUpLayer);
-
-            MoveTowersToCenter(towerColliders);
-            ApplyGravity(towerColliders);
-
-            foreach (Collider collider in towerColliders)
+            Rigidbody rb = collider.GetComponent<Rigidbody>();
+            if (rb != null && !originalPositions.ContainsKey(rb))
             {
-                Rigidbody rb = collider.GetComponent<Rigidbody>();
-                if (rb != null && !originalPositions.ContainsKey(rb))
+                // â­ ì¤‘ìš”: ì›ë³¸ ìœ„ì¹˜ì™€ íšŒì „ ì €ì¥
+                originalPositions[rb] = rb.transform.position;
+                originalRotations[rb] = rb.transform.rotation;
+            }
+
+            // Towers íƒœê·¸ê°€ ì„¤ì •ëœ íƒ€ì›Œì˜ ê³µê²©ë ¥ì„ 2ë°°ë¡œ ì¦ê°€ì‹œí‚¤ê¸°
+            if (collider.CompareTag("Towers"))
+            {
+                TowerBase tower = collider.GetComponent<TowerBase>();
+                if (tower != null)
                 {
-                    originalPositions[rb] = rb.transform.position;
-                    originalRotations[rb] = rb.transform.rotation;
-                }
-                //// Towers ÅÂ±×°¡ ¼³Á¤µÈ Å¸¿öÀÇ °ø°İ·ÂÀ» 2¹è·Î Áõ°¡½ÃÅ°±â
-                if (collider.CompareTag("Towers"))
-                {
-                    TowerBase tower = collider.GetComponent<TowerBase>();
-                    if (tower != null)
-                    {
-                        tower.isAttackUp = true;
-                    }
-                
+                    tower.isAttackUp = true;
                 }
             }
         }
     }
 
-    //²ø¾î¿À°íÀÚ ÇÏ´Â Áß½ÉÁö ¼³Á¤
+    // ëŒì–´ì˜¤ê³ ì í•˜ëŠ” ì¤‘ì‹¬ì§€ ì„¤ì •
     public void MoveTowersToCenter(Collider[] towerColliders)
     {
         if (towerColliders != null)
@@ -114,18 +117,17 @@ public class Magnet : MonoBehaviour
                     if (distance > stopDistance)
                     {
                         rb.transform.position = Vector3.MoveTowards(rb.transform.position, targetPosition, Time.deltaTime * magnetForce);
-
                     }
                     else
                     {
                         rb.transform.position = targetPosition;
-
                     }
                 }
             }
         }
     }
-    //Áß·Â ¼³Á¤
+
+    // ì¤‘ë ¥ ì„¤ì •
     public void ApplyGravity(Collider[] towerColliders)
     {
         foreach (Collider collider in towerColliders)
@@ -135,8 +137,8 @@ public class Magnet : MonoBehaviour
                 Rigidbody rb = collider.GetComponent<Rigidbody>();
                 if (rb != null && !affectedRigidbodies.Contains(rb))
                 {
-                    rb.useGravity = true; //Áß·ÂÀû¿ë
-                    rb.isKinematic = false;//¹°¸®¹ıÄ¢¿¡ µû¶ó ¿òÁ÷ÀÌ°Ô ¼³Á¤
+                    rb.useGravity = true; // ì¤‘ë ¥ì ìš©
+                    rb.isKinematic = false; // ë¬¼ë¦¬ë°˜ì‘ì— ë”°ë¼ ì›€ì§ì´ê²Œ ì„¤ì •
 
                     affectedRigidbodies.Add(rb);
                 }
@@ -144,9 +146,12 @@ public class Magnet : MonoBehaviour
         }
     }
 
-    //Áß·Â ¸ØÃß±â
+    // ì¤‘ë ¥ ë©ˆì¶”ê¸°
     public void StopGravity(Collider[] towerColliders)
     {
+        // í”Œë ˆì´ì–´ ì°¾ê¸°
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+
         foreach (Collider collider in towerColliders)
         {
             if (collider != null)
@@ -157,42 +162,62 @@ public class Magnet : MonoBehaviour
                     rb.useGravity = false;
                     rb.isKinematic = true;
 
-
-                    if (originalPositions.ContainsKey(rb) && originalRotations.ContainsKey(rb))
+                    // â­ í•µì‹¬ ìˆ˜ì •: í”Œë ˆì´ì–´ forward ë°©í–¥ìœ¼ë¡œ ì´ë™
+                    if (player != null)
                     {
-                        rb.transform.position = new Vector3(0, 0, 0);
-                        rb.transform.rotation = originalRotations[rb];
+                        // í”Œë ˆì´ì–´ ì•ìª½ ìœ„ì¹˜ ê³„ì‚° (forward ë°©í–¥ìœ¼ë¡œ ì•½ê°„ ë–¨ì–´ì§„ ê³³)
+                        Vector3 playerForwardPosition = player.transform.position + player.transform.forward * 2f;
+                        playerForwardPosition.y = rb.transform.position.y; // Y ë†’ì´ëŠ” ìœ ì§€
 
-                        // ¿À¸®Áö³Î(¿ø·¡ ÀÖ¾ú´ø) ·ÎÅ×ÀÌ¼Ç Y °ª¸¸ ÃÊ±âÈ­ÇÕ´Ï´Ù.
-                        Vector3 eulerRotation = rb.transform.rotation.eulerAngles;
-                        eulerRotation.y = 0; // ¶Ç´Â ÃÊ±âÈ­ÇÒ °ªÀ¸·Î ¼³Á¤
-                        rb.transform.rotation = Quaternion.Euler(eulerRotation);
+                        rb.transform.position = playerForwardPosition;
 
+                        // ì˜¤ë¦¬ì§€ë„ ë¡œí…Œì´ì…˜ Y ê°’ë§Œ ì´ˆê¸°í™”í•˜ê¸°
+                        if (originalRotations.ContainsKey(rb))
+                        {
+                            Vector3 eulerRotation = rb.transform.rotation.eulerAngles;
+                            eulerRotation.y = 0; // Y íšŒì „ê°’ ì´ˆê¸°í™”
+                            rb.transform.rotation = Quaternion.Euler(eulerRotation);
+                        }
                     }
+                    else
+                    {
+                        // í”Œë ˆì´ì–´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ëŠ” ê²½ìš° ì›ë³¸ ìœ„ì¹˜ë¡œ ë³µì›
+                        if (originalPositions.ContainsKey(rb))
+                        {
+                            rb.transform.position = originalPositions[rb];
+                        }
+                        Debug.LogWarning("í”Œë ˆì´ì–´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ì–´ ì›ë³¸ ìœ„ì¹˜ë¡œ ë³µì›í•©ë‹ˆë‹¤.");
+                    }
+
+                    affectedRigidbodies.Remove(rb);
                 }
             }
         }
     }
 
-
     private IEnumerator DetectTowersPeriodically()
     {
         while (true)
         {
-            DetectTowers();
+            // â­ ìˆ˜ì •: í”Œë ˆì´ì–´ê°€ ë²”ìœ„ì— ìˆì„ ë•Œë§Œ ì£¼ê¸°ì  íƒì§€
+            if (isPlayerInRange)
+            {
+                DetectTowers();
+            }
             yield return new WaitForSeconds(detectionInterval);
         }
     }
 
-    //private void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.green;
-    //    Gizmos.DrawWireSphere(transform.position, playerDetectionRadius);
+    // ë””ë²„ê·¸ìš© Gizmos (ì£¼ì„ í•´ì œí•˜ì—¬ ì‹œê°ì  í™•ì¸ ê°€ëŠ¥)
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, playerDetectionRadius);
 
-    //    Gizmos.color = Color.blue;
-    //    Gizmos.DrawWireSphere(transform.position, towerDetectionRadius);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, towerDetectionRadius);
 
-    //    Gizmos.color = Color.red;
-    //    Gizmos.DrawWireSphere(transform.position, stopDistance);
-    //}
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, stopDistance);
+    }
 }
