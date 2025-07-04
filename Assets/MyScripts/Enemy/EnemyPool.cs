@@ -120,7 +120,6 @@ public class EnemyPool : MonoBehaviour
                 enemyBase.InitializeHealth(); // 체력 초기화
             }
 
-            activeEnemies.Add(enemyInstance); // 활성화된 적 목록에 추가
             return enemyInstance; // GameObject 인스턴스 반환
         }
         else

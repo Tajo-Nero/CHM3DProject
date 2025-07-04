@@ -134,6 +134,16 @@ GameObject:
   - component: {fileID: 55833645}
   - component: {fileID: 55833644}
   - component: {fileID: 55833643}
+  - component: {fileID: 55833655}
+  - component: {fileID: 55833654}
+  - component: {fileID: 55833653}
+  - component: {fileID: 55833652}
+  - component: {fileID: 55833651}
+  - component: {fileID: 55833650}
+  - component: {fileID: 55833649}
+  - component: {fileID: 55833648}
+  - component: {fileID: 55833647}
+  - component: {fileID: 55833646}
   m_Layer: 5
   m_Name: Installation
   m_TagString: Untagged
@@ -204,6 +214,182 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &55833646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55833642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45cf67a361a37c3488786a9600976ebe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  towerAttackPower: 0
+  towerPenetrationPower: 0
+  criticalHitRate: 0
+  attackSpeed: 0
+  installationCost: 0
+  isAttackUp: 0
+  detectionRange: 10
+  splashRadius: 10
+  damageOverTime: 5
+  damageDuration: 5
+  rocketLaunchPoint: {fileID: 0}
+  attackConeAngle: 45
+--- !u!114 &55833647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55833642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 730145631c7a0da4f8b052effecf5ba9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  segments: 20
+  rocketLaunchPoint: {fileID: 0}
+  attackConeAngle: 45
+  detectionRange: 10
+--- !u!114 &55833648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55833642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a441572de7ce94449e6ca2982789784, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  segments: 8
+  detectionRange: 10
+  laserStartPoint: {fileID: 0}
+--- !u!114 &55833649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55833642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4989a9c2f9bf56d4a91a4a0af96bd06b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &55833650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55833642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48d62fa95b62393408ac8914268cf349, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  segments: 50
+  parameter: 8
+--- !u!114 &55833651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55833642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc058acf10744b54fbc024da2c50bd26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  segments: 45
+  radius: 10
+--- !u!114 &55833652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55833642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56bfc554d6193d34fa0b09fb0dc1b07d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRange: 5
+  attackDamage: 20
+  attackInterval: 2
+  health: 100
+--- !u!114 &55833653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55833642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0461ee560b20d14885dda8f68846cac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  towerAttackPower: 0
+  towerPenetrationPower: 0
+  criticalHitRate: 0
+  attackSpeed: 0
+  installationCost: 0
+  isAttackUp: 0
+  detectionRange: 20
+  laserStartPoint: {fileID: 0}
+  laserImpactEffectPrefab: {fileID: 0}
+--- !u!114 &55833654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55833642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 056d55ea43cb8574bac301e2988b1099, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  towerAttackPower: 0
+  towerPenetrationPower: 0
+  criticalHitRate: 0
+  attackSpeed: 0
+  installationCost: 0
+  isAttackUp: 0
+  detectionRange: 8
+  cannonTowerTransform: {fileID: 0}
+  segments: 50
+--- !u!114 &55833655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55833642}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fa4e7a0b77db804aba0ed8cd1d6ad73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  towerAttackPower: 0
+  towerPenetrationPower: 0
+  criticalHitRate: 0
+  attackSpeed: 0
+  installationCost: 0
+  isAttackUp: 0
+  buffRange: 10
+  attackPowerMultiplier: 1.2
+  buffDuration: 5
+  buffInterval: 6
+  segments: 50
 --- !u!1 &178007086
 GameObject:
   m_ObjectHideFlags: 0

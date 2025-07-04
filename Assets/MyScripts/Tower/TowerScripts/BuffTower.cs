@@ -1,35 +1,50 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BuffTower : TowerBase
 {
-    [SerializeField] private float buffRange = 10f; // ¹öÇÁ ¹üÀ§
-    [SerializeField] private float attackPowerMultiplier = 1.2f; // °ø°İ·Â ¹è¼ö (20% Áõ°¡)
-    [SerializeField] private float buffDuration = 5f; // ¹öÇÁ Áö¼Ó ½Ã°£
-    [SerializeField] private float buffInterval = 6f; // ¹öÇÁ ÁÖ±â
-    private List<TowerBase> towersInRange = new List<TowerBase>(); // ¹üÀ§ ³» Å¸¿ö ¸ñ·Ï
+    [SerializeField] private float buffRange = 10f; // ë²„í”„ ë²”ìœ„
+    [SerializeField] private float attackPowerMultiplier = 1.2f; // ê³µê²©ë ¥ ë°°ìˆ˜ (20% ì¦ê°€)
+    [SerializeField] private float buffDuration = 5f; // ë²„í”„ ì§€ì† ì‹œê°„
+    [SerializeField] private float buffInterval = 6f; // ë²„í”„ ì£¼ê¸°
+    private List<TowerBase> towersInRange = new List<TowerBase>(); // ë²”ìœ„ ë‚´ íƒ€ì›Œ ëª©ë¡
     private ILineRendererStrategy lineRendererStrategy;
-    public int segments = 50; // ¶óÀÎ ·»´õ·¯ ¼¼±×¸ÕÆ® ¼ö
+    public int segments = 50; // ë¼ì¸ ë Œë”ëŸ¬ ì„¸ê·¸ë¨¼íŠ¸ ìˆ˜
+
+    // ì„±ëŠ¥ ìµœì í™”: íƒ€ì›Œ íƒì§€ ì£¼ê¸° ì„¤ì •
+    [SerializeField] private float towerDetectionInterval = 0.5f; // 0.5ì´ˆë§ˆë‹¤ íƒ€ì›Œ íƒì§€
+    private float lastTowerDetectionTime = 0f;
+
+    // ë²„í”„ ì‹œìŠ¤í…œ ì•ˆì „ì„± ê°•í™”
+    private HashSet<TowerBase> currentlyBuffedTowers = new HashSet<TowerBase>(); // í˜„ì¬ ë²„í”„ ë°›ëŠ” íƒ€ì›Œë“¤
+    private Dictionary<TowerBase, Coroutine> buffCoroutines = new Dictionary<TowerBase, Coroutine>(); // ë²„í”„ ì½”ë£¨í‹´ ê´€ë¦¬
 
     void Start()
     {
-        // ¶óÀÎ ·»´õ·¯ Àü·« ¼³Á¤
+        // ë¼ì¸ ë Œë”ëŸ¬ ì „ëµ ì„¤ì •
         lineRendererStrategy = new CircleRendererStrategy();
 
-        // ¶óÀÎ ·»´õ·¯ ¼³Á¤ ¹× ÆĞÅÏ »ı¼º
+        // ë¼ì¸ ë Œë”ëŸ¬ ì„¤ì • ë° íŒ¨í„´ ìƒì„±
         lineRendererStrategy.Setup(gameObject);
         lineRendererStrategy.GeneratePattern(gameObject, transform.position, transform, segments, buffRange, 0);
 
-        StartCoroutine(BuffTowersInRange()); // ¹öÇÁ ·çÆ¾ ½ÃÀÛ
+        StartCoroutine(BuffTowersInRange()); // ë²„í”„ ë£¨í‹´ ì‹œì‘
 
-        // ¼³Ä¡ ºñ¿ë ¼³Á¤
+        // ì„¤ì¹˜ ë¹„ìš© ì„¤ì •
         installationCost = 15;
     }
 
     void Update()
     {
-        // ¶óÀÎ ·»´õ·¯¸¦ »ç¿ëÇÏ¿© ¹öÇÁ ¹üÀ§ ½Ã°¢È­
+        // ìˆ˜ì •: ì£¼ê¸°ì ìœ¼ë¡œë§Œ íƒ€ì›Œ íƒì§€ (ë§¤ í”„ë ˆì„ ëŒ€ì‹ )
+        if (Time.time - lastTowerDetectionTime >= towerDetectionInterval)
+        {
+            DetectTowersInRange();
+            lastTowerDetectionTime = Time.time;
+        }
+
+        // ë¼ì¸ ë Œë”ëŸ¬ë¥¼ ì‚¬ìš©í•˜ì—¬ ë²„í”„ ë²”ìœ„ ì‹œê°í™”
         GenerateRangeVisualization();
     }
 
@@ -42,80 +57,136 @@ public class BuffTower : TowerBase
     {
         while (true)
         {
-            DetectTowersInRange(); // ¹üÀ§ ³» Å¸¿ö °¨Áö
-            ApplyBuffToTowers(); // Å¸¿ö¿¡ ¹öÇÁ Àû¿ë
-            yield return new WaitForSeconds(buffInterval); // ¹öÇÁ ÁÖ±â ´ë±â
+            // ê°œì„ : íƒì§€ì™€ ë²„í”„ ì ìš©ì„ ë¶„ë¦¬
+            ApplyBuffToDetectedTowers(); // ì´ë¯¸ íƒì§€ëœ íƒ€ì›Œë“¤ì—ê²Œë§Œ ë²„í”„ ì ìš©
+            yield return new WaitForSeconds(buffInterval); // ë²„í”„ ì£¼ê¸° ëŒ€ê¸°
         }
     }
 
     private void DetectTowersInRange()
     {
+        // ì„±ëŠ¥ ìµœì í™”: ê¸°ì¡´ ë¦¬ìŠ¤íŠ¸ ì¬ì‚¬ìš©
         towersInRange.Clear();
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, buffRange); // ¹üÀ§ ³» Äİ¶óÀÌ´õ Å½Áö
+
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, buffRange); // ë²”ìœ„ ë‚´ ì½œë¼ì´ë” íƒì§€
+
         foreach (var hitCollider in hitColliders)
         {
             if (hitCollider.CompareTag("Towers"))
             {
                 TowerBase tower = hitCollider.GetComponent<TowerBase>();
-                if (tower != null && !towersInRange.Contains(tower))
+                if (tower != null && tower != this) // â­ ìê¸° ìì‹  ì œì™¸
                 {
-                    towersInRange.Add(tower); // ¹üÀ§ ³» Å¸¿ö ¸ñ·Ï¿¡ Ãß°¡
+                    towersInRange.Add(tower); // ë²”ìœ„ ë‚´ íƒ€ì›Œ ëª©ë¡ì— ì¶”ê°€
                 }
             }
         }
     }
 
-    private void ApplyBuffToTowers()
+    private void ApplyBuffToDetectedTowers()
     {
-        StartCoroutine(ApplyBuffForDuration()); // ¹öÇÁ Áö¼Ó ½Ã°£ µ¿¾È Àû¿ë
-    }
+        // ê°œì„ : ìœ íš¨í•œ íƒ€ì›Œë“¤ë§Œ í•„í„°ë§
+        List<TowerBase> validTowers = new List<TowerBase>();
 
-    private IEnumerator ApplyBuffForDuration()
-    {
-        List<TowerBase> buffedTowers = new List<TowerBase>(towersInRange);
-
-        // Å¸¿öµéÀÇ °ø°İ·Â Áõ°¡
-        foreach (var tower in buffedTowers)
+        foreach (var tower in towersInRange)
         {
-            tower.towerAttackPower *= attackPowerMultiplier;
+            if (tower != null && tower.gameObject.activeInHierarchy)
+            {
+                validTowers.Add(tower);
+            }
         }
 
-        yield return new WaitForSeconds(buffDuration); // ¹öÇÁ Áö¼Ó ½Ã°£ ´ë±â
-
-        // Å¸¿öµéÀÇ °ø°İ·Â ¿ø·¡´ë·Î º¹¿ø
-        foreach (var tower in buffedTowers)
+        if (validTowers.Count > 0)
         {
-            if (tower != null)
+            foreach (var tower in validTowers)
             {
-                tower.towerAttackPower /= attackPowerMultiplier;
+                // ì¤‘ë³µ ë²„í”„ ë°©ì§€
+                if (!currentlyBuffedTowers.Contains(tower))
+                {
+                    StartCoroutine(ApplyBuffForDuration(tower));
+                }
             }
+        }
+    }
+
+    private IEnumerator ApplyBuffForDuration(TowerBase tower)
+    {
+        // ì•ˆì „ì„± ì²´í¬
+        if (tower == null || !tower.gameObject.activeInHierarchy)
+        {
+            yield break;
+        }
+
+        // ë²„í”„ ì ìš©
+        currentlyBuffedTowers.Add(tower);
+        tower.towerAttackPower *= attackPowerMultiplier;
+
+        Debug.Log($"ë²„í”„ ì ìš©: {tower.name} - ê³µê²©ë ¥: {tower.towerAttackPower}");
+
+        yield return new WaitForSeconds(buffDuration); // ë²„í”„ ì§€ì† ì‹œê°„ ëŒ€ê¸°
+
+        // ë²„í”„ í•´ì œ ì‹œ ì•ˆì „ì„± ê²€ì‚¬
+        if (tower != null && tower.gameObject.activeInHierarchy && currentlyBuffedTowers.Contains(tower))
+        {
+            tower.towerAttackPower /= attackPowerMultiplier;
+            currentlyBuffedTowers.Remove(tower);
+
+            Debug.Log($"ë²„í”„ í•´ì œ: {tower.name} - ê³µê²©ë ¥: {tower.towerAttackPower}");
+        }
+        else if (currentlyBuffedTowers.Contains(tower))
+        {
+            // íƒ€ì›Œê°€ íŒŒê´´ëœ ê²½ìš°ì—ë„ ì§‘í•©ì—ì„œ ì œê±°
+            currentlyBuffedTowers.Remove(tower);
+            Debug.Log("íŒŒê´´ëœ íƒ€ì›Œì˜ ë²„í”„ ì •ë³´ ì •ë¦¬ë¨");
         }
     }
 
     public override void TowerAttack(List<Transform> targets)
     {
-        // ¹öÇÁ Å¸¿ö´Â °ø°İ ±â´ÉÀÌ ¾øÀ¸¹Ç·Î ±¸ÇöÇÏÁö ¾Ê½À´Ï´Ù.
+        // ë²„í”„ íƒ€ì›ŒëŠ” ê³µê²© ê¸°ëŠ¥ì´ ì—†ìœ¼ë¯€ë¡œ êµ¬í˜„í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.
     }
 
     public override void SetRange(float range)
     {
-        buffRange = range; // ¹öÇÁ ¹üÀ§ ¼³Á¤
-        Debug.Log("¹öÇÁ ¹üÀ§ ¼³Á¤: " + buffRange);
+        buffRange = range; // ë²„í”„ ë²”ìœ„ ì„¤ì •
+        Debug.Log("ë²„í”„ ë²”ìœ„ ì„¤ì •: " + buffRange);
     }
 
     public override void TowerPowUp()
     {
-        Debug.Log("¹öÇÁ Å¸¿ö°¡ ÆÄ¿ö¾÷µÇ¾ú½À´Ï´Ù!");
+        // íŒŒì›Œì—… ì‹œ ë²„í”„ íš¨ê³¼ ê°•í™”
+        attackPowerMultiplier += 0.1f; // ë²„í”„ ë°°ìˆ˜ ì¦ê°€ (1.2 â†’ 1.3)
+        buffRange += 2f; // ë²„í”„ ë²”ìœ„ ì¦ê°€
+
+        Debug.Log($"ë²„í”„ íƒ€ì›Œê°€ íŒŒì›Œì—…ë˜ì—ˆìŠµë‹ˆë‹¤! ë²„í”„ ë°°ìˆ˜: {attackPowerMultiplier}, ë²”ìœ„: {buffRange}");
     }
 
     public override void DetectEnemiesInRange()
     {
-        // ÀÌ ¸Ş¼­µå´Â ¹öÇÁ Å¸¿ö¿¡ ÇÊ¿äÇÏÁö ¾Ê½À´Ï´Ù.
+        // ì´ ë©”ì„œë“œëŠ” ë²„í”„ íƒ€ì›Œì— í•„ìš”í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.
+    }
+
+    // ì •ë¦¬ í•¨ìˆ˜ ì¶”ê°€
+    void OnDestroy()
+    {
+        // íƒ€ì›Œê°€ íŒŒê´´ë  ë•Œ ëª¨ë“  ë²„í”„ í•´ì œ
+        foreach (var tower in currentlyBuffedTowers)
+        {
+            if (tower != null && tower.gameObject.activeInHierarchy)
+            {
+                tower.towerAttackPower /= attackPowerMultiplier;
+            }
+        }
+
+        currentlyBuffedTowers.Clear();
+
+        // ì‹¤í–‰ ì¤‘ì¸ ëª¨ë“  ì½”ë£¨í‹´ ì •ë¦¬
+        StopAllCoroutines();
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, buffRange); // ¹öÇÁ ¹üÀ§ ½Ã°¢È­
+        Gizmos.DrawWireSphere(transform.position, buffRange); // ë²„í”„ ë²”ìœ„ ì‹œê°í™”
     }
 }
