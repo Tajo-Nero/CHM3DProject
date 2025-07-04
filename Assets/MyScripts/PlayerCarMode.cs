@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerCarMode : MonoBehaviour
@@ -22,7 +23,7 @@ public class PlayerCarMode : MonoBehaviour
     // ⭐ 성능 최적화: 드릴링 쿨다운 추가
     private float lastDigTime;
     private float digCooldown = 0.05f; // 0.05초마다 드릴링 (초당 20회로 제한)
-
+    private AutoWaypointGenerator waypointGenerator;
     void Start()
     {
         cam = Camera.main;
@@ -98,6 +99,20 @@ public class PlayerCarMode : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Nexus"))
         {
+            // 경로 생성!
+            if (waypointGenerator != null)
+            {
+                List<Vector3> generatedPath = waypointGenerator.GenerateWaypoints();
+                Debug.Log($"경로 생성 완료! 웨이포인트 {generatedPath.Count}개");
+
+                // PathManager에 경로 저장
+                PathManager pathManager = FindObjectOfType<PathManager>();
+                if (pathManager != null)
+                {
+                    pathManager.SetMainPath(generatedPath);
+                }
+            }
+
             gameManager.SpawnPlayer(_PlayerMode);
             Destroy(gameObject);
         }

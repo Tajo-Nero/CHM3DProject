@@ -56,7 +56,7 @@ public class CanonTower : TowerBase
             Transform target = targets[0];
             if (target != null)
             {
-                EnemyBase enemyHp = target.GetComponent<EnemyBase>();
+                EnemyPathFollower enemyHp = target.GetComponent<EnemyPathFollower>();
                 if (enemyHp != null)
                 {
                     enemyHp.TakeDamage(towerAttackPower);

@@ -78,7 +78,7 @@ public class RocketTower : TowerBase
 
                     if (angle <= attackConeAngle / 2)
                     {
-                        EnemyBase enemyHp = hitCollider.GetComponent<EnemyBase>();
+                        EnemyPathFollower enemyHp = hitCollider.GetComponent<EnemyPathFollower>();
                         if (enemyHp != null)
                         {
                             enemyHp.TakeDamage(towerAttackPower); // 기본 데미지 적용
@@ -90,7 +90,7 @@ public class RocketTower : TowerBase
         }
     }
 
-    private IEnumerator ApplyDamageOverTime(EnemyBase enemyHp)
+    private IEnumerator ApplyDamageOverTime(EnemyPathFollower enemyHp)
     {
         float elapsed = 0f;
         while (elapsed < damageDuration)

@@ -76,7 +76,7 @@ public class LaserTower : TowerBase
     {
         foreach (var target in targets)
         {
-            EnemyBase enemyHp = target.GetComponent<EnemyBase>();
+            EnemyPathFollower enemyHp = target.GetComponent<EnemyPathFollower>();
             if (enemyHp != null)
             {
                 enemyHp.TakeDamage(towerAttackPower); // 적에게 데미지 입힘

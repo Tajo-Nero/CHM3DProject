@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cactus : EnemyBase
+public class Cactus : EnemyPathFollower
 {
     protected override void Awake()
     {

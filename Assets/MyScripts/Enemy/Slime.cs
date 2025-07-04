@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Slime : EnemyBase
+public class Slime : EnemyPathFollower
 {
     protected override void Awake()
     {

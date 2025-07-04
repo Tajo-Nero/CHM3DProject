@@ -6,12 +6,31 @@ public class Nexus : MonoBehaviour
     [SerializeField] private float detectionRange = 5f; // 탐지 범위
     [SerializeField] private float attackDamage = 20f; // 공격 데미지
     [SerializeField] private float attackInterval = 2f; // 공격 간격 (2초)
-    [SerializeField] private float health = 100f; // 넥서스 체력
+    [SerializeField] private float maxHealth = 100f; // 넥서스 최대 체력
+    [SerializeField] private float currentHealth = 100f; // 넥서스 현재 체력
+
     private bool isAttacking = false; // 공격 중인지 여부
+    private AutoWaypointGenerator waypointGenerator;
+    private PathManager pathManager;
+
     public float DetectionRange => detectionRange;
+    public float CurrentHealth => currentHealth;
+    public float MaxHealth => maxHealth;
 
     void Start()
     {
+        currentHealth = maxHealth;
+
+        // 필요한 컴포넌트들 찾기
+        waypointGenerator = FindObjectOfType<AutoWaypointGenerator>();
+        pathManager = FindObjectOfType<PathManager>();
+
+        // 넥서스를 목표점으로 설정
+        if (waypointGenerator != null && waypointGenerator.endPoint == null)
+        {
+            waypointGenerator.endPoint = this.transform;
+        }
+
         SetRange(detectionRange); // 탐지 범위 설정
     }
 
@@ -38,19 +57,21 @@ public class Nexus : MonoBehaviour
 
         while (target != null && Vector3.Distance(transform.position, target.position) <= detectionRange)
         {
-            EnemyBase enemyAI = target.GetComponent<EnemyBase>();
-            if (enemyAI != null)
+            // EnemyPathFollower로 변경
+            EnemyPathFollower enemyPathFollower = target.GetComponent<EnemyPathFollower>();
+            if (enemyPathFollower != null)
             {
-                enemyAI.TakeDamage(attackDamage); // 적에게 공격 데미지 입히기
-                TakeDamage(enemyAI.enemy_attackDamage); // 넥서스가 적의 공격 데미지를 받음
-                Debug.Log("넥서스가 " + target.name + "에게 공격을 가했습니다! 공격 데미지: " + attackDamage);
-                Debug.Log("넥서스가 " + target.name + "에게 공격을 받았습니다! 공격 데미지: " + enemyAI.enemy_attackDamage);
+                enemyPathFollower.TakeDamage(attackDamage); // 적에게 공격 데미지 입히기
+                TakeDamage(enemyPathFollower.enemy_attackDamage); // 넥서스가 적의 공격 데미지를 받음
+
+                Debug.Log($"넥서스가 {target.name}에게 공격을 가했습니다! 공격 데미지: {attackDamage}");
+                Debug.Log($"넥서스가 {target.name}에게 공격을 받았습니다! 받은 데미지: {enemyPathFollower.enemy_attackDamage}");
             }
 
-            //  target이 파괴되었는지 확인
+            // target이 파괴되었는지 확인
             if (target == null)
             {
-                Debug.Log("타겟이 파괴되었습니다.");
+                Debug.Log("적이 파괴되었습니다.");
                 break;
             }
 
@@ -62,20 +83,41 @@ public class Nexus : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        health -= damage;
-        Debug.Log("넥서스가 데미지를 입었습니다! 현재 체력: " + health);
+        currentHealth -= damage;
+        currentHealth = Mathf.Max(0, currentHealth); // 체력이 0 이하로 떨어지지 않도록
 
-        if (health <= 0)
+        Debug.Log($"넥서스가 데미지를 입었습니다! 현재 체력: {currentHealth}/{maxHealth}");
+
+        // UI 업데이트 (필요하면 추가)
+        UpdateHealthUI();
+
+        if (currentHealth <= 0)
         {
             Die();
         }
     }
 
+    private void UpdateHealthUI()
+    {
+        // UI 매니저가 있다면 체력바 업데이트
+        if (UIManager.Instance != null)
+        {
+            // UIManager.Instance.UpdateNexusHealth(currentHealth, maxHealth);
+        }
+    }
+
     private void Die()
     {
-        Debug.Log("넥서스가 파괴되었습니다!");
+        Debug.Log("넥서스가 파괴되었습니다! 게임 오버!");
+
+        // 게임 오버 처리
+        if (GameManager.Instance != null)
+        {
+            // GameManager.Instance.GameOver();
+        }
+
         gameObject.SetActive(false);
-        Destroy(gameObject);
+        // Destroy(gameObject); // 즉시 파괴하지 말고 게임 오버 연출 후에
     }
 
     private void SetRange(float range)
@@ -93,14 +135,77 @@ public class Nexus : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            StartCoroutine(HandleCollision());
+            StartCoroutine(HandlePlayerCollision(collision.gameObject));
         }
     }
 
-    private IEnumerator HandleCollision()
+    private IEnumerator HandlePlayerCollision(GameObject player)
     {
-        yield return new WaitForSeconds(1f);
-        GameManager.Instance.BakeNavMesh();
-        
+        Debug.Log("플레이어가 넥서스에 도달했습니다!");
+
+        // 차량 모드에서 플레이어 모드로 전환하기 전에 경로 생성
+        PlayerCarMode carMode = player.GetComponent<PlayerCarMode>();
+        if (carMode != null && GameManager.Instance.IsCarModeActive())
+        {
+            Debug.Log("차량 모드 감지됨. 경로를 생성합니다...");
+
+            // 웨이포인트 생성
+            if (waypointGenerator != null)
+            {
+                var generatedPath = waypointGenerator.GenerateWaypoints();
+                Debug.Log($"경로 생성 완료! 웨이포인트 {generatedPath.Count}개");
+
+                // PathManager에 경로 저장
+                if (pathManager != null)
+                {
+                    pathManager.SetMainPath(generatedPath);
+                    Debug.Log("메인 경로가 설정되었습니다!");
+                }
+            }
+
+            yield return new WaitForSeconds(0.5f); // 약간의 지연
+
+            // GameManager를 통해 플레이어 모드로 전환
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.SwitchToPlayerMode(carMode._PlayerMode);
+                GameManager.Instance.OnPathGenerated(); // 경로 생성 완료 알림
+            }
+
+            Destroy(player); // 차량 모드 제거
+        }
+
+        // 일반 플레이어 모드인 경우
+        else
+        {
+            Debug.Log("일반 플레이어가 넥서스에 도달했습니다.");
+            // 필요한 경우 추가 로직
+        }
+    }
+
+    // 체력 회복 기능 (필요시 사용)
+    public void Heal(float healAmount)
+    {
+        currentHealth += healAmount;
+        currentHealth = Mathf.Min(currentHealth, maxHealth); // 최대 체력을 초과하지 않도록
+
+        Debug.Log($"넥서스가 {healAmount} 체력을 회복했습니다! 현재 체력: {currentHealth}/{maxHealth}");
+        UpdateHealthUI();
+    }
+
+    // 최대 체력 업그레이드 기능 (필요시 사용)
+    public void UpgradeMaxHealth(float additionalHealth)
+    {
+        maxHealth += additionalHealth;
+        currentHealth += additionalHealth; // 현재 체력도 같이 증가
+
+        Debug.Log($"넥서스 최대 체력이 증가했습니다! 현재 체력: {currentHealth}/{maxHealth}");
+        UpdateHealthUI();
+    }
+
+    // 체력 비율 반환 (UI용)
+    public float GetHealthPercentage()
+    {
+        return currentHealth / maxHealth;
     }
 }

@@ -19,6 +19,7 @@ public class TerrainManager : MonoBehaviour
     // 지형 초기화
     public void InitializeTerrain()
     {
+        Debug.Log("InitializeTerrain 호출됨!");
         SpawnTerrain();
     }
 
@@ -31,24 +32,52 @@ public class TerrainManager : MonoBehaviour
     // 지형 스폰
     private void SpawnTerrain()
     {
+        Debug.Log("=== SpawnTerrain 시작 ===");
+        Debug.Log($"terrain null 여부: {terrain == null}");
+        Debug.Log($"terrainSpawnPoint null 여부: {terrainSpawnPoint == null}");
+
         if (terrain == null)
         {
+            Debug.LogError("terrain이 null입니다!");
+            return;
+        }
+
+        if (terrainSpawnPoint == null)
+        {
+            Debug.LogError("terrainSpawnPoint가 null입니다!");
             return;
         }
 
         Vector3 spawnPosition = terrainSpawnPoint.position;
+        Debug.Log($"스폰 위치: {spawnPosition}");
+
         terrain.transform.position = spawnPosition;
-        terrain.terrainData = new TerrainData();
+        Debug.Log("터레인 위치 설정 완료");
+
+        // TerrainData가 없을 때만 새로 생성 (중복 생성 제거!)
+        if (terrain.terrainData == null)
+        {
+            terrain.terrainData = new TerrainData();
+            Debug.Log("새로운 TerrainData 생성!");
+        }
+
         InitializeTerrainData(terrain.terrainData);
+        Debug.Log("TerrainData 초기화 완료");
+
         SetTerrainHeights(terrain.terrainData);
+        Debug.Log("터레인 높이 설정 완료");
 
         TerrainCollider terrainCollider = terrain.gameObject.GetComponent<TerrainCollider>();
         if (terrainCollider == null)
         {
             terrainCollider = terrain.gameObject.AddComponent<TerrainCollider>();
+            Debug.Log("TerrainCollider 추가됨");
         }
         terrainCollider.terrainData = terrain.terrainData;
+        Debug.Log("TerrainCollider 설정 완료");
+
         SpawnTowerPowerUpForces(6);
+        Debug.Log("=== SpawnTerrain 완료 ===");
     }
 
 

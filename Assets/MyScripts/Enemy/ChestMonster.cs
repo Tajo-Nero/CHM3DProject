@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChestMonster : EnemyBase
+public class ChestMonster : EnemyPathFollower
 {
     protected override void Awake()
     {

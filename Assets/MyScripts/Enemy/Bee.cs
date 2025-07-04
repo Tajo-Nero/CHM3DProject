@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Bee : EnemyBase
+public class Bee : EnemyPathFollower
 {
     protected override void Awake()
     {

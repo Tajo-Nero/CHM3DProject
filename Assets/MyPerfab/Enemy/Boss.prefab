@@ -1989,7 +1989,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2007078506976478566}
   - component: {fileID: 7494452149820213652}
-  - component: {fileID: 7017583817862430936}
   - component: {fileID: 140832276990093169}
   - component: {fileID: 836975435478089071}
   m_Layer: 7
@@ -2042,28 +2041,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!195 &7017583817862430936
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6094248979583798090}
-  m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 1
-  m_Speed: 2
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!136 &140832276990093169
 CapsuleCollider:
   m_ObjectHideFlags: 0

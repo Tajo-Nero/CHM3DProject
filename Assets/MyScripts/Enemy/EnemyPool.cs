@@ -8,7 +8,7 @@ public class EnemyPool : MonoBehaviour
     [SerializeField] public GameObject[] enemyPrefabs; // 적 프리팹 배열
     [SerializeField] private GameObject healthBarPrefab; // 체력바 프리팹
     private Dictionary<string, ObjectPool<GameObject>> poolDictionary; // 오브젝트 풀 딕셔너리
-
+    private PathManager pathManager;
     // 활성화된 적 리스트 추가
     private List<GameObject> activeEnemies = new List<GameObject>();
 
@@ -19,6 +19,7 @@ public class EnemyPool : MonoBehaviour
 
     private void Awake()
     {
+        pathManager = FindObjectOfType<PathManager>();
         poolDictionary = new Dictionary<string, ObjectPool<GameObject>>();
 
         // 모든 적 프리팹에 대해 오브젝트 풀 생성
@@ -51,6 +52,7 @@ public class EnemyPool : MonoBehaviour
 
             poolDictionary.Add(prefab.name, pool);
         }
+
     }
 
     public GameObject GetEnemy(string enemyName)
@@ -104,28 +106,26 @@ public class EnemyPool : MonoBehaviour
             enemyInstance.transform.position = position;
             enemyInstance.transform.rotation = rotation;
 
-            NavMeshAgent agent = enemyInstance.GetComponent<NavMeshAgent>();
-            if (agent != null)
+            // 경로 할당
+            EnemyPathFollower pathFollower = enemyInstance.GetComponent<EnemyPathFollower>();
+            if (pathFollower != null && pathManager != null && pathManager.HasValidPath())
             {
-                agent.Warp(position); // NavMeshAgent 위치 초기화
-            }
-            else
-            {
-                Debug.LogError($"해당 적에는 NavMeshAgent가 없습니다: {enemyName}");
+                pathFollower.SetPath(pathManager.GetMainPath());
             }
 
-            EnemyBase enemyBase = enemyInstance.GetComponent<EnemyBase>();
+            // 체력 초기화
+            EnemyPathFollower enemyBase = enemyInstance.GetComponent<EnemyPathFollower>();
             if (enemyBase != null)
             {
-                enemyBase.InitializeHealth(); // 체력 초기화
+                enemyBase.InitializeHealth();
             }
 
-            return enemyInstance; // GameObject 인스턴스 반환
+            return enemyInstance;
         }
         else
         {
             Debug.LogError($"적을 찾을 수 없습니다: {enemyName}");
-            return null; // 적을 찾을 수 없는 경우 null 반환
+            return null;
         }
     }
 }

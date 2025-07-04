@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TurtleShell : EnemyBase
+public class TurtleShell : EnemyPathFollower
 {
     protected override void Awake()
     {

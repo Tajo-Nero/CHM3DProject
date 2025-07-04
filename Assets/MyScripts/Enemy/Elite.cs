@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Elite : EnemyBase
+public class Elite : EnemyPathFollower
 {
 
     protected override void Awake()
