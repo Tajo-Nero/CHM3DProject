@@ -15,3 +15,5 @@ MonoBehaviour:
   enemyName: Beholder
   health: 330
   attackPower: 20
+  attackSpeed: 0
+  moveSpeed: 4

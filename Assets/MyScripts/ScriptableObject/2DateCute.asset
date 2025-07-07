@@ -15,3 +15,5 @@ MonoBehaviour:
   enemyName: Cute
   health: 250
   attackPower: 10
+  attackSpeed: 0
+  moveSpeed: 4

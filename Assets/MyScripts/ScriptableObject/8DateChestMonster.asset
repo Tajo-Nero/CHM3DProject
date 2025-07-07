@@ -15,3 +15,5 @@ MonoBehaviour:
   enemyName: ChestMonster
   health: 350
   attackPower: 25
+  attackSpeed: 0
+  moveSpeed: 4

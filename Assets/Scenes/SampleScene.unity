@@ -232,7 +232,11 @@ MonoBehaviour:
   attackSpeed: 0
   installationCost: 0
   isAttackUp: 0
+  rangeMaterial: {fileID: 0}
   detectionRange: 10
+  rangeColor: {r: 1, g: 0, b: 0, a: 1}
+  rangeType: 0
+  rangeWidth: 4
   splashRadius: 10
   damageOverTime: 5
   damageDuration: 5
@@ -250,10 +254,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 730145631c7a0da4f8b052effecf5ba9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  segments: 20
-  rocketLaunchPoint: {fileID: 0}
-  attackConeAngle: 45
+  previewMaterial: {fileID: 0}
+  previewColor: {r: 1, g: 1, b: 1, a: 1}
+  rangeType: 0
   detectionRange: 10
+  rangeWidth: 4
 --- !u!114 &55833648
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -266,9 +271,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a441572de7ce94449e6ca2982789784, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  segments: 8
+  previewMaterial: {fileID: 0}
+  previewColor: {r: 1, g: 1, b: 1, a: 1}
+  rangeType: 0
   detectionRange: 10
-  laserStartPoint: {fileID: 0}
+  rangeWidth: 4
 --- !u!114 &55833649
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -293,8 +300,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d62fa95b62393408ac8914268cf349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  segments: 50
-  parameter: 8
+  previewMaterial: {fileID: 0}
+  previewColor: {r: 1, g: 1, b: 1, a: 1}
+  rangeType: 0
+  detectionRange: 5
+  rangeWidth: 4
 --- !u!114 &55833651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -307,8 +317,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc058acf10744b54fbc024da2c50bd26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  segments: 45
-  radius: 10
+  previewMaterial: {fileID: 0}
+  previewColor: {r: 1, g: 1, b: 1, a: 1}
+  rangeType: 0
+  detectionRange: 5
+  rangeWidth: 4
 --- !u!114 &55833652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -324,7 +337,8 @@ MonoBehaviour:
   detectionRange: 5
   attackDamage: 20
   attackInterval: 2
-  health: 100
+  maxHealth: 100
+  currentHealth: 100
 --- !u!114 &55833653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -343,7 +357,11 @@ MonoBehaviour:
   attackSpeed: 0
   installationCost: 0
   isAttackUp: 0
+  rangeMaterial: {fileID: 0}
   detectionRange: 20
+  rangeColor: {r: 1, g: 0, b: 0, a: 1}
+  rangeType: 0
+  rangeWidth: 4
   laserStartPoint: {fileID: 0}
   laserImpactEffectPrefab: {fileID: 0}
 --- !u!114 &55833654
@@ -364,9 +382,12 @@ MonoBehaviour:
   attackSpeed: 0
   installationCost: 0
   isAttackUp: 0
+  rangeMaterial: {fileID: 0}
   detectionRange: 8
+  rangeColor: {r: 1, g: 0, b: 0, a: 1}
+  rangeType: 0
+  rangeWidth: 4
   cannonTowerTransform: {fileID: 0}
-  segments: 50
 --- !u!114 &55833655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -385,11 +406,17 @@ MonoBehaviour:
   attackSpeed: 0
   installationCost: 0
   isAttackUp: 0
+  rangeMaterial: {fileID: 0}
+  detectionRange: 5
+  rangeColor: {r: 1, g: 0, b: 0, a: 1}
+  rangeType: 0
+  rangeWidth: 4
   buffRange: 10
   attackPowerMultiplier: 1.2
   buffDuration: 5
   buffInterval: 6
   segments: 50
+  towerDetectionInterval: 0.5
 --- !u!1 &178007086
 GameObject:
   m_ObjectHideFlags: 0
@@ -653,7 +680,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &330221220
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1090,7 +1117,7 @@ TerrainCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 417076374}
-  m_Material: {fileID: 13400000, guid: 9ec87731a6f602748875b1b82bec0ad3, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1101,7 +1128,7 @@ TerrainCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_TerrainData: {fileID: 15600000, guid: 0e8bda889d042394cbf76549e9876cbf, type: 2}
+  m_TerrainData: {fileID: 15600000, guid: cc6fc424fcf287a43bad3751b54803c7, type: 2}
   m_EnableTreeColliders: 0
 --- !u!218 &417076381
 Terrain:
@@ -1112,7 +1139,7 @@ Terrain:
   m_GameObject: {fileID: 417076374}
   m_Enabled: 1
   serializedVersion: 6
-  m_TerrainData: {fileID: 15600000, guid: 0e8bda889d042394cbf76549e9876cbf, type: 2}
+  m_TerrainData: {fileID: 15600000, guid: cc6fc424fcf287a43bad3751b54803c7, type: 2}
   m_TreeDistance: 5000
   m_TreeBillboardDistance: 50
   m_TreeCrossFadeLength: 5
@@ -1695,6 +1722,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &720760954
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 720760955}
+  - component: {fileID: 720760956}
+  m_Layer: 0
+  m_Name: PathManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &720760955
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 720760954}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &720760956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 720760954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 149e3a391598d45458fbd8905c831ce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &802131741
 GameObject:
   m_ObjectHideFlags: 0
@@ -2508,7 +2579,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 039160bebf6f0b24bac1729bff767799, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  navMeshSurface: {fileID: 417076379}
   pauseMenuController: {fileID: 1465412207}
   installationCost: 40
   shopCost: 0
@@ -2807,7 +2877,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1607856298
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3323,7 +3393,7 @@ RectTransform:
   m_Father: {fileID: 186392287}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0.2, y: 1}
   m_AnchoredPosition: {x: -6.3, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3444,6 +3514,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2030327033}
   m_CullTransparentMesh: 1
+--- !u!1 &2091572309
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2091572311}
+  - component: {fileID: 2091572310}
+  m_Layer: 0
+  m_Name: TowerSelectionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2091572310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2091572309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f12802db28eb6d041af77857bc4c9cce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &2091572311
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2091572309}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -3459,3 +3573,5 @@ SceneRoots:
   - {fileID: 330221220}
   - {fileID: 459223340}
   - {fileID: 1607856299}
+  - {fileID: 720760955}
+  - {fileID: 2091572311}

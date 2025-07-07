@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class RocketTower : TowerBase
 {
-    [SerializeField] private float detectionRange = 10f; // 감지 범위
     [SerializeField] private float splashRadius = 10f; // 스플래시 반경
     [SerializeField] private float damageOverTime = 5f; // 지속 데미지
     [SerializeField] private float damageDuration = 5f; // 지속 데미지 시간
     [SerializeField] private Transform rocketLaunchPoint; // 로켓 발사 위치
     private bool isAttacking = false; // 공격 중인지 여부
     [SerializeField] private float attackConeAngle = 45f; // 공격 범위 각도
-    private ILineRendererStrategy lineRendererStrategy;
 
     void Awake()
     {
@@ -23,20 +21,30 @@ public class RocketTower : TowerBase
         installationCost = 10;
         SetRange(detectionRange); // 감지 범위 초기화
 
-        // 라인 렌더러 전략 설정
-        lineRendererStrategy = new FanRendererStrategy();
     }
 
-    private void Start()
+    protected override void Start()
     {
-        // 라인 렌더러 설정 및 패턴 생성
-        lineRendererStrategy.Setup(gameObject);
-        lineRendererStrategy.GeneratePattern(gameObject, transform.position, rocketLaunchPoint, 20, attackConeAngle, detectionRange);
+        rangeColor = Color.blue; // 로켓 타워 - 주황
+        detectionRange = 10f;
+        rangeType = RangeType.Fan;
+
+        base.Start(); // TowerBase의 SetupRangeDecal 호출
+
+        SetRange(detectionRange);
+
+        // 기존 LineRenderer 코드 제거
     }
 
     void Update()
     {
-        DetectEnemiesInRange(); // 적 감지
+        DetectEnemiesInRange();
+
+        // 범위가 표시 중이고 타워가 회전했다면 범위도 회전
+        if (isRangeVisible && rangeDecal != null)
+        {
+            rangeDecal.transform.localRotation = Quaternion.Euler(90, transform.eulerAngles.y, 0);
+        }
     }
 
     public override void DetectEnemiesInRange()
@@ -121,19 +129,4 @@ public class RocketTower : TowerBase
         towerAttackPower *= 2;
         Debug.Log("로켓 타워의 공격력이 강화되었습니다: " + towerAttackPower);
     }
-
-    //private void OnDrawGizmos()
-    //{
-    //    // 감지 범위 및 공격 범위를 시각적으로 표시
-    //    Gizmos.color = Color.yellow;
-    //    Gizmos.DrawWireSphere(transform.position, detectionRange);
-    //
-    //    Vector3 forward = rocketLaunchPoint.forward * splashRadius;
-    //    Vector3 right = Quaternion.Euler(0, attackConeAngle / 2, 0) * forward;
-    //    Vector3 left = Quaternion.Euler(0, -attackConeAngle / 2, 0) * forward;
-    //
-    //    Gizmos.color = Color.yellow;
-    //    Gizmos.DrawLine(rocketLaunchPoint.position, rocketLaunchPoint.position + right);
-    //    Gizmos.DrawLine(rocketLaunchPoint.position, rocketLaunchPoint.position + left);
-    //}
 }

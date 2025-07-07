@@ -15,3 +15,5 @@ MonoBehaviour:
   enemyName: TurtleShell
   health: 330
   attackPower: 16
+  attackSpeed: 0
+  moveSpeed: 4

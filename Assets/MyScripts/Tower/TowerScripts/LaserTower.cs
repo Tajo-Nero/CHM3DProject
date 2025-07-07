@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class LaserTower : TowerBase
 {
-    [SerializeField] private float detectionRange = 20f; // 탐지 거리
     [SerializeField] private Transform laserStartPoint; // 레이저 시작점
     [SerializeField] private ParticleSystem laserImpactEffectPrefab; // 레이저 충돌 파티클 효과 프리팹
-    private ILineRendererStrategy lineRendererStrategy;
     private bool isAttacking = false; // 공격 중인지 여부
 
     void Awake()
@@ -17,14 +15,16 @@ public class LaserTower : TowerBase
         installationCost = 15; // 설치 비용 설정
     }
 
-    void Start()
+    protected override void Start()
     {
-        SetRange(detectionRange); // 탐지 거리 설정
+        rangeColor = Color.blue; // 레이저 타워 - 파랑
+        detectionRange = 20f;
 
-        // 라인 렌더러 전략을 초기화
-        lineRendererStrategy = new LaserRendererStrategy();
-        lineRendererStrategy.Setup(gameObject);
-        lineRendererStrategy.GeneratePattern(gameObject, transform.position, laserStartPoint, 4, detectionRange, detectionRange);
+        base.Start(); // TowerBase의 SetupRangeDecal 호출
+
+        SetRange(detectionRange);
+        rangeType = RangeType.Rectangle;
+        // 기존 LineRenderer 코드 제거
     }
 
     void Update()
@@ -111,17 +111,4 @@ public class LaserTower : TowerBase
         Debug.Log("파워업! 타워의 공격력이 두 배로 증가했습니다: " + towerAttackPower);
     }
 
-    // 기즈모를 그리는 함수
-    private void OnDrawGizmos()
-    {
-        if (Application.isPlaying)
-        {
-            Vector3 boxCenter = transform.position + transform.forward * (detectionRange / 2);
-            Vector3 boxHalfExtents = new Vector3(2f, 2f, detectionRange / 2);
-            Quaternion boxOrientation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
-
-            Gizmos.color = Color.red; // 기즈모 색상 설정
-            Gizmos.DrawWireCube(boxCenter, boxHalfExtents * 2); // 박스 캐스트 모양의 기즈모 그리기
-        }
-    }
 }

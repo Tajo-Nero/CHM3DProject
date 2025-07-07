@@ -4,12 +4,9 @@ using UnityEngine;
 
 public class CanonTower : TowerBase
 {
-    [SerializeField] private float detectionRange = 8f; // 감지 범위
     private bool isAttacking = false;
     [SerializeField] private Transform cannonTowerTransform;
     private List<Transform> targets = new List<Transform>();
-    private ILineRendererStrategy lineRendererStrategy;
-    public int segments = 50;
 
     void Awake()
     {
@@ -20,18 +17,18 @@ public class CanonTower : TowerBase
         installationCost = 8;
         isAttackUp = false;
 
-        // 라인 렌더러 전략 설정
-        lineRendererStrategy = new CircleRendererStrategy();
     }
 
-    void Start()
+    protected override void Start()
     {
-        // 라인 렌더러 설정 및 패턴 생성
-        lineRendererStrategy.Setup(gameObject);
-        lineRendererStrategy.GeneratePattern(gameObject, transform.position, cannonTowerTransform, segments, detectionRange, 0);
+        rangeColor = Color.red; // 공격 타워 - 빨강
+        detectionRange = 8f;
+        rangeType = RangeType.Circle;
 
-        SetRange(detectionRange);       
+        // 기존 LineRenderer 코드 제거하고 Decal로 교체
+        base.Start(); // TowerBase의 SetupRangeDecal 호출
 
+        SetRange(detectionRange);
     }
 
     void Update()

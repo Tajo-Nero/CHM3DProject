@@ -9,7 +9,6 @@ public class BuffTower : TowerBase
     [SerializeField] private float buffDuration = 5f; // 버프 지속 시간
     [SerializeField] private float buffInterval = 6f; // 버프 주기
     private List<TowerBase> towersInRange = new List<TowerBase>(); // 범위 내 타워 목록
-    private ILineRendererStrategy lineRendererStrategy;
     public int segments = 50; // 라인 렌더러 세그먼트 수
 
     // 성능 최적화: 타워 탐지 주기 설정
@@ -20,18 +19,15 @@ public class BuffTower : TowerBase
     private HashSet<TowerBase> currentlyBuffedTowers = new HashSet<TowerBase>(); // 현재 버프 받는 타워들
     private Dictionary<TowerBase, Coroutine> buffCoroutines = new Dictionary<TowerBase, Coroutine>(); // 버프 코루틴 관리
 
-    void Start()
+    protected override void Start()
     {
-        // 라인 렌더러 전략 설정
-        lineRendererStrategy = new CircleRendererStrategy();
+        rangeColor = Color.green; // 버프 타워 - 초록
+        detectionRange = 10f; // buffRange와 동일하게
 
-        // 라인 렌더러 설정 및 패턴 생성
-        lineRendererStrategy.Setup(gameObject);
-        lineRendererStrategy.GeneratePattern(gameObject, transform.position, transform, segments, buffRange, 0);
+        base.Start(); // TowerBase의 SetupRangeDecal 호출
 
-        StartCoroutine(BuffTowersInRange()); // 버프 루틴 시작
-
-        // 설치 비용 설정
+        // 기존 LineRenderer 코드 제거
+        StartCoroutine(BuffTowersInRange());
         installationCost = 15;
     }
 
@@ -44,14 +40,8 @@ public class BuffTower : TowerBase
             lastTowerDetectionTime = Time.time;
         }
 
-        // 라인 렌더러를 사용하여 버프 범위 시각화
-        GenerateRangeVisualization();
     }
 
-    private void GenerateRangeVisualization()
-    {
-        lineRendererStrategy.GeneratePattern(gameObject, transform.position, transform, segments, buffRange, 0);
-    }
 
     private IEnumerator BuffTowersInRange()
     {

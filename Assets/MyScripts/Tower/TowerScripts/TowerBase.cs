@@ -1,73 +1,160 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
+using System.Collections.Generic;
 
 public abstract class TowerBase : MonoBehaviour
 {
-    //1.타워 공격력
-    //public int towerAttackPower;
-    ////2.타워 관통력
-    //public int towerPenetrationPower;
-    ////3.치명타율
-    //public float criticalHitRate;
-    ////4.공격속도
-    //public float attackSpeed;
-    ////5.설치 비용
-    //public int installationCost;
-    //6.범위
-
-    //공격 하는 함수,범위내의 적 감지 함수,범위 설정하는 함수
-    //void TowerAttak()//타워 공격하는 기능
-    //{
-    //    
-    //}
-    //void SetRange()//타워 공격 가능한 범위
-    //{
-    //    
-    //}
-    //void DetectEnemiesInRange()//타워 범위내의 적 감지
-    //{
-    //    
-    //}  
-
-    //각각의 타워는 TowerBase를 상속받음
-
-    //캐논 타워 단일대상 공격 캐논타워 
-    //1 : 80 2: 25 3: 5% 4: 0.7 5 : 8 6 : 원형범위
-
-    //레이저 타워 광통 공격 레이저 쏘는타워 
-    //1 : 250 2: 0 3: 15% 4: 2.5 5: 11 6: 일직선범위
-
-    //로켓 타워 스플레쉬공격하는 타워 
-    //1 : 50 2: 100 3: 5% 4: 1.5 5:10 6: 넓은 부채꼴 범위
-    //스플래쉬 범위, 지속데미지 변수 추가
-    //스플래쉬 공격 함수, 지속 데미지를 주는 함수 추가
-
-    //강화 타워 범위내의 타워가 있으면 강화시켜주고 범위내의 모든적 공격 가능
-    //1 : 14 2: 100 3: 5% 4: 3.5 5: 14 6: 좁은 부채꼴 범위
-    //강화지속시간, 공격력 올려줄 변수 추가
-    //범위내의 Towers 태그 붙어있는 타워들 공격력 수치 증가하는 함수 추가
-
-    // 1. 타워 공격력    
+    [Header("Tower Stats")]
     public float towerAttackPower;
-    // 2. 타워 관통력
     public float towerPenetrationPower;
-    // 3. 치명타 확률
     public float criticalHitRate;
-    // 4. 공격 속도
     public float attackSpeed;
-    // 5. 설치 비용
     public int installationCost;
-    // 6. 공격 강화 가능여부
     public bool isAttackUp = false;
 
+    [Header("Range Display")]
+    [SerializeField] protected Material rangeMaterial; // Inspector에서 할당할 Material
+    [SerializeField] protected float detectionRange = 5f;
+    [SerializeField] protected Color rangeColor = Color.red;
+
+    public enum RangeType
+    {
+        Circle,      // 원형
+        Rectangle,   // 직사각형
+        Fan          // 부채꼴
+    }
+
+    [SerializeField] protected RangeType rangeType = RangeType.Circle;
+    [SerializeField] protected float rangeWidth = 4f;  // 직사각형 폭
+
+    protected DecalProjector rangeDecal;
+    protected bool isRangeVisible = false;
+
+    protected virtual void Start()
+    {
+        SetupRangeDecal(); // 이것만 호출
+    }
+
+    protected virtual void SetupRangeDecal()
+    {
+        // 범위 표시 전용 GameObject 생성
+        GameObject rangeDisplayObject = new GameObject($"{gameObject.name}_RangeDisplay");
+        rangeDisplayObject.transform.SetParent(transform);
+
+        // 위치와 회전 설정
+        rangeDisplayObject.transform.localPosition = Vector3.up * 2.5f;
+        rangeDisplayObject.transform.localRotation = Quaternion.Euler(90, 0, 0);
+
+        // Decal Projector 추가
+        rangeDecal = rangeDisplayObject.AddComponent<DecalProjector>();
+        rangeDecal.enabled = false;
+
+        // Inspector에서 할당한 Material 사용
+        if (rangeMaterial != null)
+        {
+            // Material 복사본 생성 (색상 개별 조정을 위해)
+            Material instanceMaterial = new Material(rangeMaterial);
+            instanceMaterial.color = new Color(rangeColor.r, rangeColor.g, rangeColor.b, 0.3f);
+            rangeDecal.material = instanceMaterial;
+
+            Debug.Log($"Material 할당 완료: {rangeMaterial.name}");
+        }
+        else
+        {
+            Debug.LogError($"Range Material이 할당되지 않았습니다: {gameObject.name}");
+
+            // 임시 Material 생성 (fallback)
+            CreateFallbackMaterial();
+        }
+
+        // 범위 타입에 따라 크기 설정
+        SetDecalSize();
+    }
+
+    // Material이 없을 때 임시로 생성
+    private void CreateFallbackMaterial()
+    {
+        Material fallbackMaterial = new Material(Shader.Find("Unlit/Transparent"));
+        fallbackMaterial.color = new Color(rangeColor.r, rangeColor.g, rangeColor.b, 0.3f);
+        rangeDecal.material = fallbackMaterial;
+        Debug.LogWarning($"임시 Material 사용: {gameObject.name}");
+    }
+
+    protected virtual void SetDecalSize()
+    {
+        if (rangeDecal == null) return;
+
+        switch (rangeType)
+        {
+            case RangeType.Circle:
+                rangeDecal.size = new Vector3(detectionRange * 2, detectionRange * 2, 15f);
+                break;
+
+            case RangeType.Rectangle:
+                rangeDecal.size = new Vector3(rangeWidth, detectionRange, 15f);
+                break;
+
+            case RangeType.Fan:
+                rangeDecal.size = new Vector3(detectionRange * 2, detectionRange * 2, 15f);
+                // Fan의 경우 타워 방향에 맞게 회전 필요
+                rangeDecal.transform.localRotation = Quaternion.Euler(90, transform.eulerAngles.y, 0);
+                break;
+        }
+    }
+
+    public virtual void ShowRange()
+    {
+        if (rangeDecal != null)
+        {
+            rangeDecal.enabled = true;
+            isRangeVisible = true;
+            Debug.Log($"범위 표시: {gameObject.name}");
+        }
+    }
+
+    public virtual void HideRange()
+    {
+        if (rangeDecal != null)
+        {
+            rangeDecal.enabled = false;
+            isRangeVisible = false;
+        }
+    }
+
+    public virtual void SetRangeSize(float newRange)
+    {
+        detectionRange = newRange;
+        if (rangeDecal != null)
+        {
+            SetDecalSize();
+        }
+    }
+
+    void OnMouseDown()
+    {
+        Debug.Log($"타워 클릭됨: {gameObject.name}");
+
+        if (TowerSelectionManager.Instance != null)
+        {
+            TowerSelectionManager.Instance.SelectTower(this);
+        }
+        else
+        {
+            ToggleRange();
+        }
+    }
+
+    protected void ToggleRange()
+    {
+        if (isRangeVisible)
+            HideRange();
+        else
+            ShowRange();
+    }
+
+    // 추상 메서드들
     public abstract void TowerPowUp();
-    // 적을 공격하는 함수
     public abstract void TowerAttack(List<Transform> targets);
-    // 범위를 설정하는 함수
     public abstract void SetRange(float range);
-    // 범위 내의 적을 탐지하는 함수
     public abstract void DetectEnemiesInRange();
-
-
-  }      
+}
