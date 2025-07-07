@@ -10,7 +10,6 @@ public class Nexus : MonoBehaviour
     [SerializeField] private float currentHealth = 100f; // 넥서스 현재 체력
 
     private bool isAttacking = false; // 공격 중인지 여부
-    private AutoWaypointGenerator waypointGenerator;
     private PathManager pathManager;
 
     public float DetectionRange => detectionRange;
@@ -21,15 +20,7 @@ public class Nexus : MonoBehaviour
     {
         currentHealth = maxHealth;
 
-        // 필요한 컴포넌트들 찾기
-        waypointGenerator = FindObjectOfType<AutoWaypointGenerator>();
         pathManager = FindObjectOfType<PathManager>();
-
-        // 넥서스를 목표점으로 설정
-        if (waypointGenerator != null && waypointGenerator.endPoint == null)
-        {
-            waypointGenerator.endPoint = this.transform;
-        }
 
         SetRange(detectionRange); // 탐지 범위 설정
     }
@@ -149,18 +140,13 @@ public class Nexus : MonoBehaviour
         {
             Debug.Log("차량 모드 감지됨. 경로를 생성합니다...");
 
-            // 웨이포인트 생성
-            if (waypointGenerator != null)
+            if (pathManager != null && pathManager.HasValidPath())
             {
-                var generatedPath = waypointGenerator.GenerateWaypoints();
-                Debug.Log($"경로 생성 완료! 웨이포인트 {generatedPath.Count}개");
-
-                // PathManager에 경로 저장
-                if (pathManager != null)
-                {
-                    pathManager.SetMainPath(generatedPath);
-                    Debug.Log("메인 경로가 설정되었습니다!");
-                }
+                Debug.Log("플레이어가 만든 경로를 사용합니다!");
+            }
+            else
+            {
+                Debug.LogError("유효한 경로가 없습니다!");
             }
 
             yield return new WaitForSeconds(0.5f); // 약간의 지연
@@ -174,12 +160,9 @@ public class Nexus : MonoBehaviour
 
             Destroy(player); // 차량 모드 제거
         }
-
-        // 일반 플레이어 모드인 경우
         else
         {
             Debug.Log("일반 플레이어가 넥서스에 도달했습니다.");
-            // 필요한 경우 추가 로직
         }
     }
 

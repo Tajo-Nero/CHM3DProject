@@ -27,12 +27,10 @@ public class PauseMenuObserver : MonoBehaviour, IObserver
         if (eventMessage == "OpenMenu")
         {
             Debug.Log("Pause menu opened!");
-            // 여기에 필요한 추가 작업을 수행
         }
         else if (eventMessage == "CloseMenu")
         {
             Debug.Log("Pause menu closed!");
-            // 여기에 필요한 추가 작업을 수행
         }
     }
 }

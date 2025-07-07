@@ -11,7 +11,6 @@ public class EnemyPool : MonoBehaviour
     private PathManager pathManager;
     // 활성화된 적 리스트 추가
     private List<GameObject> activeEnemies = new List<GameObject>();
-
     public int ActiveEnemies
     {
         get { return activeEnemies.Count; }
@@ -106,8 +105,8 @@ public class EnemyPool : MonoBehaviour
             enemyInstance.transform.position = position;
             enemyInstance.transform.rotation = rotation;
 
-            // 경로 할당
             EnemyPathFollower pathFollower = enemyInstance.GetComponent<EnemyPathFollower>();
+            // 경로 할당
             if (pathFollower != null && pathManager != null && pathManager.HasValidPath())
             {
                 pathFollower.SetPath(pathManager.GetMainPath());

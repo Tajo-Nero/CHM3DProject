@@ -23,11 +23,19 @@ public class PlayerCarMode : MonoBehaviour
     // ⭐ 성능 최적화: 드릴링 쿨다운 추가
     private float lastDigTime;
     private float digCooldown = 0.05f; // 0.05초마다 드릴링 (초당 20회로 제한)
-    private AutoWaypointGenerator waypointGenerator;
+
+    private List<Vector3> playerPath = new List<Vector3>();
+    private float pathRecordDistance = 2f;
+    private Vector3 lastRecordedPosition;
+    private bool isRecording = false;
+
     void Start()
     {
         cam = Camera.main;
         gameManager = FindObjectOfType<GameManager>(); // GameManager 인스턴스 찾기
+        lastRecordedPosition = transform.position;
+        playerPath.Add(transform.position);
+        isRecording = true;
     }
 
     void Update()
@@ -60,6 +68,10 @@ public class PlayerCarMode : MonoBehaviour
                 transform.Rotate(Vector3.up, horizontalInput * rotationSpeed * Time.deltaTime, Space.Self);
             }
         }
+        if (isRecording && moveDir.magnitude > 0)
+        {
+            RecordPlayerPath();
+        }
 
         // 카메라 회전 및 위치 업데이트
         if (cam != null)
@@ -78,7 +90,6 @@ public class PlayerCarMode : MonoBehaviour
             }
         }
 
-        // ⭐ 수정된 부분: 쿨다운을 적용한 드릴링
         if (Time.time - lastDigTime >= digCooldown)
         {
             PerformDig(); // 드릴링 및 지형 파괴 처리
@@ -100,21 +111,28 @@ public class PlayerCarMode : MonoBehaviour
         if (collision.gameObject.CompareTag("Nexus"))
         {
             // 경로 생성!
-            if (waypointGenerator != null)
+            if (playerPath.Count > 0)
             {
-                List<Vector3> generatedPath = waypointGenerator.GenerateWaypoints();
-                Debug.Log($"경로 생성 완료! 웨이포인트 {generatedPath.Count}개");
-
-                // PathManager에 경로 저장
                 PathManager pathManager = FindObjectOfType<PathManager>();
                 if (pathManager != null)
                 {
-                    pathManager.SetMainPath(generatedPath);
+                    pathManager.SetMainPath(playerPath);
                 }
+                Debug.Log($"플레이어 경로 저장: {playerPath.Count}개 지점");
             }
 
             gameManager.SpawnPlayer(_PlayerMode);
             Destroy(gameObject);
+        }
+    }
+
+    private void RecordPlayerPath()
+    {
+        float distance = Vector3.Distance(transform.position, lastRecordedPosition);
+        if (distance >= pathRecordDistance)
+        {
+            playerPath.Add(transform.position);
+            lastRecordedPosition = transform.position;
         }
     }
 
