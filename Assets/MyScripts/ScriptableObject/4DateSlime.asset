@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff4026baf09f92c4eaa544427e78cc67, type: 3}
   m_Name: 4DateSlime
   m_EditorClassIdentifier: 
-  enemyName: Slime
+  enemyType: 0
+  prefab: {fileID: 243143470300942330, guid: 262a8e87096c0bf42825351fd26779ad, type: 3}
   health: 300
   attackPower: 12
-  attackSpeed: 0
   moveSpeed: 4

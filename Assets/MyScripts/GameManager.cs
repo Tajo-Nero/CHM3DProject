@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
 
 /// <summary>
 /// 게임 관리 클래스, 게임 상태를 관리하고 업데이트합니다.
@@ -21,13 +23,24 @@ public class GameManager : MonoBehaviour, IObserver
     [Header("Nexus Settings")]
     public GameObject nexusPrefab; // 넥서스 프리팹
     public Transform nexusSpawnPoint; // 넥서스 스폰 지점
+    private int nexusHealth = 100; // 넥서스 체력
+    public int maxNexusHealth = 100; // 최대 넥서스 체력
 
     [Header("Terrain Settings")]
     public TerrainManager terrainManager; // 지형 매니저
 
+    [Header("UI References")]
+    public Text healthText; // 체력 텍스트
+    public Slider healthSlider; // 체력 슬라이더
+    public Text resourceText; // 자원 텍스트
+    public GameObject gameOverPanel; // 게임 오버 패널
+    public GameObject victoryPanel; // 승리 패널
+
     // 게임 상태 관리
     private bool isCarModeActive = true; // 차량 모드가 활성화되어 있는지
     private bool pathGenerated = false; // 경로가 생성되었는지
+    private bool isGameOver = false; // 게임 오버 상태인지
+    private bool isGameWon = false; // 게임 승리 상태인지
 
     private void Awake()
     {
@@ -59,6 +72,7 @@ public class GameManager : MonoBehaviour, IObserver
         // 처음에는 차량 모드로 시작
         SpawnCarPlayer();
 
+        // 웨이브 매니저 찾기
         if (waveManager == null)
         {
             waveManager = FindObjectOfType<WaveManager>();
@@ -68,6 +82,23 @@ public class GameManager : MonoBehaviour, IObserver
         {
             Debug.LogError("WaveManager 인스턴스를 찾을 수 없습니다.");
         }
+        
+
+        // 체력 초기화
+        nexusHealth = maxNexusHealth;
+        UpdateHealthUI();
+
+        // 게임 오버/승리 패널 비활성화
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(false);
+        }
+
+        if (victoryPanel != null)
+        {
+            victoryPanel.SetActive(false);
+        }
+
     }
 
     // 차량 플레이어 스폰
@@ -83,10 +114,17 @@ public class GameManager : MonoBehaviour, IObserver
     // 일반 플레이어 스폰 (넥서스 도달 후)
     public void SpawnPlayer(GameObject playerPrefab)
     {
-        if (playerPrefab != null && !isCarModeActive)
+        if (playerPrefab != null)
         {
             Instantiate(playerPrefab, playerSpawnPoint.position, playerSpawnPoint.rotation);
             Debug.Log("일반 플레이어가 스폰되었습니다.");
+
+            // 차량 모드 비활성화
+            isCarModeActive = false;
+
+            // 경로 생성됨으로 설정
+            pathGenerated = true;
+
         }
     }
 
@@ -101,22 +139,46 @@ public class GameManager : MonoBehaviour, IObserver
             SpawnPlayer(playerModePrefab);
             Debug.Log("차량 모드에서 플레이어 모드로 전환되었습니다.");
 
-            // 웨이브 시작 가능 상태로 변경
-            if (waveManager != null)
-            {
-                // waveManager.EnableWaveStart(); // WaveManager에 이 메서드가 있다면
-            }
         }
     }
 
+    // 설치 비용 확인
     public bool CanAffordInstallation(int cost)
     {
         return installationCost >= cost; // 설치 비용을 감당할 수 있는지 확인
     }
 
+    // 비용 차감
     public void DeductCost(int cost)
     {
         installationCost -= cost; // 설치 비용 차감
+        UpdateResourceUI();
+    }
+
+    // 자원 얻기
+    public int GetResources()
+    {
+        return installationCost;
+    }
+
+    // 자원 추가
+    public void AddResources(int amount)
+    {
+        installationCost += amount;
+        UpdateResourceUI();
+        Debug.Log($"자원 {amount}이 추가되었습니다. 현재 자원: {installationCost}");
+    }
+
+    // 자원 사용
+    public bool UseResources(int amount)
+    {
+        if (installationCost >= amount)
+        {
+            installationCost -= amount;
+            UpdateResourceUI();
+            return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -145,21 +207,53 @@ public class GameManager : MonoBehaviour, IObserver
         UpdateUI();
     }
 
+    // UI 업데이트
     public void UpdateUI()
     {
+        UpdateResourceUI();
+        UpdateHealthUI();
+
         if (UIManager.Instance != null)
         {
             UIManager.Instance.UpdateShopCost(shopCost);
             UIManager.Instance.UpdateInstallationCost(installationCost);
             if (waveManager != null)
             {
-                UIManager.Instance.UpdateWaveProgress(waveManager.GetCurrentWaveIndex(), waveManager.GetTotalWaves());
+                UIManager.Instance.UpdateWaveProgress(waveManager.GetCurrentWave(), waveManager.GetTotalWaves());
             }
+        }
+    }
+
+    // 자원 UI 업데이트
+    private void UpdateResourceUI()
+    {
+        if (resourceText != null)
+        {
+            resourceText.text = installationCost.ToString();
+        }
+    }
+
+    // 체력 UI 업데이트
+    private void UpdateHealthUI()
+    {
+        if (healthSlider != null)
+        {
+            healthSlider.maxValue = maxNexusHealth;
+            healthSlider.value = nexusHealth;
+        }
+
+        if (healthText != null)
+        {
+            healthText.text = $"{nexusHealth}/{maxNexusHealth}";
         }
     }
 
     void Update()
     {
+        // 게임 오버 상태에서는 입력 무시
+        if (isGameOver || isGameWon)
+            return;
+
         // 경로가 생성되었고 플레이어 모드인 경우에만 웨이브 진행 가능
         if (Input.GetKeyDown(KeyCode.G) && pathGenerated && !isCarModeActive)
         {
@@ -167,6 +261,7 @@ public class GameManager : MonoBehaviour, IObserver
         }
     }
 
+    // 웨이브 진행
     public void AdvanceWave()
     {
         // 경로가 생성되지 않았으면 웨이브 시작 불가
@@ -182,9 +277,12 @@ public class GameManager : MonoBehaviour, IObserver
             return;
         }
 
-        waveManager.StartNextWave(); // 다음 웨이브 시작
 
-        int currentWave = waveManager.GetCurrentWaveIndex();
+        // 다음 웨이브 시작
+        waveManager.StartNextWave();
+
+        // 특정 웨이브에서 비용 증가
+        int currentWave = waveManager.GetCurrentWave();
         if (currentWave == 2 || currentWave == 3 || currentWave == 7 || currentWave == 8)
         {
             IncreaseCosts(0, 3, 1.0f, 1.0f); // 상점 비용 0, 설치 비용 3 증가 (확률 100%)
@@ -193,11 +291,13 @@ public class GameManager : MonoBehaviour, IObserver
         UpdateUI(); // 웨이브 진행 후 UI 업데이트
     }
 
+    // 적 처치 시 보상
     public void EnemyDefeated()
     {
         IncreaseCosts(3, 2, 0.2f, 0.2f); // 상점 비용 3, 설치 비용 2 증가 (확률값은 설정에 맞게 조정)
     }
 
+    // 설치 비용 보너스
     public void InstallationCostBonus(int bonusAmount)
     {
         installationCost += bonusAmount;
@@ -205,24 +305,16 @@ public class GameManager : MonoBehaviour, IObserver
         UpdateUI();
     }
 
-    public void OnWaveCompleted()
-    {
-        Debug.Log("웨이브 완료! 다음 웨이브를 시작하려면 'G' 키를 눌러주세요.");
 
-        int currentWave = waveManager.GetCurrentWaveIndex();
-        if (currentWave == 5 || currentWave == 10)
-        {
-            OpenShop();
-        }
 
-        UpdateUI(); // 웨이브 완료 후 UI 업데이트
-    }
-
+    // 상점 열기
     private void OpenShop()
     {
         Debug.Log("상점이 열렸습니다! 필요한 물건을 구매하세요.");
+        // 상점 UI 표시 로직 추가
     }
 
+    // 넥서스 스폰
     private void SpawnNexus()
     {
         if (nexusPrefab != null)
@@ -231,6 +323,7 @@ public class GameManager : MonoBehaviour, IObserver
         }
     }
 
+    // 지형 리셋
     public void ResetTerrain()
     {
         if (terrainManager != null)
@@ -243,6 +336,99 @@ public class GameManager : MonoBehaviour, IObserver
         pathGenerated = false;
     }
 
+    // 넥서스 체력 관리
+    public int GetHealth()
+    {
+        return nexusHealth;
+    }
+
+    // 체력 설정
+    public void SetHealth(int newHealth)
+    {
+        nexusHealth = Mathf.Clamp(newHealth, 0, maxNexusHealth);
+        UpdateHealthUI();
+
+        // 체력이 0 이하면 게임 오버
+        if (nexusHealth <= 0)
+        {
+            GameOver();
+        }
+    }
+
+    // 넥서스 데미지 처리
+    public void TakeDamage(float damage)
+    {
+        nexusHealth -= Mathf.RoundToInt(damage);
+        nexusHealth = Mathf.Max(0, nexusHealth);
+
+        UpdateHealthUI();
+
+        Debug.Log($"넥서스가 {damage} 데미지를 받았습니다. 남은 체력: {nexusHealth}");
+
+        // 체력이 0 이하면 게임 오버
+        if (nexusHealth <= 0)
+        {
+            GameOver();
+        }
+    }
+
+    // 게임 오버 처리
+    public void GameOver()
+    {
+        if (isGameOver) return;
+
+        isGameOver = true;
+        Debug.Log("게임 오버! 넥서스가 파괴되었습니다.");
+
+        // 게임 오버 UI 표시
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
+
+        // 시간 느리게 설정 (완전히 멈추지 않고)
+        Time.timeScale = 0.5f;
+
+        // 게임 오버 효과 추가 (선택 사항)
+        StartCoroutine(GameOverEffects());
+    }
+
+    // 게임 오버 효과 코루틴
+    private IEnumerator GameOverEffects()
+    {
+        // 게임 오버 효과 (필요시 추가)
+        yield return new WaitForSeconds(2f);
+
+        // 시간 정상화
+        Time.timeScale = 1f;
+    }
+
+    // 게임 승리 처리
+    public void GameWon()
+    {
+        if (isGameWon) return;
+
+        isGameWon = true;
+        Debug.Log("게임 승리! 모든 웨이브를 클리어했습니다.");
+
+        // 승리 UI 표시
+        if (victoryPanel != null)
+        {
+            victoryPanel.SetActive(true);
+        }
+
+        // 승리 효과 (선택 사항)
+        StartCoroutine(VictoryEffects());
+    }
+
+    // 승리 효과 코루틴
+    private IEnumerator VictoryEffects()
+    {
+        // 승리 효과 (필요시 추가)
+        yield return new WaitForSeconds(2f);
+    }
+
+    // IObserver 인터페이스 구현
     public void OnNotify(GameObject obj, string eventMessage)
     {
         if (eventMessage == "EnemyDefeated")
@@ -267,5 +453,6 @@ public class GameManager : MonoBehaviour, IObserver
     {
         pathGenerated = true;
         Debug.Log("경로 생성이 완료되었습니다! 이제 웨이브를 시작할 수 있습니다.");
+
     }
 }

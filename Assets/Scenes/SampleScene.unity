@@ -415,8 +415,8 @@ MonoBehaviour:
   attackPowerMultiplier: 1.2
   buffDuration: 5
   buffInterval: 6
-  segments: 50
   towerDetectionInterval: 0.5
+  segments: 50
 --- !u!1 &178007086
 GameObject:
   m_ObjectHideFlags: 0
@@ -446,17 +446,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bd7a4731e4eafa46bea52bc28a116a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyPrefabs:
-  - {fileID: 1550717235643762586, guid: 6e7a47278f15b6245ab9432a8e75e61b, type: 3}
-  - {fileID: 393127831579949386, guid: 888bfd332fc6de94dbc9be38a3056e06, type: 3}
-  - {fileID: 243143470300942330, guid: 262a8e87096c0bf42825351fd26779ad, type: 3}
-  - {fileID: 7819527783306013827, guid: d1cd81610a60d9447952ab17e3b27d92, type: 3}
-  - {fileID: 9107608812774186470, guid: 47ac48545871b5a4ca5435d40e35a133, type: 3}
-  - {fileID: 557227371485691561, guid: d21a3c165dda99c4a8d756958167b063, type: 3}
-  - {fileID: 940485957724764862, guid: c53ddb82d132c4a428a168a8b1b688f1, type: 3}
-  - {fileID: 1318307798755763279, guid: af53ac75b41dc8442bf77f39ac3f9c8e, type: 3}
-  - {fileID: 9163465238740143843, guid: ad6c48fd7a157bc41bd921033b01a934, type: 3}
-  healthBarPrefab: {fileID: 7406556536078814920, guid: 47a9037c16223c94599e1151a4b71da7, type: 3}
+  poolItems:
+  - enemyType: 0
+    poolSize: 10
+  - enemyType: 3
+    poolSize: 10
+  - enemyType: 4
+    poolSize: 10
+  - enemyType: 5
+    poolSize: 10
+  - enemyType: 2
+    poolSize: 10
+  - enemyType: 6
+    poolSize: 10
+  enemyDataList:
+  - {fileID: 11400000, guid: f07500efe65075243836bb7e25535250, type: 2}
+  - {fileID: 11400000, guid: 3f1c604735a25b34b826f586b58c587b, type: 2}
+  - {fileID: 11400000, guid: f23a2628eee59cc4191a88eeeaa84c08, type: 2}
+  - {fileID: 11400000, guid: b25c040b5a3d36f48b375d5e2d4ae9c3, type: 2}
+  - {fileID: 11400000, guid: dd3d0450ed06f6c43a6dce2c7bae1207, type: 2}
+  - {fileID: 11400000, guid: b2a6dc4a3116fa246924de38c4b96e4e, type: 2}
 --- !u!4 &178007088
 Transform:
   m_ObjectHideFlags: 0
@@ -662,6 +671,8 @@ MonoBehaviour:
   - {fileID: 1661630883}
   - {fileID: 879509662}
   - {fileID: 2030327033}
+  totalWaves: 12
+  statusText: {fileID: 0}
 --- !u!1 &330221219
 GameObject:
   m_ObjectHideFlags: 0
@@ -680,7 +691,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &330221220
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1452,8 +1463,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7283feaf37cf4dc42abecc0d02227bd8, type: 2}
   - {fileID: 11400000, guid: 812feae73d798c74a81d4fe08ad29172, type: 2}
   - {fileID: 11400000, guid: 891c02248599009499922ae4a2e924e6, type: 2}
+  currentWaveIndex: 0
+  isWaveActive: 0
+  waitingForNextWave: 0
   spawnPoints:
   - {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
+  timeBetweenSpawns: 1.5
+  waveText: {fileID: 0}
   waveProgressBar: {fileID: 303224030}
 --- !u!4 &484055444
 Transform:
@@ -1766,6 +1782,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 149e3a391598d45458fbd8905c831ce3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  visualizePath: 1
+  pathWidth: 0.2
+  pathColor: {r: 0, g: 0, b: 1, a: 1}
 --- !u!1 &802131741
 GameObject:
   m_ObjectHideFlags: 0
@@ -2588,7 +2607,13 @@ MonoBehaviour:
   playerSpawnPoint: {fileID: 4469273657927019661, guid: cacd6b9801ccee64ab230b9a9cd59e46, type: 3}
   nexusPrefab: {fileID: 8961772740767177616, guid: 3f177067e9ab12f42886cb5a10945b4b, type: 3}
   nexusSpawnPoint: {fileID: 2097204850680251578, guid: 223d2c7793b55d4448704ca1a79f5e0d, type: 3}
+  maxNexusHealth: 100
   terrainManager: {fileID: 355360607}
+  healthText: {fileID: 0}
+  healthSlider: {fileID: 0}
+  resourceText: {fileID: 0}
+  gameOverPanel: {fileID: 0}
+  victoryPanel: {fileID: 0}
 --- !u!4 &1345901730
 Transform:
   m_ObjectHideFlags: 0
@@ -2877,7 +2902,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1607856298
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3393,7 +3418,7 @@ RectTransform:
   m_Father: {fileID: 186392287}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0.2, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: -6.3, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}

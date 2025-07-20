@@ -34,7 +34,7 @@ public class EnemySpewer : MonoBehaviour
         // G 키를 눌러도 경로가 생성되지 않았으면 스폰하지 않음
         if (Input.GetKeyDown(KeyCode.G) && !isSpawning)
         {
-            if (pathManager != null && pathManager.HasValidPath())
+            if (pathManager.GetMainPath() != null && pathManager.GetMainPath().Count >= 2)
             {
                 StartCoroutine(SpawnEnemies());
             }
@@ -69,10 +69,11 @@ public class EnemySpewer : MonoBehaviour
             string enemyName = enemyNames[enemyIndex];
 
             // EnemyPool을 통해 적 스폰
-            GameObject spawnedEnemy = enemyPool.SpawnEnemy(enemyName, transform.position, transform.rotation);
+            GameObject spawnedEnemy = enemyPool.GetEnemy(enemyName, transform.position);
 
             if (spawnedEnemy != null)
             {
+                spawnedEnemy.transform.rotation = transform.rotation;
                 Debug.Log($"적 스폰 성공: {enemyName} ({i + 1}/{enemiesPerWave}) - 순서: {enemyIndex}");
             }
             else
@@ -122,10 +123,11 @@ public class EnemySpewer : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            GameObject spawnedEnemy = enemyPool.SpawnEnemy(enemyName, transform.position, transform.rotation);
+            GameObject spawnedEnemy = enemyPool.GetEnemy(enemyName, transform.position);
 
             if (spawnedEnemy != null)
             {
+                spawnedEnemy.transform.rotation = transform.rotation;
                 Debug.Log($"특정 적 스폰: {enemyName} ({i + 1}/{count})");
             }
 

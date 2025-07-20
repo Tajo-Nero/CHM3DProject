@@ -1,130 +1,138 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
-using UnityEngine.Pool;
 
 public class EnemyPool : MonoBehaviour
 {
-    [SerializeField] public GameObject[] enemyPrefabs; // 적 프리팹 배열
-    [SerializeField] private GameObject healthBarPrefab; // 체력바 프리팹
-    private Dictionary<string, ObjectPool<GameObject>> poolDictionary; // 오브젝트 풀 딕셔너리
-    private PathManager pathManager;
-    // 활성화된 적 리스트 추가
-    private List<GameObject> activeEnemies = new List<GameObject>();
-    public int ActiveEnemies
+    // 간소화된 풀 항목
+    [System.Serializable]
+    public class PoolItem
     {
-        get { return activeEnemies.Count; }
+        public EnemyType enemyType;
+        public int poolSize = 10;
+        [HideInInspector] public Queue<GameObject> pool = new Queue<GameObject>();
     }
+
+    // 전체 풀 목록
+    public List<PoolItem> poolItems = new List<PoolItem>();
+
+    // EnemyData 목록
+    public List<EnemyData> enemyDataList;
+
+    // 초기화 시 맵핑 생성
+    private Dictionary<EnemyType, EnemyData> enemyDataMap = new Dictionary<EnemyType, EnemyData>();
 
     private void Awake()
     {
-        pathManager = FindObjectOfType<PathManager>();
-        poolDictionary = new Dictionary<string, ObjectPool<GameObject>>();
-
-        // 모든 적 프리팹에 대해 오브젝트 풀 생성
-        foreach (var prefab in enemyPrefabs)
+        // 맵핑 생성
+        foreach (var data in enemyDataList)
         {
-            var pool = new ObjectPool<GameObject>(
-                createFunc: () =>
+            enemyDataMap[data.enemyType] = data;
+        }
+
+        // 풀 초기화
+        InitializePools();
+    }
+
+    private void InitializePools()
+    {
+        foreach (var item in poolItems)
+        {
+            // 해당 타입의 EnemyData 찾기
+            if (enemyDataMap.TryGetValue(item.enemyType, out EnemyData data))
+            {
+                // 풀 생성
+                for (int i = 0; i < item.poolSize; i++)
                 {
-                    var obj = Instantiate(prefab);
-                    obj.SetActive(false); // 초기 생성 시 비활성화
-                    return obj;
-                },
-                actionOnGet: obj =>
-                {
-                    obj.SetActive(true);
-                    activeEnemies.Add(obj); // 활성화된 적 리스트에 추가
-                    Debug.Log($"적 활성화됨: {obj.name}");
-                },
-                actionOnRelease: obj =>
-                {
+                    GameObject obj = Instantiate(data.prefab);
                     obj.SetActive(false);
-                    activeEnemies.Remove(obj); // 활성화된 적 리스트에서 제거
-                    Debug.Log($"적 비활성화됨: {obj.name}");
-                },
-                actionOnDestroy: obj => Destroy(obj),
-                collectionCheck: false,
-                defaultCapacity: 10,
-                maxSize: 20
-            );
+                    obj.transform.SetParent(transform);
 
-            poolDictionary.Add(prefab.name, pool);
-        }
-
-    }
-
-    public GameObject GetEnemy(string enemyName)
-    {
-        if (poolDictionary.TryGetValue(enemyName, out var pool))
-        {
-            return pool.Get();
-        }
-        else
-        {
-            Debug.LogError($"해당 이름의 적 {enemyName}(을)를 찾을 수 없습니다.");
-            return null;
+                    // 풀에 추가
+                    item.pool.Enqueue(obj);
+                }
+            }
         }
     }
 
-    public void ReturnEnemy(GameObject enemyInstance)
+    // 타입으로 적 가져오기 - 간단하고 직관적
+    public GameObject GetEnemy(EnemyType type, Vector3 position)
     {
-        // 체력바 삭제
-        Transform healthBar = enemyInstance.transform.Find(healthBarPrefab.name + "(Clone)");
-        if (healthBar != null)
+        foreach (var item in poolItems)
         {
-            Destroy(healthBar.gameObject);
+            if (item.enemyType == type && item.pool.Count > 0)
+            {
+                GameObject enemy = item.pool.Dequeue();
+                enemy.transform.position = position;
+                enemy.SetActive(true);
+
+                // EnemyData 설정
+                EnemyPathFollower follower = enemy.GetComponent<EnemyPathFollower>();
+                if (follower != null && enemyDataMap.TryGetValue(type, out EnemyData data))
+                {
+                    follower.enemyData = data;
+                }
+
+                return enemy;
+            }
         }
 
-        string enemyName = enemyInstance.name.Replace("(Clone)", "").Trim();
-        if (poolDictionary.TryGetValue(enemyName, out var pool))
-        {
-            pool.Release(enemyInstance);
-            activeEnemies.Remove(enemyInstance);
-            Debug.Log($"적 반환됨: {enemyName}");
-        }
-        else
-        {
-            Debug.LogError($"적 반환에 실패하였습니다: {enemyName}");
-        }
+        // 풀이 비었으면 새로 생성
+        return CreateNewEnemy(type, position);
     }
 
-
-    public GameObject SpawnEnemy(string enemyName, Vector3 position, Quaternion rotation)
+    // 새 적 생성
+    private GameObject CreateNewEnemy(EnemyType type, Vector3 position)
     {
-        if (poolDictionary.TryGetValue(enemyName, out var pool))
+        if (enemyDataMap.TryGetValue(type, out EnemyData data))
         {
-            GameObject enemyInstance = pool.Get();
+            GameObject enemy = Instantiate(data.prefab, position, Quaternion.identity);
 
-            if (enemyInstance == null)
+            EnemyPathFollower follower = enemy.GetComponent<EnemyPathFollower>();
+            if (follower != null)
             {
-                Debug.LogError($"적 인스턴스를 생성할 수 없습니다: {enemyName}");
-                return null;
+                follower.enemyData = data;
             }
 
-            enemyInstance.transform.position = position;
-            enemyInstance.transform.rotation = rotation;
-
-            EnemyPathFollower pathFollower = enemyInstance.GetComponent<EnemyPathFollower>();
-            // 경로 할당
-            if (pathFollower != null && pathManager != null && pathManager.HasValidPath())
-            {
-                pathFollower.SetPath(pathManager.GetMainPath());
-            }
-
-            // 체력 초기화
-            EnemyPathFollower enemyBase = enemyInstance.GetComponent<EnemyPathFollower>();
-            if (enemyBase != null)
-            {
-                enemyBase.InitializeHealth();
-            }
-
-            return enemyInstance;
+            return enemy;
         }
-        else
+
+        Debug.LogError($"EnemyData not found for type: {type}");
+        return null;
+    }
+
+    // 적 반환 (비활성화)
+    public void ReturnEnemy(GameObject enemy)
+    {
+        EnemyPathFollower follower = enemy.GetComponent<EnemyPathFollower>();
+        if (follower != null && follower.enemyData != null)
         {
-            Debug.LogError($"적을 찾을 수 없습니다: {enemyName}");
-            return null;
+            EnemyType type = follower.enemyData.enemyType;
+
+            foreach (var item in poolItems)
+            {
+                if (item.enemyType == type)
+                {
+                    enemy.SetActive(false);
+                    enemy.transform.SetParent(transform);
+                    item.pool.Enqueue(enemy);
+                    return;
+                }
+            }
         }
+
+        // 매칭되는 풀이 없으면 파괴
+        Destroy(enemy);
+    }
+
+    // 호환성 유지: 문자열로 가져오기
+    public GameObject GetEnemy(string enemyName, Vector3 position)
+    {
+        if (System.Enum.TryParse(enemyName, out EnemyType type))
+        {
+            return GetEnemy(type, position);
+        }
+
+        Debug.LogError($"Unknown enemy name: {enemyName}");
+        return null;
     }
 }

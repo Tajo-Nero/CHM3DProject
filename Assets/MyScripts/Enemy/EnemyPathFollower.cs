@@ -44,7 +44,6 @@ public abstract class EnemyPathFollower : MonoBehaviour
         if (enemyData != null)
         {
             enemy_attackDamage = enemyData.attackPower;
-            enemy_attackSpeed = enemyData.attackSpeed;
             enemy_health = enemyData.health;
 
             // moveSpeed 설정 (0이면 기본값 사용)
@@ -53,7 +52,6 @@ public abstract class EnemyPathFollower : MonoBehaviour
                 moveSpeed = enemyData.moveSpeed;
             }
 
-            Debug.Log($"적 초기화 완료: {enemyData.enemyName}, 속도: {moveSpeed}, 체력: {enemy_health}");
         }
         else
         {

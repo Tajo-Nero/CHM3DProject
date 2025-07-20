@@ -4,70 +4,69 @@ using UnityEngine;
 
 public class BuffTower : TowerBase
 {
-    [SerializeField] private float buffRange = 10f; // 버프 범위
-    [SerializeField] private float attackPowerMultiplier = 1.2f; // 공격력 배수 (20% 증가)
-    [SerializeField] private float buffDuration = 5f; // 버프 지속 시간
-    [SerializeField] private float buffInterval = 6f; // 버프 주기
-    private List<TowerBase> towersInRange = new List<TowerBase>(); // 범위 내 타워 목록
-    public int segments = 50; // 라인 렌더러 세그먼트 수
+    [Header("버프 설정")]
+    [SerializeField] private float buffRange = 10f;
+    [SerializeField] private float attackPowerMultiplier = 1.2f;
+    [SerializeField] private float buffDuration = 5f;
+    [SerializeField] private float buffInterval = 6f;
+    [SerializeField] private float towerDetectionInterval = 0.5f;
 
-    // 성능 최적화: 타워 탐지 주기 설정
-    [SerializeField] private float towerDetectionInterval = 0.5f; // 0.5초마다 타워 탐지
+    [Header("시각화")]
+    public int segments = 50;
+
+    // 버프 관리
+    private HashSet<TowerBase> towersInRange = new HashSet<TowerBase>();
+    private HashSet<TowerBase> currentlyBuffedTowers = new HashSet<TowerBase>();
+    private Dictionary<TowerBase, Coroutine> buffCoroutines = new Dictionary<TowerBase, Coroutine>();
+
+    // 성능 관리
     private float lastTowerDetectionTime = 0f;
 
-    // 버프 시스템 안전성 강화
-    private HashSet<TowerBase> currentlyBuffedTowers = new HashSet<TowerBase>(); // 현재 버프 받는 타워들
-    private Dictionary<TowerBase, Coroutine> buffCoroutines = new Dictionary<TowerBase, Coroutine>(); // 버프 코루틴 관리
-
-    protected override void Start()
+    void Start()
     {
-        rangeColor = Color.green; // 버프 타워 - 초록
-        detectionRange = 10f; // buffRange와 동일하게
-
-        base.Start(); // TowerBase의 SetupRangeDecal 호출
-
-        // 기존 LineRenderer 코드 제거
-        StartCoroutine(BuffTowersInRange());
+        // 기본 설정
         installationCost = 15;
+
+        // 버프 루틴 시작
+        StartCoroutine(BuffRoutine());
     }
 
     void Update()
     {
-        // 수정: 주기적으로만 타워 탐지 (매 프레임 대신)
+        // 주기적 타워 탐지
         if (Time.time - lastTowerDetectionTime >= towerDetectionInterval)
         {
             DetectTowersInRange();
             lastTowerDetectionTime = Time.time;
         }
-
     }
 
-
-    private IEnumerator BuffTowersInRange()
+    private IEnumerator BuffRoutine()
     {
         while (true)
         {
-            // 개선: 탐지와 버프 적용을 분리
-            ApplyBuffToDetectedTowers(); // 이미 탐지된 타워들에게만 버프 적용
-            yield return new WaitForSeconds(buffInterval); // 버프 주기 대기
+            // 일정 간격으로 버프 적용
+            ApplyBuffToDetectedTowers();
+            yield return new WaitForSeconds(buffInterval);
         }
     }
 
     private void DetectTowersInRange()
     {
-        // 성능 최적화: 기존 리스트 재사용
+        // 탐지 전 기존 목록 초기화
         towersInRange.Clear();
 
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, buffRange); // 범위 내 콜라이더 탐지
+        // 효율적인 충돌 감지
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, buffRange);
 
         foreach (var hitCollider in hitColliders)
         {
             if (hitCollider.CompareTag("Towers"))
             {
                 TowerBase tower = hitCollider.GetComponent<TowerBase>();
-                if (tower != null && tower != this) // ⭐ 자기 자신 제외
+                if (tower != null && tower != this)
                 {
-                    towersInRange.Add(tower); // 범위 내 타워 목록에 추가
+                    towersInRange.Add(tower);
                 }
             }
         }
@@ -75,33 +74,42 @@ public class BuffTower : TowerBase
 
     private void ApplyBuffToDetectedTowers()
     {
-        // 개선: 유효한 타워들만 필터링
-        List<TowerBase> validTowers = new List<TowerBase>();
+        // 유효한 타워 확인
+        List<TowerBase> invalidTowers = new List<TowerBase>();
 
         foreach (var tower in towersInRange)
         {
-            if (tower != null && tower.gameObject.activeInHierarchy)
+            if (tower == null || !tower.gameObject.activeInHierarchy)
             {
-                validTowers.Add(tower);
+                invalidTowers.Add(tower);
+                continue;
+            }
+
+            // 이미 버프 중인 타워는 스킵
+            if (!currentlyBuffedTowers.Contains(tower))
+            {
+                // 이전 코루틴이 있다면 중지
+                if (buffCoroutines.ContainsKey(tower) && buffCoroutines[tower] != null)
+                {
+                    StopCoroutine(buffCoroutines[tower]);
+                }
+
+                // 새 버프 코루틴 시작
+                Coroutine buffCoroutine = StartCoroutine(ApplyBuffForDuration(tower));
+                buffCoroutines[tower] = buffCoroutine;
             }
         }
 
-        if (validTowers.Count > 0)
+        // 무효한 타워 제거
+        foreach (var tower in invalidTowers)
         {
-            foreach (var tower in validTowers)
-            {
-                // 중복 버프 방지
-                if (!currentlyBuffedTowers.Contains(tower))
-                {
-                    StartCoroutine(ApplyBuffForDuration(tower));
-                }
-            }
+            towersInRange.Remove(tower);
         }
     }
 
     private IEnumerator ApplyBuffForDuration(TowerBase tower)
     {
-        // 안전성 체크
+        // 안전성 검사
         if (tower == null || !tower.gameObject.activeInHierarchy)
         {
             yield break;
@@ -111,72 +119,97 @@ public class BuffTower : TowerBase
         currentlyBuffedTowers.Add(tower);
         tower.towerAttackPower *= attackPowerMultiplier;
 
-        Debug.Log($"버프 적용: {tower.name} - 공격력: {tower.towerAttackPower}");
+        // 시각적 효과 (옵션)
+        ApplyBuffVisualEffect(tower, true);
 
-        yield return new WaitForSeconds(buffDuration); // 버프 지속 시간 대기
+        yield return new WaitForSeconds(buffDuration);
 
-        // 버프 해제 시 안전성 검사
+        // 버프 해제
+        RemoveBuff(tower);
+    }
+
+    private void RemoveBuff(TowerBase tower)
+    {
+        // 안전성 검사
         if (tower != null && tower.gameObject.activeInHierarchy && currentlyBuffedTowers.Contains(tower))
         {
             tower.towerAttackPower /= attackPowerMultiplier;
-            currentlyBuffedTowers.Remove(tower);
-
-            Debug.Log($"버프 해제: {tower.name} - 공격력: {tower.towerAttackPower}");
+            ApplyBuffVisualEffect(tower, false);
         }
-        else if (currentlyBuffedTowers.Contains(tower))
+
+        // 버프 목록에서 제거
+        currentlyBuffedTowers.Remove(tower);
+
+        // 코루틴 참조 제거
+        if (buffCoroutines.ContainsKey(tower))
         {
-            // 타워가 파괴된 경우에도 집합에서 제거
-            currentlyBuffedTowers.Remove(tower);
-            Debug.Log("파괴된 타워의 버프 정보 정리됨");
+            buffCoroutines.Remove(tower);
         }
     }
 
+    private void ApplyBuffVisualEffect(TowerBase tower, bool isActive)
+    {
+        // 버프 시각 효과 (발광, 파티클 등)
+        if (tower == null) return;
+
+        // 예: 머티리얼 변경이나 파티클 효과
+        Renderer renderer = tower.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            if (isActive)
+            {
+                // 버프 활성화 효과
+                renderer.material.EnableKeyword("_EMISSION");
+            }
+            else
+            {
+                // 버프 비활성화 효과
+                renderer.material.DisableKeyword("_EMISSION");
+            }
+        }
+    }
+
+    // TowerBase 구현 메서드
     public override void TowerAttack(List<Transform> targets)
     {
-        // 버프 타워는 공격 기능이 없으므로 구현하지 않습니다.
+        // 버프 타워는 직접 공격하지 않음
     }
 
     public override void SetRange(float range)
     {
-        buffRange = range; // 버프 범위 설정
-        Debug.Log("버프 범위 설정: " + buffRange);
+        buffRange = range;
     }
 
     public override void TowerPowUp()
     {
-        // 파워업 시 버프 효과 강화
-        attackPowerMultiplier += 0.1f; // 버프 배수 증가 (1.2 → 1.3)
-        buffRange += 2f; // 버프 범위 증가
+        // 파워업 효과
+        attackPowerMultiplier += 0.1f;
+        buffRange += 2f;
 
-        Debug.Log($"버프 타워가 파워업되었습니다! 버프 배수: {attackPowerMultiplier}, 범위: {buffRange}");
     }
-
     public override void DetectEnemiesInRange()
     {
-        // 이 메서드는 버프 타워에 필요하지 않습니다.
+        // 버프 타워는 적을 감지하지 않음
     }
 
-    // 정리 함수 추가
+    // 정리 및 안전성
     void OnDestroy()
     {
-        // 타워가 파괴될 때 모든 버프 해제
-        foreach (var tower in currentlyBuffedTowers)
+        // 모든 버프 해제
+        List<TowerBase> buffedTowers = new List<TowerBase>(currentlyBuffedTowers);
+        foreach (var tower in buffedTowers)
         {
-            if (tower != null && tower.gameObject.activeInHierarchy)
-            {
-                tower.towerAttackPower /= attackPowerMultiplier;
-            }
+            RemoveBuff(tower);
         }
 
-        currentlyBuffedTowers.Clear();
-
-        // 실행 중인 모든 코루틴 정리
+        // 코루틴 정리
         StopAllCoroutines();
     }
 
     private void OnDrawGizmos()
     {
+        // 버프 범위 시각화
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, buffRange); // 버프 범위 시각화
+        Gizmos.DrawWireSphere(transform.position, buffRange);
     }
 }

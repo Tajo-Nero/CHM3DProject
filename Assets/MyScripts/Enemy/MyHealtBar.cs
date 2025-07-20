@@ -3,45 +3,66 @@ using UnityEngine.UI;
 
 public class MyHealthBar : MonoBehaviour
 {
-    public Image healthBarImage; // 체력바 이미지
-    public Text healthBarText; // 체력바 텍스트
-    public float maxHealth; // 최대 체력
+    public Slider healthSlider;
+    public float maxHealth;
+    public float currentHealth;
 
-    public void Initialize(float health)
+    // 사망 이벤트 정의
+    public delegate void EnemyDeathHandler(GameObject enemy);
+    public event EnemyDeathHandler OnEnemyDeath;
+
+    // 초기화 함수
+    public void Initialize(float maxHealthValue)
     {
-        maxHealth = health;
-        UpdateHealth(health, health);
-    }
+        maxHealth = maxHealthValue;
+        currentHealth = maxHealthValue;
 
-    public void UpdateHealth(float currentHealth, float maxHealth)
-    {
-        if (healthBarImage != null)
+        if (healthSlider != null)
         {
-            float healthRatio = currentHealth / maxHealth;
-            healthBarImage.fillAmount = healthRatio;
-        }
-        else
-        {
-            Debug.LogError("healthBarImage가 null입니다. MyHealthBar 스크립트에서 체력바 이미지를 참조하십시오.");
-        }
-
-        if (healthBarText != null)
-        {
-            healthBarText.text = $"{currentHealth} / {maxHealth}";
-        }
-        else
-        {
-            Debug.LogError("healthBarText가 null입니다. MyHealthBar 스크립트에서 체력바 텍스트를 참조하십시오.");
+            healthSlider.maxValue = maxHealth;
+            healthSlider.value = currentHealth;
         }
     }
 
-    public void SetHealthBarImage(Image image)
+    // 체력 업데이트 함수
+    public void UpdateHealth(float currentHealthValue, float maxHealthValue)
     {
-        healthBarImage = image;
+        currentHealth = currentHealthValue;
+        maxHealth = maxHealthValue;
+
+        if (healthSlider != null)
+        {
+            healthSlider.maxValue = maxHealth;
+            healthSlider.value = currentHealth;
+        }
+
+        // 사망 체크
+        if (currentHealth <= 0)
+        {
+            if (OnEnemyDeath != null)
+            {
+                OnEnemyDeath.Invoke(transform.parent.gameObject);
+            }
+        }
     }
 
-    public void SetHealthBarText(Text text)
+    // 피해 입기 함수
+    public void TakeDamage(float damage)
     {
-        healthBarText = text;
+        currentHealth -= damage;
+
+        if (healthSlider != null)
+        {
+            healthSlider.value = currentHealth;
+        }
+
+        // 사망 체크
+        if (currentHealth <= 0)
+        {
+            if (OnEnemyDeath != null)
+            {
+                OnEnemyDeath.Invoke(transform.parent.gameObject);
+            }
+        }
     }
 }

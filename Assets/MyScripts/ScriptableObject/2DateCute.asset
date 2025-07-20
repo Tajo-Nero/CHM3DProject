@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff4026baf09f92c4eaa544427e78cc67, type: 3}
   m_Name: 2DateCute
   m_EditorClassIdentifier: 
-  enemyName: Cute
+  enemyType: 0
+  prefab: {fileID: 557227371485691561, guid: d21a3c165dda99c4a8d756958167b063, type: 3}
   health: 250
   attackPower: 10
-  attackSpeed: 0
   moveSpeed: 4

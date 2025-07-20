@@ -54,7 +54,7 @@ MonoBehaviour:
   attackSpeed: 0
   installationCost: 0
   isAttackUp: 0
-  rangeMaterial: {fileID: 2100000, guid: 26532c369fe59794c8e59454d5d2d346, type: 2}
+  rangeMaterial: {fileID: 2100000, guid: 07553007ceddacc47bac6a131f3dc619, type: 2}
   detectionRange: 12
   rangeColor: {r: 1, g: 0, b: 0, a: 1}
   rangeType: 2
