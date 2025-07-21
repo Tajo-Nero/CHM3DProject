@@ -13,7 +13,6 @@ Rabbithole Games에서 개발한 로그라이트 타워 디펜스 게임 을 모
 - [게임 플레이](#게임-플레이)
 - [기능](#기능)
 - [개발 현황](#개발-현황)
-- [시스템 요구사항](#시스템-요구사항)
 - [개발 환경](#개발-환경)
 - [프로젝트 구조](#프로젝트-구조)
 - [기여 방법](#기여-방법)
@@ -84,24 +83,6 @@ Rabbithole Games에서 개발한 로그라이트 타워 디펜스 게임 을 모
 - ⏳ 게임 밸런싱
 - ⏳ 추가 타워 타입
 - ⏳ 최적화 작업
-
-## 시스템 요구사항
-
-### 최소 사양
-- OS: Windows 10 64-bit
-- Processor: Intel i5-4590 / AMD FX 8350
-- Memory: 8 GB RAM
-- Graphics: NVIDIA GTX 960 / AMD R9 280
-- DirectX: Version 11
-- Storage: 2 GB 이상
-
-### 권장 사양
-- OS: Windows 11 64-bit
-- Processor: Intel i7-7700K / AMD Ryzen 5 2600
-- Memory: 16 GB RAM
-- Graphics: NVIDIA GTX 1060 / AMD RX 580
-- DirectX: Version 12
-- Storage: 4 GB 이상
 
 ## 개발 환경
 
