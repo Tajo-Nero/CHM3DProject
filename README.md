@@ -5,7 +5,7 @@
 ![Platform](https://img.shields.io/badge/Platform-PC-lightgrey)
 
 Unity 기반의 3D 타워 디펜스 게임으로, 플레이어가 직접 지형을 파괴하여 경로를 생성하고 타워를 배치하여 적을 방어하는 게임입니다.
-
+Rabbithole Games에서 개발한 로그라이트 타워 디펜스 게임 을 모작했습니다.
 **⚠️ 현재 개발 중인 프로젝트입니다. 일부 기능이 완성되지 않았을 수 있습니다.**
 
 ## 목차
