@@ -213,20 +213,22 @@ public class GameManager : MonoBehaviour, IObserver
     }
 
     // UI 업데이트
+    // GameManager.cs의 UpdateUI 메서드를 다음과 같이 수정:
+
+    // UI 업데이트
     public void UpdateUI()
     {
         UpdateResourceUI();
         UpdateHealthUI();
 
+        // UIManager가 있다면 비용 업데이트
         if (UIManager.Instance != null)
         {
             UIManager.Instance.UpdateShopCost(shopCost);
             UIManager.Instance.UpdateInstallationCost(installationCost);
-            if (waveManager != null)
-            {
-                UIManager.Instance.UpdateWaveProgress(waveManager.GetCurrentWave(), waveManager.GetTotalWaves());
-            }
         }
+
+        // 웨이브 관련 UI는 WaveProgressBar가 직접 처리하므로 제거
     }
 
     // 자원 UI 업데이트

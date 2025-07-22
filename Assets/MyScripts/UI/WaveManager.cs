@@ -31,7 +31,7 @@ public class WaveManager : MonoBehaviour
     // 웨이브 완료 이벤트
     public delegate void WaveEvent(int waveNumber);
     public event WaveEvent OnWaveCompleted;
-    private bool isPlayerReady = false;  // 플레이어 준비 상태 추가
+    private bool isPlayerReady = false;  // 플레이어 준비 상태
 
     void Start()
     {
@@ -43,10 +43,10 @@ public class WaveManager : MonoBehaviour
 
         currentWaveIndex = -1;
 
-        // 초기에는 안내 텍스트 숨김
+        // 초기에는 웨이브 텍스트 숨김
         if (waveText != null)
         {
-            waveText.text = "";  // 빈 텍스트로 시작
+            waveText.text = "";
         }
 
         UpdateWaveUI();
@@ -54,7 +54,6 @@ public class WaveManager : MonoBehaviour
 
     void OnDestroy()
     {
-        // 이벤트 구독 해제
         EnemyPathFollower.OnAnyEnemyDeath -= HandleEnemyDeath;
     }
 
@@ -66,14 +65,22 @@ public class WaveManager : MonoBehaviour
             StartNextWave();
         }
     }
-    // 플레이어가 준비되었을 때 호출
+
+    // 플레이어가 준비되었을 때 호출 (GameManager에서 호출)
     public void OnPlayerReady()
     {
         isPlayerReady = true;
 
-        if (waveText != null && currentWaveIndex < 0)
+        // WaveProgressBar에도 알림
+        if (waveProgressBar != null)
         {
-            waveText.text = "G 키를 눌러 첫 웨이브 시작";
+            waveProgressBar.OnPlayerReady();
+        }
+
+        // 웨이브 텍스트는 표시하지 않음 (WaveProgressBar의 statusText로 대체)
+        if (waveText != null)
+        {
+            waveText.text = "";
         }
     }
 
@@ -103,11 +110,8 @@ public class WaveManager : MonoBehaviour
         isWaveActive = true;
         waitingForNextWave = false;
 
-        Debug.Log($"웨이브 {currentWaveIndex + 1} 시작!");
-
         int totalEnemies = wave.wave_enemyCount;
         remainingEnemies = totalEnemies;
-
 
         if (waveProgressBar != null)
         {
@@ -134,23 +138,19 @@ public class WaveManager : MonoBehaviour
                 if (enemy == null)
                 {
                     Debug.LogError($"적 생성 실패: {i + 1}/{totalEnemies}");
-                    remainingEnemies--; // 생성 실패한 적은 카운트에서 제외
-                }
-                else
-                {
-                    Debug.Log($"적 생성 성공: {enemyData.enemyType} ({i + 1}/{totalEnemies})");
+                    remainingEnemies--;
                 }
             }
             else
             {
                 Debug.LogError($"EnemyData가 null입니다! 인덱스: {i}");
-                remainingEnemies--; // 데이터가 없는 적은 카운트에서 제외
+                remainingEnemies--;
             }
 
             yield return new WaitForSeconds(timeBetweenSpawns);
         }
 
-        Debug.Log($"웨이브 {currentWaveIndex + 1} 스폰 완료 - 활성 적: {activeEnemies.Count}, 남은 적: {remainingEnemies}");
+        Debug.Log($"웨이브 {currentWaveIndex + 1} 스폰 완료 - 활성 적: {activeEnemies.Count}");
     }
 
     private EnemyData GetEnemyDataFromWave(Wave wave, int index)
@@ -207,33 +207,24 @@ public class WaveManager : MonoBehaviour
 
         if (enemy != null)
         {
-            // 활성 적 리스트에 추가
             activeEnemies.Add(enemy);
 
-            // 경로 설정
             EnemyPathFollower pathFollower = enemy.GetComponent<EnemyPathFollower>();
             if (pathFollower != null)
             {
                 pathFollower.SetPath(path);
-                Debug.Log($"{enemy.name}에 경로 설정 완료");
-            }
-            else
-            {
-                Debug.LogError($"{enemy.name}에 EnemyPathFollower가 없습니다!");
             }
         }
 
         return enemy;
     }
+
     private void HandleEnemyDeath(GameObject enemy)
     {
         if (activeEnemies.Contains(enemy))
         {
             activeEnemies.Remove(enemy);
             remainingEnemies--;
-
-            Debug.Log($"[사망] {enemy.name} | 활성: {activeEnemies.Count} | 남은수: {remainingEnemies}");
-
 
             UpdateWaveProgress();
 
@@ -255,6 +246,7 @@ public class WaveManager : MonoBehaviour
             waveProgressBar.UpdateProgress(progress);
         }
     }
+
     private void WaveCompleted()
     {
         isWaveActive = false;
@@ -262,11 +254,7 @@ public class WaveManager : MonoBehaviour
 
         Debug.Log($"웨이브 {currentWaveIndex + 1} 완료!");
 
-        if (OnWaveCompleted != null)
-        {
-            OnWaveCompleted.Invoke(currentWaveIndex + 1);
-        }
-
+        // 보상 지급
         if (gameManager != null)
         {
             int reward = 50 + (currentWaveIndex * 10);
@@ -274,34 +262,20 @@ public class WaveManager : MonoBehaviour
             Debug.Log($"웨이브 보상: {reward} 자원");
         }
 
-        if (waveProgressBar != null)
+        // OnWaveCompleted 이벤트 발생 (WaveProgressBar가 구독 중)
+        if (OnWaveCompleted != null)
         {
-            waveProgressBar.EndWave();
+            OnWaveCompleted.Invoke(currentWaveIndex + 1);
         }
 
-        // 웨이브 완료 텍스트
+        // EndWave는 호출하지 않음 (OnWaveCompleted에서 처리됨)
+
+        // 웨이브 완료 시 waveText는 사용하지 않음
         if (waveText != null)
         {
-            if (currentWaveIndex + 1 < waves.Length)
-            {
-                // 2초 후에 다음 웨이브 안내 표시
-                StartCoroutine(ShowNextWaveText());
-            }
-            else
-            {
-                waveText.text = "모든 웨이브 완료! 승리!";
-            }
+            waveText.text = "";
         }
     }
-
-    // 웨이브 완료 후 잠시 대기 후 안내 텍스트 표시
-    private IEnumerator ShowNextWaveText()
-    {
-        waveText.text = $"웨이브 {currentWaveIndex + 1} 완료!";
-        yield return new WaitForSeconds(2f);
-        waveText.text = $"G 키를 눌러 웨이브 {currentWaveIndex + 2} 시작";
-    }
-
 
     private void GameWon()
     {
@@ -320,16 +294,10 @@ public class WaveManager : MonoBehaviour
 
     private void UpdateWaveUI()
     {
-        if (waveText != null)
+        // waveText는 게임 승리 시에만 사용
+        if (waveText != null && currentWaveIndex >= 0 && currentWaveIndex < waves.Length)
         {
-            if (currentWaveIndex >= 0 && currentWaveIndex < waves.Length)
-            {
-                waveText.text = $"Wave {currentWaveIndex + 1}/{waves.Length}";
-            }
-            else if (currentWaveIndex < 0)
-            {
-                waveText.text = "G 키를 눌러 첫 웨이브 시작";
-            }
+            waveText.text = "";  // 평상시에는 빈 텍스트
         }
     }
 
@@ -382,19 +350,13 @@ public class WaveManager : MonoBehaviour
         currentWaveIndex = -1;
         isWaveActive = false;
         waitingForNextWave = false;
+        isPlayerReady = false;  // 플레이어 준비 상태도 리셋
 
         UpdateWaveUI();
 
         if (waveProgressBar != null)
         {
-            for (int i = 0; i < waveProgressBar.waveTextures.Length; i++)
-            {
-                if (waveProgressBar.waveTextures[i] != null)
-                {
-                    waveProgressBar.waveTextures[i].SetActive(false);
-                }
-            }
-            waveProgressBar.scrollbar.value = 0;
+            waveProgressBar.ResetProgressBar();
         }
     }
 }
