@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff4026baf09f92c4eaa544427e78cc67, type: 3}
   m_Name: 8DateChestMonster
   m_EditorClassIdentifier: 
-  enemyType: 0
+  enemyType: 7
   prefab: {fileID: 393127831579949386, guid: 888bfd332fc6de94dbc9be38a3056e06, type: 3}
   health: 350
   attackPower: 25

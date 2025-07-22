@@ -54,15 +54,19 @@ public class EnemyPool : MonoBehaviour
         }
     }
 
-    // 타입으로 적 가져오기 - 간단하고 직관적
     public GameObject GetEnemy(EnemyType type, Vector3 position)
     {
+        Debug.Log($"요청된 적 타입: {type}");
+
         foreach (var item in poolItems)
         {
             if (item.enemyType == type && item.pool.Count > 0)
             {
                 GameObject enemy = item.pool.Dequeue();
+                Debug.Log($"풀에서 가져옴: {enemy.name}");
+
                 enemy.transform.position = position;
+                enemy.transform.rotation = Quaternion.identity;
                 enemy.SetActive(true);
 
                 // EnemyData 설정
@@ -72,11 +76,12 @@ public class EnemyPool : MonoBehaviour
                     follower.enemyData = data;
                 }
 
-                return enemy;
+                return enemy;  
             }
         }
 
         // 풀이 비었으면 새로 생성
+        Debug.Log($"풀이 비어서 새로 생성: {type}");
         return CreateNewEnemy(type, position);
     }
 
@@ -108,19 +113,31 @@ public class EnemyPool : MonoBehaviour
         {
             EnemyType type = follower.enemyData.enemyType;
 
+            // 경로와 상태 초기화
+            follower.currentPath = null;
+            follower.currentWaypointIndex = 0;
+            follower.enemy_health = follower.enemyData.health; // 체력 리셋
+
+            // 체력바 초기화
+            MyHealthBar healthBar = enemy.GetComponentInChildren<MyHealthBar>();
+            if (healthBar != null)
+            {
+                healthBar.Initialize(follower.enemyData.health);
+            }
+
             foreach (var item in poolItems)
             {
                 if (item.enemyType == type)
                 {
                     enemy.SetActive(false);
                     enemy.transform.SetParent(transform);
+                    enemy.transform.position = Vector3.zero; // 위치 초기화
                     item.pool.Enqueue(enemy);
                     return;
                 }
             }
         }
 
-        // 매칭되는 풀이 없으면 파괴
         Destroy(enemy);
     }
 
@@ -134,5 +151,45 @@ public class EnemyPool : MonoBehaviour
 
         Debug.LogError($"Unknown enemy name: {enemyName}");
         return null;
+    }
+    [ContextMenu("Wave 기반 자동 설정")]
+    private void SetupPoolBasedOnWaves()
+    {
+        // WaveManager에서 모든 Wave 가져오기
+        WaveManager waveManager = FindObjectOfType<WaveManager>();
+        if (waveManager == null || waveManager.waves == null)
+        {
+            Debug.LogError("WaveManager를 찾을 수 없습니다!");
+            return;
+        }
+
+        // 사용되는 모든 적 타입 수집
+        HashSet<EnemyType> usedEnemyTypes = new HashSet<EnemyType>();
+
+        foreach (Wave wave in waveManager.waves)
+        {
+            if (wave.wave_enemyData != null)
+            {
+                foreach (EnemyData data in wave.wave_enemyData)
+                {
+                    if (data != null)
+                    {
+                        usedEnemyTypes.Add(data.enemyType);
+                    }
+                }
+            }
+        }
+
+        // Pool Items 재구성
+        poolItems.Clear();
+        foreach (EnemyType type in usedEnemyTypes)
+        {
+            PoolItem item = new PoolItem();
+            item.enemyType = type;
+            item.poolSize = 10; // 기본값
+            poolItems.Add(item);
+        }
+
+        Debug.Log($"Wave에서 사용하는 {usedEnemyTypes.Count}개 적 타입으로 Pool 설정 완료!");
     }
 }

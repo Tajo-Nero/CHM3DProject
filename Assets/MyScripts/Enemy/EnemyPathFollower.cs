@@ -15,9 +15,10 @@ public abstract class EnemyPathFollower : MonoBehaviour
     public float rotationSpeed = 360f;
     public float waypointReachDistance = 1f;
 
+    private MyHealthBar healthBar;
     private bool isAttacking = false;
-    private List<Vector3> currentPath;
-    private int currentWaypointIndex = 0;
+    public List<Vector3> currentPath;
+    public int currentWaypointIndex = 0;
     private GameObject target;
     private EnemyPool enemyPool;
     private TowerGenerator towerGenerator;
@@ -25,12 +26,39 @@ public abstract class EnemyPathFollower : MonoBehaviour
     public GameObject healthBarPrefab;
     protected Animator animator;
 
+    public delegate void DeathHandler(GameObject enemy);
+    public static event DeathHandler OnAnyEnemyDeath;
+
     protected virtual void Awake()
     {
         InitializeComponents();
         InitializeEnemyData();
+
+        // 자식에서 체력바 찾기
+        healthBar = GetComponentInChildren<MyHealthBar>();
+
+        if (healthBar == null)
+        {
+            Debug.LogWarning($"{gameObject.name}에 체력바가 없습니다!");
+        }
+    }
+    protected virtual void Start()
+    {
+        // 체력바 초기화
+        if (healthBar != null && enemyData != null)
+        {
+            healthBar.Initialize(enemyData.health);
+            // 강제로 한 번 더 위치 업데이트
+            healthBar.transform.position = transform.position + healthBar.offset;
+        }
     }
 
+    void OnEnable()
+    {
+        // 재활성화될 때 경로가 없으면 초기화
+        currentPath = null;
+        currentWaypointIndex = 0;
+    }
     private void InitializeComponents()
     {
         animator = GetComponent<Animator>();
@@ -59,27 +87,19 @@ public abstract class EnemyPathFollower : MonoBehaviour
         }
     }
 
+
     public void SetPath(List<Vector3> waypoints)
     {
         if (waypoints == null || waypoints.Count == 0)
         {
-            Debug.LogError("설정된 경로가 없습니다!");
+            Debug.LogError($"{gameObject.name}: 빈 경로가 전달되었습니다!");
             return;
         }
 
         currentPath = new List<Vector3>(waypoints);
         currentWaypointIndex = 0;
 
-        Debug.Log($"경로 설정 완료: {currentPath.Count}개 웨이포인트");
-
-        // 시작 위치를 첫 번째 웨이포인트 근처로 조정
-        if (currentPath.Count > 0)
-        {
-            Vector3 startPos = currentPath[0];
-            startPos.y = transform.position.y; // Y 좌표는 유지
-            transform.position = startPos;
-            Debug.Log($"적 시작 위치 설정: {startPos}");
-        }
+        Debug.Log($"{gameObject.name}: 경로 설정 완료 - {currentPath.Count}개 지점");
     }
 
     public void InitializeHealth()
@@ -105,7 +125,6 @@ public abstract class EnemyPathFollower : MonoBehaviour
     {
         if (currentPath == null || currentPath.Count == 0)
         {
-            Debug.LogWarning($"경로가 설정되지 않았습니다: {gameObject.name}");
             return;
         }
 
@@ -198,14 +217,15 @@ public abstract class EnemyPathFollower : MonoBehaviour
         enemy_health -= damage;
         Debug.Log($"{gameObject.name}이(가) {damage} 데미지를 받았습니다. 남은 체력: {enemy_health}");
 
+        // 체력바 업데이트 - healthBar 사용 (myHealthBar 아님!)
+        if (healthBar != null)
+        {
+            healthBar.TakeDamage(damage); // UpdateHealth 대신 TakeDamage 사용
+        }
+
         if (enemy_health <= 0)
         {
             Die();
-        }
-
-        if (myHealthBar != null)
-        {
-            myHealthBar.UpdateHealth(enemy_health, myHealthBar.maxHealth);
         }
     }
 
@@ -217,14 +237,15 @@ public abstract class EnemyPathFollower : MonoBehaviour
     private void Die()
     {
         Debug.Log($"{gameObject.name}이(가) 죽었습니다!");
+
+        // 죽음 이벤트 발생
+        OnAnyEnemyDeath?.Invoke(gameObject);
+
         if (towerGenerator != null)
         {
             towerGenerator.NotifyObservers(gameObject, "EnemyDefeated");
         }
-        if (myHealthBar != null)
-        {
-            Destroy(myHealthBar.gameObject);
-        }
+
         if (enemyPool != null)
         {
             enemyPool.ReturnEnemy(gameObject);
@@ -234,7 +255,6 @@ public abstract class EnemyPathFollower : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
     public void Victory()
     {
         if (animator != null)

@@ -56,19 +56,25 @@ public class WaveProgressBar : MonoBehaviour
 
     void Update()
     {
-        // 웨이브 매니저 연동
         if (waveManager != null)
         {
             // 현재 웨이브 동기화
             int waveManagerWave = waveManager.GetCurrentWave();
-            if (waveManagerWave != currentWave + 1)
+
+            // 범위 체크 추가
+            if (waveManagerWave > 0 && waveManagerWave - 1 != currentWave)
             {
                 currentWave = waveManagerWave - 1;
-                UpdateWaveText();
-                UpdateWaveTexture();
+
+                // 범위 체크
+                if (currentWave >= 0 && currentWave < totalWaves)
+                {
+                    UpdateWaveText();
+                    UpdateWaveTexture();
+                }
             }
 
-            // 웨이브 진행 상황 업데이트 (적 처치 진행도)
+            // 웨이브 진행 상황 업데이트
             if (waveManager.isWaveActive && maxEnemiesInWave > 0)
             {
                 float progress = waveManager.GetWaveProgress();
@@ -97,28 +103,32 @@ public class WaveProgressBar : MonoBehaviour
         }
     }
 
-    // 웨이브 종료 시 호출 (이벤트 콜백)
     public void OnWaveCompleted(int waveNumber)
     {
-        // UI 업데이트
-        currentWave = waveNumber;
-        UpdateScrollbar();
-        UpdateWaveText();
+        // waveNumber는 1부터 시작하므로 -1
+        currentWave = waveNumber - 1;
 
-        // 다음 웨이브가 있다면 안내 메시지 표시
-        if (currentWave < totalWaves)
+        // 범위 체크
+        if (currentWave >= 0 && currentWave < totalWaves)
         {
-            UpdateStatusText($"웨이브 {currentWave} 완료! G 키를 눌러 다음 웨이브 시작");
-        }
-        else
-        {
-            UpdateStatusText("모든 웨이브 완료!");
-        }
+            UpdateScrollbar();
+            UpdateWaveText();
 
-        // 현재 웨이브 텍스처 비활성화
-        if (waveNumber - 1 < waveTextures.Length)
-        {
-            waveTextures[waveNumber - 1].SetActive(false);
+            // 현재 웨이브 텍스처 비활성화
+            if (currentWave < waveTextures.Length && waveTextures[currentWave] != null)
+            {
+                waveTextures[currentWave].SetActive(false);
+            }
+
+            // 다음 웨이브가 있다면 안내 메시지
+            if (currentWave + 1 < totalWaves)
+            {
+                UpdateStatusText($"웨이브 {currentWave + 1} 완료! G 키를 눌러 다음 웨이브 시작");
+            }
+            else
+            {
+                UpdateStatusText("모든 웨이브 완료!");
+            }
         }
     }
 
@@ -132,10 +142,15 @@ public class WaveProgressBar : MonoBehaviour
                 texture.SetActive(false);
         }
 
-        // 현재 웨이브 텍스처 활성화
-        if (currentWave < waveTextures.Length && waveTextures[currentWave] != null)
+        // 범위 체크 추가
+        if (currentWave >= 0 && currentWave < waveTextures.Length && waveTextures[currentWave] != null)
         {
             waveTextures[currentWave].SetActive(true);
+            Debug.Log($"웨이브 텍스처 활성화: {currentWave}");
+        }
+        else
+        {
+            Debug.LogWarning($"웨이브 텍스처 범위 초과: currentWave={currentWave}, 텍스처 수={waveTextures.Length}");
         }
     }
 
@@ -196,11 +211,17 @@ public class WaveProgressBar : MonoBehaviour
         }
     }
 
-    // 웨이브 시작 - WaveManager에서 직접 호출하기 위한 함수
     public void StartWave()
     {
-        // 이미 구현된 OnWaveStarted 함수 활용
-        OnWaveStarted();
+        // 현재 웨이브가 유효한 범위인지 확인
+        if (currentWave >= 0 && currentWave < totalWaves)
+        {
+            OnWaveStarted();
+        }
+        else
+        {
+            Debug.LogError($"잘못된 웨이브 인덱스: {currentWave}");
+        }
     }
 
     // 웨이브 종료 - WaveManager에서 직접 호출하기 위한 함수

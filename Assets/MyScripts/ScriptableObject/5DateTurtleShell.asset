@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff4026baf09f92c4eaa544427e78cc67, type: 3}
   m_Name: 5DateTurtleShell
   m_EditorClassIdentifier: 
-  enemyType: 0
+  enemyType: 4
   prefab: {fileID: 7819527783306013827, guid: d1cd81610a60d9447952ab17e3b27d92, type: 3}
   health: 330
   attackPower: 16

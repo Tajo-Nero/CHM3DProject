@@ -25,11 +25,13 @@ public class EnemyData : ScriptableObject
 public enum EnemyType
 {
     Bee,
-    Beholder,
-    Cactus,
     Cute,
     Mushroom,
+    Slime,          
     TurtleShell,
     Elite,
+    Beholder,
+    ChestMonster,   
+    Cactus,
     Boss
 }

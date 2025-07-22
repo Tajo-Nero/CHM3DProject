@@ -126,6 +126,11 @@ public class GameManager : MonoBehaviour, IObserver
             pathGenerated = true;
 
         }
+        WaveManager waveManager = FindObjectOfType<WaveManager>();
+        if (waveManager != null)
+        {
+            waveManager.OnPlayerReady();
+        }
     }
 
     // 차량 모드에서 플레이어 모드로 전환

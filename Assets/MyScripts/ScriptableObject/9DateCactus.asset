@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff4026baf09f92c4eaa544427e78cc67, type: 3}
   m_Name: 9DateCactus
   m_EditorClassIdentifier: 
-  enemyType: 0
+  enemyType: 8
   prefab: {fileID: 9163465238740143843, guid: ad6c48fd7a157bc41bd921033b01a934, type: 3}
   health: 360
   attackPower: 30

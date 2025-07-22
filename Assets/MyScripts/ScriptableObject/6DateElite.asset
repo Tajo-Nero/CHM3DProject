@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff4026baf09f92c4eaa544427e78cc67, type: 3}
   m_Name: 6DateElite
   m_EditorClassIdentifier: 
-  enemyType: 0
+  enemyType: 5
   prefab: {fileID: 1318307798755763279, guid: af53ac75b41dc8442bf77f39ac3f9c8e, type: 3}
   health: 500
   attackPower: 50

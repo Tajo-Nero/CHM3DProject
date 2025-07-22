@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -232,11 +232,8 @@ MonoBehaviour:
   attackSpeed: 0
   installationCost: 0
   isAttackUp: 0
-  rangeMaterial: {fileID: 0}
   detectionRange: 10
-  rangeColor: {r: 1, g: 0, b: 0, a: 1}
-  rangeType: 0
-  rangeWidth: 4
+  rangeMaterial: {fileID: 0}
   splashRadius: 10
   damageOverTime: 5
   damageDuration: 5
@@ -254,11 +251,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 730145631c7a0da4f8b052effecf5ba9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  previewMaterial: {fileID: 0}
-  previewColor: {r: 1, g: 1, b: 1, a: 1}
   rangeType: 0
   detectionRange: 10
   rangeWidth: 4
+  fanAngle: 45
 --- !u!114 &55833648
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -271,11 +267,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a441572de7ce94449e6ca2982789784, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  previewMaterial: {fileID: 0}
-  previewColor: {r: 1, g: 1, b: 1, a: 1}
   rangeType: 0
   detectionRange: 10
   rangeWidth: 4
+  fanAngle: 45
 --- !u!114 &55833649
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,6 +283,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4989a9c2f9bf56d4a91a4a0af96bd06b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  groundCheckDistance: 2
+  floorLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!114 &55833650
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -300,11 +299,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d62fa95b62393408ac8914268cf349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  previewMaterial: {fileID: 0}
-  previewColor: {r: 1, g: 1, b: 1, a: 1}
   rangeType: 0
   detectionRange: 5
   rangeWidth: 4
+  fanAngle: 45
 --- !u!114 &55833651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -317,11 +315,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc058acf10744b54fbc024da2c50bd26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  previewMaterial: {fileID: 0}
-  previewColor: {r: 1, g: 1, b: 1, a: 1}
   rangeType: 0
   detectionRange: 5
   rangeWidth: 4
+  fanAngle: 45
 --- !u!114 &55833652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -357,11 +354,8 @@ MonoBehaviour:
   attackSpeed: 0
   installationCost: 0
   isAttackUp: 0
-  rangeMaterial: {fileID: 0}
   detectionRange: 20
-  rangeColor: {r: 1, g: 0, b: 0, a: 1}
-  rangeType: 0
-  rangeWidth: 4
+  rangeMaterial: {fileID: 0}
   laserStartPoint: {fileID: 0}
   laserImpactEffectPrefab: {fileID: 0}
 --- !u!114 &55833654
@@ -382,11 +376,8 @@ MonoBehaviour:
   attackSpeed: 0
   installationCost: 0
   isAttackUp: 0
-  rangeMaterial: {fileID: 0}
   detectionRange: 8
-  rangeColor: {r: 1, g: 0, b: 0, a: 1}
-  rangeType: 0
-  rangeWidth: 4
+  rangeMaterial: {fileID: 0}
   cannonTowerTransform: {fileID: 0}
 --- !u!114 &55833655
 MonoBehaviour:
@@ -406,17 +397,13 @@ MonoBehaviour:
   attackSpeed: 0
   installationCost: 0
   isAttackUp: 0
-  rangeMaterial: {fileID: 0}
   detectionRange: 5
-  rangeColor: {r: 1, g: 0, b: 0, a: 1}
-  rangeType: 0
-  rangeWidth: 4
+  rangeMaterial: {fileID: 0}
   buffRange: 10
   attackPowerMultiplier: 1.2
   buffDuration: 5
   buffInterval: 6
   towerDetectionInterval: 0.5
-  segments: 50
 --- !u!1 &178007086
 GameObject:
   m_ObjectHideFlags: 0
@@ -449,23 +436,31 @@ MonoBehaviour:
   poolItems:
   - enemyType: 0
     poolSize: 10
+  - enemyType: 1
+    poolSize: 10
+  - enemyType: 2
+    poolSize: 10
   - enemyType: 3
     poolSize: 10
   - enemyType: 4
     poolSize: 10
   - enemyType: 5
     poolSize: 10
-  - enemyType: 2
-    poolSize: 10
   - enemyType: 6
+    poolSize: 10
+  - enemyType: 7
+    poolSize: 10
+  - enemyType: 8
     poolSize: 10
   enemyDataList:
   - {fileID: 11400000, guid: f07500efe65075243836bb7e25535250, type: 2}
   - {fileID: 11400000, guid: 3f1c604735a25b34b826f586b58c587b, type: 2}
   - {fileID: 11400000, guid: f23a2628eee59cc4191a88eeeaa84c08, type: 2}
+  - {fileID: 11400000, guid: 13c06a9cc12f1844cb05cc3c433fb4bc, type: 2}
   - {fileID: 11400000, guid: b25c040b5a3d36f48b375d5e2d4ae9c3, type: 2}
-  - {fileID: 11400000, guid: dd3d0450ed06f6c43a6dce2c7bae1207, type: 2}
   - {fileID: 11400000, guid: b2a6dc4a3116fa246924de38c4b96e4e, type: 2}
+  - {fileID: 11400000, guid: 98ca756f0a8ea00459087fa2c5d43e8b, type: 2}
+  - {fileID: 11400000, guid: f6f526037cc64fe42b8f3578f7a62340, type: 2}
 --- !u!4 &178007088
 Transform:
   m_ObjectHideFlags: 0
@@ -1467,7 +1462,7 @@ MonoBehaviour:
   isWaveActive: 0
   waitingForNextWave: 0
   spawnPoints:
-  - {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
+  - {fileID: 1703944072}
   timeBetweenSpawns: 1.5
   waveText: {fileID: 0}
   waveProgressBar: {fileID: 303224030}
@@ -3171,6 +3166,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1683199889}
   m_CullTransparentMesh: 1
+--- !u!4 &1703944072 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
+  m_PrefabInstance: {fileID: 2072445734}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1747639152
 GameObject:
   m_ObjectHideFlags: 0
@@ -3539,6 +3539,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2030327033}
   m_CullTransparentMesh: 1
+--- !u!1001 &2072445734
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1272087387990586008, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
+      propertyPath: m_Name
+      value: EnemySpewerPos
+      objectReference: {fileID: 0}
+    - target: {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 41.78
+      objectReference: {fileID: 0}
+    - target: {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -22.29
+      objectReference: {fileID: 0}
+    - target: {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3446070343583260522, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2f06defbff99c6c4d8957a41be48b9ed, type: 3}
 --- !u!1 &2091572309
 GameObject:
   m_ObjectHideFlags: 0
@@ -3600,3 +3657,4 @@ SceneRoots:
   - {fileID: 1607856299}
   - {fileID: 720760955}
   - {fileID: 2091572311}
+  - {fileID: 2072445734}
