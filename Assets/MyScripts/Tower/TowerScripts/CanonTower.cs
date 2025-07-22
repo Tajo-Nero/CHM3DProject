@@ -16,17 +16,20 @@ public class CanonTower : TowerBase
         attackSpeed = 0.7f;
         installationCost = 8;
         isAttackUp = false;
-
     }
 
     protected override void Start()
     {
-        rangeColor = Color.red; // 공격 타워 - 빨강
         detectionRange = 8f;
-        rangeType = RangeType.Circle;
 
-        // 기존 LineRenderer 코드 제거하고 Decal로 교체
-        base.Start(); // TowerBase의 SetupRangeDecal 호출
+        base.Start(); // TowerBase의 Start 호출
+
+        // 캐논 타워는 원형 범위
+        if (rangeDisplay != null)
+        {
+            rangeDisplay.shape = TowerRangeDisplay.RangeShape.Circle;
+            rangeDisplay.UpdateRangeMesh();
+        }
 
         SetRange(detectionRange);
     }
@@ -66,6 +69,7 @@ public class CanonTower : TowerBase
     public override void SetRange(float range)
     {
         detectionRange = range;
+        SetRangeSize(range); // TowerBase의 메서드 호출
     }
 
     public override void DetectEnemiesInRange()

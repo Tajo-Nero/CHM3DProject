@@ -96,7 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48d62fa95b62393408ac8914268cf349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  previewMaterial: {fileID: 2100000, guid: dd7bbfa90e9096540bc93cf3bc891ccd, type: 2}
+  previewMaterial: {fileID: 2100000, guid: 6082b650ee0af9a48b7f073c2f51f950, type: 2}
   previewColor: {r: 1, g: 1, b: 1, a: 1}
   rangeType: 0
   detectionRange: 5

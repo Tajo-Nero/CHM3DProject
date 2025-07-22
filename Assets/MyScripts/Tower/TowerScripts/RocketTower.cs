@@ -4,66 +4,95 @@ using UnityEngine;
 
 public class RocketTower : TowerBase
 {
-    [SerializeField] private float splashRadius = 10f; // 스플래시 반경
-    [SerializeField] private float damageOverTime = 5f; // 지속 데미지
-    [SerializeField] private float damageDuration = 5f; // 지속 데미지 시간
-    [SerializeField] private Transform rocketLaunchPoint; // 로켓 발사 위치
-    private bool isAttacking = false; // 공격 중인지 여부
-    [SerializeField] private float attackConeAngle = 45f; // 공격 범위 각도
+    [SerializeField] private float splashRadius = 10f;
+    [SerializeField] private float damageOverTime = 5f;
+    [SerializeField] private float damageDuration = 5f;
+    [SerializeField] private Transform rocketLaunchPoint;
+    private bool isAttacking = false;
+    [SerializeField] private float attackConeAngle = 45f;
 
     void Awake()
     {
-        // 타워 기본 속성 초기화
         towerAttackPower = 20;
         towerPenetrationPower = 5;
         criticalHitRate = 0.05f;
         attackSpeed = 1.5f;
         installationCost = 10;
-        SetRange(detectionRange); // 감지 범위 초기화
-
     }
 
     protected override void Start()
     {
-        rangeColor = Color.blue; // 로켓 타워 - 주황
         detectionRange = 10f;
-        rangeType = RangeType.Fan;
 
-        base.Start(); // TowerBase의 SetupRangeDecal 호출
+        base.Start(); // TowerBase의 Start 호출
+
+        // 로켓 타워는 부채꼴 범위
+        if (rangeDisplay != null)
+        {
+            rangeDisplay.shape = TowerRangeDisplay.RangeShape.Fan;
+            rangeDisplay.fanAngle = attackConeAngle;
+            rangeDisplay.UpdateRangeMesh();
+        }
 
         SetRange(detectionRange);
-
-        // 기존 LineRenderer 코드 제거
     }
 
     void Update()
     {
         DetectEnemiesInRange();
-
-        // 범위가 표시 중이고 타워가 회전했다면 범위도 회전
-        if (isRangeVisible && rangeDecal != null)
-        {
-            rangeDecal.transform.localRotation = Quaternion.Euler(90, transform.eulerAngles.y, 0);
-        }
     }
 
     public override void DetectEnemiesInRange()
     {
+        List<Transform> detectedEnemies = new List<Transform>();
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, detectionRange);
+
         foreach (var hitCollider in hitColliders)
         {
-            if (hitCollider.CompareTag("Enemy") && !isAttacking)
+            if (hitCollider.CompareTag("Enemy"))
             {
-                StartCoroutine(AttackRoutine(hitCollider.transform));
+                // 부채꼴 범위 체크
+                Vector3 directionToTarget = (hitCollider.transform.position - transform.position).normalized;
+                float angle = Vector3.Angle(transform.forward, directionToTarget);
+
+                // fanAngle의 절반 이내에 있는지 체크
+                float halfAngle = rangeDisplay != null ? rangeDisplay.fanAngle / 2f : attackConeAngle / 2f;
+
+                if (angle <= halfAngle)
+                {
+                    detectedEnemies.Add(hitCollider.transform);
+                }
             }
+        }
+
+        if (detectedEnemies.Count > 0 && !isAttacking)
+        {
+            StartCoroutine(AttackRoutine(detectedEnemies[0])); // 첫 번째 적만 공격
         }
     }
 
+    // 디버그용 Gizmo
+    void OnDrawGizmosSelected()
+    {
+        if (!Application.isPlaying) return;
+
+        Gizmos.color = Color.grey;
+        float halfAngle = rangeDisplay != null ? rangeDisplay.fanAngle / 2f : attackConeAngle / 2f;
+
+        // 부채꼴 시각화
+        Vector3 forward = transform.forward * detectionRange;
+        Vector3 right = Quaternion.Euler(0, halfAngle, 0) * forward;
+        Vector3 left = Quaternion.Euler(0, -halfAngle, 0) * forward;
+
+        Gizmos.DrawLine(transform.position, transform.position + forward);
+        Gizmos.DrawLine(transform.position, transform.position + right);
+        Gizmos.DrawLine(transform.position, transform.position + left);
+    }
     private IEnumerator AttackRoutine(Transform target)
     {
         isAttacking = true;
-        TowerAttack(new List<Transform> { target }); // 상속받은 TowerAttack 메서드 사용
-        yield return new WaitForSeconds(attackSpeed); // 공격 주기 대기
+        TowerAttack(new List<Transform> { target });
+        yield return new WaitForSeconds(attackSpeed);
         isAttacking = false;
     }
 
@@ -74,7 +103,7 @@ public class RocketTower : TowerBase
             Vector3 targetPosition = target.position;
             Vector3 direction = (targetPosition - rocketLaunchPoint.position).normalized;
 
-            Debug.Log("로켓 발사! " + target.name + "에게 타격을 입혔습니다!");
+            Debug.Log("로켓 발사! " + target.name + "에게 공격을 입혔습니다!");
 
             Collider[] hitColliders = Physics.OverlapSphere(targetPosition, splashRadius);
             foreach (var hitCollider in hitColliders)
@@ -89,8 +118,8 @@ public class RocketTower : TowerBase
                         EnemyPathFollower enemyHp = hitCollider.GetComponent<EnemyPathFollower>();
                         if (enemyHp != null)
                         {
-                            enemyHp.TakeDamage(towerAttackPower); // 기본 데미지 적용
-                            StartCoroutine(ApplyDamageOverTime(enemyHp)); // 지속 데미지 적용
+                            enemyHp.TakeDamage(towerAttackPower);
+                            StartCoroutine(ApplyDamageOverTime(enemyHp));
                         }
                     }
                 }
@@ -105,12 +134,12 @@ public class RocketTower : TowerBase
         {
             if (enemyHp != null && enemyHp.gameObject.activeSelf)
             {
-                enemyHp.TakeDamage(damageOverTime); // 지속 데미지 적용
+                enemyHp.TakeDamage(damageOverTime);
                 Debug.Log("지속 데미지 적용: " + enemyHp.name);
             }
             else
             {
-                break; // 적이 사라지거나 비활성화된 경우 중지
+                break;
             }
             elapsed += 1f;
             yield return new WaitForSeconds(1f);
@@ -120,12 +149,11 @@ public class RocketTower : TowerBase
     public override void SetRange(float range)
     {
         detectionRange = range;
-        Debug.Log("감지 범위 설정: " + detectionRange);
+        SetRangeSize(range); // TowerBase의 메서드 호출
     }
 
     public override void TowerPowUp()
     {
-        // 파워업 기능 추가
         towerAttackPower *= 2;
         Debug.Log("로켓 타워의 공격력이 강화되었습니다: " + towerAttackPower);
     }

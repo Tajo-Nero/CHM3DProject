@@ -4,8 +4,8 @@ public class PreviewRocket : PreviewBase
 {
     protected override void Start()
     {
-        previewColor = Color.grey;
         detectionRange = 10f;
+        fanAngle = 45f;
         rangeType = PreviewRangeType.Fan;
 
         base.Start();

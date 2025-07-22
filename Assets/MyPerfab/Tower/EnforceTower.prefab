@@ -736,14 +736,10 @@ MonoBehaviour:
   attackSpeed: 0
   installationCost: 0
   isAttackUp: 0
-  rangeMaterial: {fileID: 2100000, guid: 26532c369fe59794c8e59454d5d2d346, type: 2}
   detectionRange: 5
-  rangeColor: {r: 1, g: 0, b: 0, a: 1}
-  rangeType: 0
-  rangeWidth: 4
+  rangeMaterial: {fileID: 2100000, guid: dd7bbfa90e9096540bc93cf3bc891ccd, type: 2}
   buffRange: 12
   attackPowerMultiplier: 1.2
   buffDuration: 5
   buffInterval: 6
-  segments: 50
   towerDetectionInterval: 0.5

@@ -26,8 +26,7 @@ public class PlayerMove : MonoBehaviour
 
     // 상태 변수들
     private bool isGrounded; // 땅에 닿아있는지
-    private bool isHammering = false; // 해머 사용 중인지
-    private bool isMoving = false; // 이동 중인지
+    //private bool isHammering = false; // 해머 사용 중인지
 
     [Header("Camera Settings")]
     private float mouseX, mouseY; // 마우스 입력 값
@@ -68,7 +67,7 @@ public class PlayerMove : MonoBehaviour
         HandleMovement();
         HandleRotation();
         HandleJump();
-        HandleHammer();
+        //HandleHammer();
         HandleGameInput();
         HandleTowerDeletion();
         UpdateCameraPosition();
@@ -84,9 +83,6 @@ public class PlayerMove : MonoBehaviour
         {
             animator.SetBool("IsJump", false);
         }
-
-        // 애니메이터에 Ground 상태 전달
-        animator.SetBool("IsGrounded", isGrounded);
     }
 
     private void HandleMovement()
@@ -98,12 +94,9 @@ public class PlayerMove : MonoBehaviour
         // 이동 처리
         playerTransform.Translate(moveDir * moveSpeed * Time.deltaTime);
 
-        // 이동 상태 업데이트
-        isMoving = moveDir.magnitude > 0.1f;
 
         // 애니메이터에 이동 속도 전달
         animator.SetFloat("Move", moveDir.magnitude);
-        animator.SetBool("IsMoving", isMoving);
     }
 
     private void HandleRotation()
@@ -126,23 +119,23 @@ public class PlayerMove : MonoBehaviour
         }
     }
 
-    private void HandleHammer()
-    {
-        // 마우스 버튼 상태에 따른 해머 애니메이션
-        bool hammerInput = Input.GetMouseButton(0);
+    //private void HandleHammer()
+    //{
+    //    // 마우스 버튼 상태에 따른 해머 애니메이션
+    //    bool hammerInput = Input.GetMouseButton(0);
 
-        // 상태가 변경될 때만 애니메이터 업데이트
-        if (hammerInput != isHammering)
-        {
-            isHammering = hammerInput;
-            animator.SetBool("IsHammer", isHammering);
+    //    // 상태가 변경될 때만 애니메이터 업데이트
+    //    if (hammerInput != isHammering)
+    //    {
+    //        isHammering = hammerInput;
+    //        animator.SetBool("IsHammer", isHammering);
 
-            if (isHammering)
-            {
-                animator.SetTrigger("HammerAttack"); // 트리거로도 사용 가능
-            }
-        }
-    }
+    //        if (isHammering)
+    //        {
+    //            animator.SetTrigger("HammerAttack"); // 트리거로도 사용 가능
+    //        }
+    //    }
+    //}
 
     private void HandleGameInput()
     {
@@ -194,18 +187,6 @@ public class PlayerMove : MonoBehaviour
         UpdateCameraPosition();
     }
 
-    // 애니메이션 이벤트에서 호출 가능한 메서드들
-    public void OnHammerHit()
-    {
-        // 해머 타격 시점에 호출 (Animation Event)
-        Debug.Log("해머 타격!");
-    }
-
-    public void OnJumpLand()
-    {
-        // 착지 시점에 호출 (Animation Event)
-        Debug.Log("착지!");
-    }
 
     // 디버그용 기즈모
     private void OnDrawGizmosSelected()
