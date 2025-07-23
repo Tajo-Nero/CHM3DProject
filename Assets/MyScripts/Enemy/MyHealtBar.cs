@@ -3,45 +3,122 @@ using UnityEngine.UI;
 
 public class MyHealthBar : MonoBehaviour
 {
-    public Image healthBarImage; // 체력바 이미지
-    public Text healthBarText; // 체력바 텍스트
-    public float maxHealth; // 최대 체력
+    public Slider healthSlider;
+    public Text healthText; // 체력 텍스트 추가
+    public float maxHealth;
+    public float currentHealth;
 
-    public void Initialize(float health)
+    // 체력바 오프셋
+    public Vector3 offset = new Vector3(0, 2f, 0);
+
+    private Camera mainCamera;
+    private Transform enemyTransform;
+
+    // 사망 이벤트 정의
+    public delegate void EnemyDeathHandler(GameObject enemy);
+    public event EnemyDeathHandler OnEnemyDeath;
+
+    void Awake()
     {
-        maxHealth = health;
-        UpdateHealth(health, health);
+        if (healthSlider == null)
+        {
+            healthSlider = GetComponentInChildren<Slider>();
+        }
+
+        // 텍스트 자동 찾기
+        if (healthText == null)
+        {
+            healthText = GetComponentInChildren<Text>();
+        }
+
+        mainCamera = Camera.main;
+        enemyTransform = transform.root;
+
+        // 즉시 위치 설정
+        SetInitialPosition();
     }
 
-    public void UpdateHealth(float currentHealth, float maxHealth)
+    void Start()
     {
-        if (healthBarImage != null)
+        Canvas canvas = GetComponentInParent<Canvas>();
+        if (canvas != null && canvas.worldCamera == null)
         {
-            float healthRatio = currentHealth / maxHealth;
-            healthBarImage.fillAmount = healthRatio;
-        }
-        else
-        {
-            Debug.LogError("healthBarImage가 null입니다. MyHealthBar 스크립트에서 체력바 이미지를 참조하십시오.");
+            canvas.worldCamera = mainCamera;
         }
 
-        if (healthBarText != null)
+        // Start에서도 한 번 더 위치 설정
+        SetInitialPosition();
+    }
+
+    void SetInitialPosition()
+    {
+        if (enemyTransform != null)
         {
-            healthBarText.text = $"{currentHealth} / {maxHealth}";
-        }
-        else
-        {
-            Debug.LogError("healthBarText가 null입니다. MyHealthBar 스크립트에서 체력바 텍스트를 참조하십시오.");
+            transform.position = enemyTransform.position + offset;
         }
     }
 
-    public void SetHealthBarImage(Image image)
+    // 초기화 함수
+    public void Initialize(float maxHealthValue)
     {
-        healthBarImage = image;
+        maxHealth = maxHealthValue;
+        currentHealth = maxHealthValue;
+
+        UpdateHealthDisplay();
+
+        // 초기화할 때도 위치 설정
+        SetInitialPosition();
     }
 
-    public void SetHealthBarText(Text text)
+    // 체력 업데이트 함수
+    public void UpdateHealth(float currentHealthValue, float maxHealthValue)
     {
-        healthBarText = text;
+        currentHealth = currentHealthValue;
+        maxHealth = maxHealthValue;
+
+        UpdateHealthDisplay();
+
+        // 사망 체크
+        if (currentHealth <= 0)
+        {
+            if (OnEnemyDeath != null)
+            {
+                OnEnemyDeath.Invoke(enemyTransform.gameObject);
+            }
+        }
+    }
+
+    // 피해 입기 함수
+    public void TakeDamage(float damage)
+    {
+        currentHealth = Mathf.Max(0, currentHealth - damage);
+
+        UpdateHealthDisplay();
+
+        // 사망 체크
+        if (currentHealth <= 0)
+        {
+            if (OnEnemyDeath != null)
+            {
+                OnEnemyDeath.Invoke(enemyTransform.gameObject);
+            }
+        }
+    }
+
+    // 체력 표시 업데이트
+    private void UpdateHealthDisplay()
+    {
+        // 슬라이더 업데이트
+        if (healthSlider != null)
+        {
+            healthSlider.maxValue = maxHealth;
+            healthSlider.value = currentHealth;
+        }
+
+        // 텍스트 업데이트 (현재체력/최대체력)
+        if (healthText != null)
+        {
+            healthText.text = $"{Mathf.Ceil(currentHealth)}/{Mathf.Ceil(maxHealth)}";
+        }
     }
 }

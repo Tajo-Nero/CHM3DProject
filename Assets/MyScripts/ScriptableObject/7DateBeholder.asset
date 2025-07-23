@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff4026baf09f92c4eaa544427e78cc67, type: 3}
   m_Name: 7DateBeholder
   m_EditorClassIdentifier: 
-  enemyName: Beholder
+  enemyType: 6
+  prefab: {fileID: 1550717235643762586, guid: 6e7a47278f15b6245ab9432a8e75e61b, type: 3}
   health: 330
   attackPower: 20
+  moveSpeed: 4

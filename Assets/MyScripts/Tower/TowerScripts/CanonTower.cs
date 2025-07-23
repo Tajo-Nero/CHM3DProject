@@ -4,12 +4,9 @@ using UnityEngine;
 
 public class CanonTower : TowerBase
 {
-    [SerializeField] private float detectionRange = 8f; // 감지 범위
     private bool isAttacking = false;
     [SerializeField] private Transform cannonTowerTransform;
     private List<Transform> targets = new List<Transform>();
-    private ILineRendererStrategy lineRendererStrategy;
-    public int segments = 50;
 
     void Awake()
     {
@@ -19,19 +16,22 @@ public class CanonTower : TowerBase
         attackSpeed = 0.7f;
         installationCost = 8;
         isAttackUp = false;
-
-        // 라인 렌더러 전략 설정
-        lineRendererStrategy = new CircleRendererStrategy();
     }
 
-    void Start()
+    protected override void Start()
     {
-        // 라인 렌더러 설정 및 패턴 생성
-        lineRendererStrategy.Setup(gameObject);
-        lineRendererStrategy.GeneratePattern(gameObject, transform.position, cannonTowerTransform, segments, detectionRange, 0);
+        detectionRange = 8f;
 
-        SetRange(detectionRange);       
+        base.Start(); // TowerBase의 Start 호출
 
+        // 캐논 타워는 원형 범위
+        if (rangeDisplay != null)
+        {
+            rangeDisplay.shape = TowerRangeDisplay.RangeShape.Circle;
+            rangeDisplay.UpdateRangeMesh();
+        }
+
+        SetRange(detectionRange);
     }
 
     void Update()
@@ -69,6 +69,7 @@ public class CanonTower : TowerBase
     public override void SetRange(float range)
     {
         detectionRange = range;
+        SetRangeSize(range); // TowerBase의 메서드 호출
     }
 
     public override void DetectEnemiesInRange()

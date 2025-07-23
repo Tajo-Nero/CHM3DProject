@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff4026baf09f92c4eaa544427e78cc67, type: 3}
   m_Name: 3DateMushroom
   m_EditorClassIdentifier: 
-  enemyName: Mushroom
+  enemyType: 2
+  prefab: {fileID: 940485957724764862, guid: c53ddb82d132c4a428a168a8b1b688f1, type: 3}
   health: 280
   attackPower: 12
+  moveSpeed: 4

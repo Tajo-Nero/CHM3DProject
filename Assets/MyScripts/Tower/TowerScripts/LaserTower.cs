@@ -4,59 +4,83 @@ using UnityEngine;
 
 public class LaserTower : TowerBase
 {
-    [SerializeField] private float detectionRange = 20f; // 탐지 거리
-    [SerializeField] private Transform laserStartPoint; // 레이저 시작점
-    [SerializeField] private ParticleSystem laserImpactEffectPrefab; // 레이저 충돌 파티클 효과 프리팹
-    private ILineRendererStrategy lineRendererStrategy;
-    private bool isAttacking = false; // 공격 중인지 여부
+    [SerializeField] private Transform laserStartPoint;
+    [SerializeField] private ParticleSystem laserImpactEffectPrefab;
+    private bool isAttacking = false;
 
     void Awake()
     {
-        towerAttackPower = 50; // 공격력 설정
-        attackSpeed = 1f; // 공격 속도 설정
-        installationCost = 15; // 설치 비용 설정
+        towerAttackPower = 50;
+        attackSpeed = 1f;
+        installationCost = 15;
     }
 
-    void Start()
+    protected override void Start()
     {
-        SetRange(detectionRange); // 탐지 거리 설정
+        detectionRange = 20f;
 
-        // 라인 렌더러 전략을 초기화
-        lineRendererStrategy = new LaserRendererStrategy();
-        lineRendererStrategy.Setup(gameObject);
-        lineRendererStrategy.GeneratePattern(gameObject, transform.position, laserStartPoint, 4, detectionRange, detectionRange);
+        base.Start(); // TowerBase의 Start 호출
+
+        // 레이저 타워는 직사각형 범위
+        if (rangeDisplay != null)
+        {
+            rangeDisplay.shape = TowerRangeDisplay.RangeShape.Rectangle;
+            rangeDisplay.rectangleWidth = 4f;
+            rangeDisplay.UpdateRangeMesh();
+        }
+
+        SetRange(detectionRange);
     }
 
     void Update()
     {
-        DetectEnemiesInRange(); // 적 탐지
+        DetectEnemiesInRange();
     }
 
     public override void DetectEnemiesInRange()
     {
         List<Transform> targets = new List<Transform>();
 
-        // 자기 자신의 위치에서 탐지 박스 설정
+        // 직사각형 범위에 맞게 수정
+        float halfWidth = rangeDisplay != null ? rangeDisplay.rectangleWidth / 2f : 2f;
         Vector3 boxCenter = transform.position + transform.forward * (detectionRange / 2);
-        Vector3 boxHalfExtents = new Vector3(2f, 2f, detectionRange / 2);
-        Quaternion boxOrientation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
+        Vector3 boxHalfExtents = new Vector3(halfWidth, 2f, detectionRange / 2);
 
-        // 박스 캐스트로 적 탐지
-        RaycastHit[] hits = Physics.BoxCastAll(boxCenter, boxHalfExtents, transform.forward, boxOrientation, detectionRange);
+        // Box 방향을 타워 회전에 맞춤
+        Collider[] hitColliders = Physics.OverlapBox(
+            boxCenter,
+            boxHalfExtents,
+            transform.rotation
+        );
 
-        foreach (var hit in hits)
+        foreach (var hitCollider in hitColliders)
         {
-            if (hit.collider.CompareTag("Enemy"))
+            if (hitCollider.CompareTag("Enemy"))
             {
-                targets.Add(hit.transform);
-                Debug.Log("Detected Enemy: " + hit.transform.name);
+                targets.Add(hitCollider.transform);
             }
         }
 
         if (targets.Count > 0 && !isAttacking)
         {
-            StartCoroutine(AttackRoutine(targets)); // 공격 루틴 시작
+            StartCoroutine(AttackRoutine(targets));
         }
+    }
+
+    // 디버그용 Gizmo 추가
+    void OnDrawGizmosSelected()
+    {
+        if (!Application.isPlaying) return;
+
+        Gizmos.color = Color.cyan;
+        float halfWidth = rangeDisplay != null ? rangeDisplay.rectangleWidth / 2f : 2f;
+        Vector3 boxCenter = transform.position + transform.forward * (detectionRange / 2);
+        Vector3 boxSize = new Vector3(halfWidth * 2, 4f, detectionRange);
+
+        Matrix4x4 oldMatrix = Gizmos.matrix;
+        Gizmos.matrix = Matrix4x4.TRS(boxCenter, transform.rotation, Vector3.one);
+        Gizmos.DrawWireCube(Vector3.zero, boxSize);
+        Gizmos.matrix = oldMatrix;
     }
 
     private IEnumerator AttackRoutine(List<Transform> targets)
@@ -64,10 +88,10 @@ public class LaserTower : TowerBase
         isAttacking = true;
         while (targets.Count > 0)
         {
-            TowerAttack(targets); // 타워 공격
-            yield return new WaitForSeconds(attackSpeed); // 공격 대기 시간
+            TowerAttack(targets);
+            yield return new WaitForSeconds(attackSpeed);
 
-            targets.RemoveAll(t => t == null || !t.gameObject.activeSelf); // 비활성화된 타겟 제거
+            targets.RemoveAll(t => t == null || !t.gameObject.activeSelf);
         }
         isAttacking = false;
     }
@@ -79,7 +103,7 @@ public class LaserTower : TowerBase
             EnemyPathFollower enemyHp = target.GetComponent<EnemyPathFollower>();
             if (enemyHp != null)
             {
-                enemyHp.TakeDamage(towerAttackPower); // 적에게 데미지 입힘
+                enemyHp.TakeDamage(towerAttackPower);
                 Debug.Log("Laser hit " + target.name + " for " + towerAttackPower + " damage!");
 
                 // 레이저 충돌 파티클 효과 재생
@@ -95,33 +119,20 @@ public class LaserTower : TowerBase
     private IEnumerator PlayParticleEffect(ParticleSystem laserImpactEffect)
     {
         laserImpactEffect.Play();
-        yield return new WaitForSeconds(0.5f); // 파티클 효과 재생 시간
+        yield return new WaitForSeconds(0.5f);
         laserImpactEffect.Stop();
-        Destroy(laserImpactEffect.gameObject); // 파티클 오브젝트 파괴
+        Destroy(laserImpactEffect.gameObject);
     }
 
     public override void SetRange(float range)
     {
-        detectionRange = range; // 탐지 거리 설정
+        detectionRange = range;
+        SetRangeSize(range); // TowerBase의 메서드 호출
     }
 
     public override void TowerPowUp()
     {
-        towerAttackPower *= 2; // 공격력 두 배로 증가
+        towerAttackPower *= 2;
         Debug.Log("파워업! 타워의 공격력이 두 배로 증가했습니다: " + towerAttackPower);
-    }
-
-    // 기즈모를 그리는 함수
-    private void OnDrawGizmos()
-    {
-        if (Application.isPlaying)
-        {
-            Vector3 boxCenter = transform.position + transform.forward * (detectionRange / 2);
-            Vector3 boxHalfExtents = new Vector3(2f, 2f, detectionRange / 2);
-            Quaternion boxOrientation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
-
-            Gizmos.color = Color.red; // 기즈모 색상 설정
-            Gizmos.DrawWireCube(boxCenter, boxHalfExtents * 2); // 박스 캐스트 모양의 기즈모 그리기
-        }
     }
 }

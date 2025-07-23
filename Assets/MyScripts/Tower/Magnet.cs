@@ -110,6 +110,9 @@ public class Magnet : MonoBehaviour
             Vector3 targetPosition = new Vector3(transform.position.x, transform.position.y + 1.9f, transform.position.z);
             foreach (Collider collider in towerColliders)
             {
+                // null 체크 추가
+                if (collider == null) continue;
+
                 Rigidbody rb = collider.GetComponent<Rigidbody>();
                 if (rb != null)
                 {
