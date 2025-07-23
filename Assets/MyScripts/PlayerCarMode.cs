@@ -23,7 +23,6 @@ public class PlayerCarMode : MonoBehaviour
     [Header("참조")]
     public GameObject _PlayerMode;
     private GameManager gameManager;
-    private GameObject drillSphere;
 
     // 성능 최적화
     private float lastDigTime;
@@ -178,17 +177,6 @@ public class PlayerCarMode : MonoBehaviour
             {
                 Dig(terrainCollider, hit.point);
             }
-
-            // 드릴 시각화 (있는 경우)
-            if (drillSphere != null)
-            {
-                drillSphere.transform.position = hit.point;
-                drillSphere.SetActive(true);
-            }
-        }
-        else if (drillSphere != null)
-        {
-            drillSphere.SetActive(false);
         }
     }
 
