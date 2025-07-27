@@ -30,7 +30,8 @@ public class PlayerCarMode : MonoBehaviour
 
     // 경로 기록 시스템
     private List<Vector3> playerPath = new List<Vector3>();
-    private float pathRecordDistance = 2f;
+    [Header("경로 웨이포인트 M단위")]
+    public float pathRecordDistance = 2f;
     private Vector3 lastRecordedPosition;
     private bool isRecording = false;
 

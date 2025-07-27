@@ -267,17 +267,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8d8c8d24cf845740b773da6533bebf8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camPos: {fileID: 1791439045690941793}
-  cam: {fileID: 0}
-  target: {fileID: 2005926775401804638, guid: 3f177067e9ab12f42886cb5a10945b4b, type: 3}
   rotationSpeed: 50
   moveSpeed: 2
-  _PlayerMode: {fileID: 7620607172156864347, guid: c94b039541aa54740a324f0398da259c, type: 3}
+  sprintSpeed: 5
+  camPos: {fileID: 1791439045690941793}
+  cam: {fileID: 0}
   cameraRotationX: 30
-  drillSpherePrefab: {fileID: 0}
   digDistance: 4
   digRadius: 3
   digDepth: 0.2
+  sprintDigDepth: 0.4
+  _PlayerMode: {fileID: 7620607172156864347, guid: c94b039541aa54740a324f0398da259c, type: 3}
+  pathRecordDistance: 6
 --- !u!1 &4999732465524792496
 GameObject:
   m_ObjectHideFlags: 0
